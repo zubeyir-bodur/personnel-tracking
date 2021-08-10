@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "defaultProvider": "unpkg",
+  "libraries": [
+    {
+      "library": "jquery@latest",
+      "destination": "lib/jquery/"
+    },
+    {
+      "library": "bootstrap@latest",
+      "destination": "lib/bootstrap/"
+    }
+  ]
+}
