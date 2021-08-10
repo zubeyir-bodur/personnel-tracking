@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using personnel_tracking_entity;
 using personnel_tracking_webapi.Filters;
+using personnel_tracking_webapi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +15,30 @@ namespace personnel_tracking_webapi.Controllers
     [TokenCheck]
     public class AreaController : ControllerBase
     {
+        private readonly PersonnelTrackingDBContext dbContext;
+        public AreaController()
+        {
+            if (dbContext == null) dbContext = new PersonnelTrackingDBContext();
+        }
+
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok();
+            ResponseModel response = new ResponseModel();
+
+            try
+            {
+                var areaList = dbContext.Set<Area>().ToList();
+
+                response.Data = areaList;
+            }
+            catch (Exception ex)
+            {
+                response.HasError = true;
+                response.ErrorMessage = ex.Message;
+            }
+
+            return Ok(response);
         }
 
         [HttpPost]
