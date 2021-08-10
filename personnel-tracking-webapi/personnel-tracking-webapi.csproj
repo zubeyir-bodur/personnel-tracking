@@ -5,5 +5,9 @@
     <RootNamespace>personnel_tracking_webapi</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\personnel-tracking-entity\personnel-tracking-entity.csproj" />
+  </ItemGroup>
+
 
 </Project>
