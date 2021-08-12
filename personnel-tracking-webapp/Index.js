@@ -5,3 +5,6 @@
         });
     });
 });
+$(function () {
+    $("#CompanyDiv").load("Company/Index.html");
+});
