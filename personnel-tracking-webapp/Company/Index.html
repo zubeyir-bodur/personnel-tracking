@@ -1,8 +1,8 @@
-﻿<div class="row" id="container-area">
+﻿<div class="row" id="container-company">
     <div class="col-12">
         <div class="card-body">
             <div class="table-responsive">
-                <table id="table-area" class="table w-100">
+                <table id="table-company" class="table w-100">
                     <thead>
                         <tr>
                             <td>Sıra No</td>
@@ -10,6 +10,7 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <!--to do: read from the response model-->
                         <tr>
                             <td>1</td>
                             <td>Test</td>
@@ -20,3 +21,12 @@
         </div>
     </div>
 </div>
+
+<script>
+    $('#table-company').DataTable({
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Turkish.json'
+        }
+    });
+
+</script>

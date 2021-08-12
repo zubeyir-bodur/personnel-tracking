@@ -1,8 +1,8 @@
-﻿<div class="row" id="container-area">
+﻿<div class="row" id="container-personneltype">
     <div class="col-12">
         <div class="card-body">
             <div class="table-responsive">
-                <table id="table-area" class="table w-100">
+                <table id="table-personneltype" class="table w-100">
                     <thead>
                         <tr>
                             <td>Sıra No</td>
@@ -20,3 +20,11 @@
         </div>
     </div>
 </div>
+
+<script>
+    $('#table-personneltype').DataTable({
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Turkish.json'
+        }
+    });
+</script>

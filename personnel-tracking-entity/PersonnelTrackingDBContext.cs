@@ -28,7 +28,7 @@ namespace personnel_tracking_entity
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Data Source=DESKTOP-24P0SDH\\SQLEXPRESS;Initial Catalog=PersonelTakipDB;Integrated Security=True;MultipleActiveResultSets=True");
+                optionsBuilder.UseSqlServer("Data Source=DESKTOP-24P0SDH\\SQLEXPRESS;Initial Catalog=PersonnelTrackingDB;Integrated Security=True;MultipleActiveResultSets=True");
             }
         }
 

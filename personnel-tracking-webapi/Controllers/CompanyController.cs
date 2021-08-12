@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace personnel_tracking_webapi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/company")]
     [ApiController]
     [TokenCheck]
-    public class CompanyController : Controller
+    public class CompanyController : ControllerBase
     {
         private readonly PersonnelTrackingDBContext dbContext;
         public CompanyController()
@@ -26,6 +26,7 @@ namespace personnel_tracking_webapi.Controllers
         /// Gets all companies to show to the admin
         /// </summary>
         /// <returns></returns>
+        /// GET: http://localhost:5000/api/company
         [HttpGet]
         public IActionResult Get()
         {
@@ -51,7 +52,6 @@ namespace personnel_tracking_webapi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Route("{id}")]
         public async Task<IActionResult> Post(Company company)
         {
             var response = new ResponseModel();
