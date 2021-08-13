@@ -3,28 +3,6 @@
         <div class="card-body">
             <div class="table-responsive">
                 <table id="table-area" class="table w-100">
-                    <thead>
-                        <tr>
-                            <td>Sıra No</td>
-                            <td>Firma Adı</td>
-                            <td>Bölge Adı</td>
-                            <td>Enlem</td>
-                            <td>Boylam</td>
-                            <td>QR Kod</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Test</td>
-                            <td>A1 2.Kat</td>
-                            <td>70.1684964894</td>
-                            <td>68.4323423091</td>
-                            <td>
-                                <img src="../img/qr-code.png" width="48" height="48" />
-                            </td>
-                        </tr>
-                    </tbody>
                 </table>
             </div>
         </div>
@@ -32,9 +10,36 @@
 </div>
 
 <script>
-    $('#table-area').DataTable({
-        language: {
-            url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Turkish.json'
+    var dataset = [];
+    $.ajax({
+        url: "http://localhost:5000/api/area",
+        headers: {
+            "Authorization": "Bearer token"
         }
+    }).done((response) => {
+        for (var i = 0; i < response.data.length; i++) {
+            var obj = response.data[i];
+            let j = 0;
+            dataset[i] = [];
+            for (var m in obj) {
+                dataset[i][j] = obj[m];
+                j++;
+            }
+        }
+        $('#table-area').DataTable({
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Turkish.json'
+            },
+            data: dataset,
+            columns: [
+                { title: "Sıra No" },
+                { title: "Firma Adı" },
+                { title: "Bölge Adı" },
+                { title: "Enlem" },
+                { title: "Boylam" },
+                { title: "QR Kod" }
+            ]
+        });
     });
+
 </script>

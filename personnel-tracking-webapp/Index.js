@@ -1,7 +1,9 @@
 ﻿$(() => {
     $(document).ready(() => {
-        $.get('Area/Index.html', (e) => {
-            $('#container-main').append(e);
+        $("#AreaPage").click(() => {
+            console.log(clicked);
+            var area = $.get('Area/Index.html');
+            $('#container-main').empty().append(area);
         });
     });
 });
