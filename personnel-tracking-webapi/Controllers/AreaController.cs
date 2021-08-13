@@ -25,9 +25,6 @@ namespace personnel_tracking_webapi.Controllers
 
             try {
                 var areaList = dbContext.Areas.Where(u => true).ToList();
-                for(int i = 0; i < areaList.Count; i++) {
-                    Console.WriteLine(areaList[i].AreaName);
-                }
                 response.Data = areaList;
             } catch (Exception ex) {
                 response.HasError = true;
@@ -36,19 +33,22 @@ namespace personnel_tracking_webapi.Controllers
 
             return Ok(response);
         }
+
         // TODO: Rearrange here later
         [HttpPost]
-        public IActionResult Post(int areaId, int companyId, string areaName, decimal latitude, decimal longitude, byte[] qrCode) {
+        public IActionResult Post(Area areaDto) {
             ResponseModel response = new ResponseModel();
 
             try {
                 Area newArea = new Area();
-                newArea.AreaId = areaId;
-                newArea.CompanyId = areaId;
-                newArea.Latitude = latitude;
-                newArea.Longitude = longitude;
-                newArea.QrCode = qrCode;
+                newArea.AreaId = areaDto.AreaId;
+                newArea.CompanyId = areaDto.CompanyId;
+                newArea.Latitude = areaDto.Latitude;
+                newArea.Longitude = areaDto.Longitude;
+                newArea.QrCode = areaDto.QrCode;
+               
                 dbContext.Add<Area>(newArea);
+               
                 response.Data = newArea;
             } catch (Exception e) {
                 response.HasError = true;
@@ -57,13 +57,20 @@ namespace personnel_tracking_webapi.Controllers
 
             return Ok(response);
         }
-        //TODO: Implement later
-        [HttpPut("{areaId}")]
-        public IActionResult Put(int areaId) {
+
+        
+        [HttpPut]
+        public IActionResult Put(Area areaDto) {
             ResponseModel response = new ResponseModel();
 
             try {
-                Area area = dbContext.Areas.Where(u => u.AreaId == areaId).FirstOrDefault();
+                Area area = dbContext.Areas.Where(u => u.AreaId == areaDto.AreaId).FirstOrDefault();
+                area.CompanyId = areaDto.CompanyId;
+                area.Latitude = areaDto.Latitude;
+                area.Longitude = areaDto.Longitude;
+                area.QrCode = areaDto.QrCode;
+                dbContext.Update<Area>(area);
+
             } catch (Exception e) {
                 response.HasError = true;
                 response.ErrorMessage = e.Message;
@@ -72,13 +79,13 @@ namespace personnel_tracking_webapi.Controllers
             return Ok(response);
         }
 
-        [HttpDelete("{areaId}")]
-        public IActionResult Delete(int areaId)
+        [HttpDelete]
+        public IActionResult Delete(Area areaDto)
         {
             ResponseModel response = new ResponseModel();
 
             try {
-                Area area = dbContext.Areas.Where(u => u.AreaId == areaId).FirstOrDefault();
+                Area area = dbContext.Areas.Where(u => u.AreaId == areaDto.AreaId).FirstOrDefault();
                 dbContext.Areas.Remove(area);
             } catch (Exception e) {
                 response.HasError = true;
