@@ -5,16 +5,10 @@
                 <table id="table-personneltype" class="table w-100">
                     <thead>
                         <tr>
-                            <td>Sıra No</td>
-                            <td>Rol Adı</td>
+                            <td>Serial No</td>
+                            <td>Role</td>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Müdür</td>
-                        </tr>
-                    </tbody>
                 </table>
             </div>
         </div>
@@ -22,9 +16,26 @@
 </div>
 
 <script>
-    $('#table-personneltype').DataTable({
-        language: {
-            url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Turkish.json'
-        }
-    });
+    $(document).ready( () => {
+        $.ajax({
+            "url": " http://localhost:5000/api/personnel-type",
+            "type": "GET",
+            "dataType": 'json',
+            "headers": { Authorization: "Bearer " + localStorage.getItem("token") },
+            "success": function (response) {
+                console.log(response);
+                $('#table-personneltype').DataTable({
+
+                    data: response.data,
+                    language: {
+                        url: 'cdn.datatables.net/plug-ins/1.10.25/i18n/English.json'
+                    },
+                    columns: [
+                        { 'data': 'personnelTypeId' },
+                        { 'data': 'personnelTypeName' }
+                    ]
+                });
+            }
+        });
+    })
 </script>

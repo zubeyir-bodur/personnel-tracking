@@ -1,8 +1,14 @@
 ﻿$(() => {
     $(document).ready(() => {
         $("#CompanyPage").click(() => {
-            var company = $.get('Company/Index.html');
-            $('#container-main').empty().append(company);
+            $.get('Company/Index.html', (obj) => {
+                $('#container-main').empty().append(obj);
+            });
+        });
+        $("#PersonnelTypePage").click(() => {
+            $.get('PersonnelType/Index.html', (obj) => {
+                $('#container-main').empty().append(obj);
+            });
         });
     });
 });
