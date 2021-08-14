@@ -13,7 +13,7 @@ namespace personnel_tracking_webapi.Controllers
 {
     [Route("api/company")]
     [ApiController]
-    [TokenCheck]
+    //[TokenCheck]
     public class CompanyController : ControllerBase
     {
         private readonly PersonnelTrackingDBContext dbContext;
@@ -33,8 +33,7 @@ namespace personnel_tracking_webapi.Controllers
             ResponseModel response = new ResponseModel();
             try
             {
-                var companyList = dbContext.Companies.ToList();
-                response.Data = companyList;
+                response.Data = dbContext.Set<Company>().Include(c => c.Areas).Include(c => c.Personnel).ToList();
             }
             catch (Exception ex)
             {
@@ -49,17 +48,11 @@ namespace personnel_tracking_webapi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Post(Company companyDto)
+        public IActionResult Post(Company company)
         {
             var response = new ResponseModel();
             try
             {
-                // dto to entity
-                var company = new Company
-                {
-                    CompanyId = companyDto.CompanyId,
-                    CompanyName = companyDto.CompanyName
-                };
                 // don't add the same company twice
                 bool exists = dbContext.Companies.
                     FirstOrDefault(c => company.CompanyName.Equals(c.CompanyName)) != null;
@@ -72,7 +65,7 @@ namespace personnel_tracking_webapi.Controllers
                 else {
                     response.HasError = true;
                     response.ErrorMessage = "Same entry already exists";
-                    response.Data = companyDto; // send back the dto
+                    response.Data = company;
                 }
                 return Ok(response);
             }
@@ -89,19 +82,14 @@ namespace personnel_tracking_webapi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut]
-        public IActionResult Put(Company companyDto)
+        public IActionResult Put(Company company)
         {
             var response = new ResponseModel();
             try
             {
-                // todo: dto integration
-                var company = new Company
-                {
-                    CompanyId = companyDto.CompanyId,
-                    CompanyName = companyDto.CompanyName
-                };
+
                 bool exists = dbContext.Companies.
-                    FirstOrDefault(c => c.CompanyId == companyDto.CompanyId) != null;
+                    FirstOrDefault(c => c.CompanyId == company.CompanyId) != null;
                 if (exists)
                 {
                     dbContext.Update(company);
