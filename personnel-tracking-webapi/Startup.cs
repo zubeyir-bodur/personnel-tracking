@@ -27,7 +27,7 @@ namespace personnel_tracking_webapi
         {
             services.AddControllers().AddNewtonsoftJson(options => 
                 options.SerializerSettings.ReferenceLoopHandling = 
-                Newtonsoft.Json.ReferenceLoopHandling.Error);
+                Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddCors(policy => policy.AddDefaultPolicy(options => {
                 options.AllowCredentials().AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowed(origin => true);
             }));
