@@ -5,26 +5,36 @@
                 <table id="table-company" class="table w-100">
                     <thead>
                         <tr>
-                            <td>Sıra No</td>
-                            <td>Firma Adı</td>
+                            <td>Serial No</td>
+                            <td>Company Name</td>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!--to do: read from the response model-->
-                        <tr>
-                            <td>1</td>
-                            <td>Test</td>
-                        </tr>
-                    </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
 <script>
-    $('#table-company').DataTable({
-        language: {
-            url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Turkish.json'
-        }
-    });
+    $(document).ready(() => {
+        $.ajax({
+            "url": " http://localhost:5000/api/company",
+            "type": "GET",
+            "dataType": 'json',
+            "headers": { Authorization: "Bearer " + localStorage.getItem("token") },
+            "success": function (response) {
+                console.log(response);
+                $('#table-company').DataTable( {
+
+                    data: response.data,
+                    language: {
+                        url: 'cdn.datatables.net/plug-ins/1.10.25/i18n/English.json'
+                    },
+                    columns: [
+                        { 'data': 'companyId' },
+                        { 'data': 'companyName' },
+                    ]
+                });
+            }
+        });
+    })
 </script>
