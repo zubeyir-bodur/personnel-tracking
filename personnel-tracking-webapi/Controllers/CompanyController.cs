@@ -31,7 +31,6 @@ namespace personnel_tracking_webapi.Controllers
         public IActionResult Get()
         {
             ResponseModel response = new ResponseModel();
-
             try
             {
                 var companyList = dbContext.Companies.ToList();
@@ -42,31 +41,47 @@ namespace personnel_tracking_webapi.Controllers
                 response.HasError = true;
                 response.ErrorMessage = ex.Message;
             }
-
             return Ok(response);
         }
 
         /// <summary>
-        /// Registers a company to the table, provided that
-        /// Form is submitted from the frontend
+        /// Registers a company to the table
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> Post(Company company)
+        public IActionResult Post(Company companyDto)
         {
             var response = new ResponseModel();
             try
             {
-                dbContext.Add(company);
-                await dbContext.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                // dto to entity
+                var company = new Company
+                {
+                    CompanyId = companyDto.CompanyId,
+                    CompanyName = companyDto.CompanyName
+                };
+                // don't add the same company twice
+                bool exists = dbContext.Companies.
+                    FirstOrDefault(c => company.CompanyName.Equals(c.CompanyName)) != null;
+                if (!exists)
+                {
+                    dbContext.Add(company);
+                    dbContext.SaveChanges();
+                    response.Data = company;
+                }
+                else {
+                    response.HasError = true;
+                    response.ErrorMessage = "Same entry already exists";
+                    response.Data = companyDto; // send back the dto
+                }
+                return Ok(response);
             }
             catch (Exception ex)
             {
                 response.HasError = true;
                 response.ErrorMessage = ex.Message;
+                return NotFound(response);
             }
-            return Ok(response);
         }
 
         /// <summary>
@@ -74,15 +89,30 @@ namespace personnel_tracking_webapi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut]
-        [Route("{id}")]
-        public async Task<IActionResult> Put(Company company)
+        public IActionResult Put(Company companyDto)
         {
             var response = new ResponseModel();
             try
             {
-                dbContext.Update(company);
-                await dbContext.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                // todo: dto integration
+                var company = new Company
+                {
+                    CompanyId = companyDto.CompanyId,
+                    CompanyName = companyDto.CompanyName
+                };
+                bool exists = dbContext.Companies.
+                    FirstOrDefault(c => c.CompanyId == companyDto.CompanyId) != null;
+                if (exists)
+                {
+                    dbContext.Update(company);
+                    dbContext.SaveChanges();
+                    response.Data = company;
+                }
+                else {
+                    response.HasError = true;
+                    response.ErrorMessage = "Company edit error";
+                }
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -96,9 +126,8 @@ namespace personnel_tracking_webapi.Controllers
         /// Checks if the id is valid and asks user's permission to delete
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
-        [Route("{id}")]
-        public async Task<IActionResult> Delete(int? id)
+        [HttpDelete]
+        public IActionResult Delete(int? id)
         {
             var response = new ResponseModel();
             if (id == null)
@@ -109,7 +138,7 @@ namespace personnel_tracking_webapi.Controllers
             }
             try
             {
-                var company = await dbContext.Companies.FirstOrDefaultAsync(c => c.CompanyId == id);
+                var company = dbContext.Companies.FirstOrDefault(c => c.CompanyId == id);
                 if (company == null)
                 {
                     response.HasError = true;
@@ -117,6 +146,8 @@ namespace personnel_tracking_webapi.Controllers
                     return NotFound(response);
                 }
                 response.Data = company; // company to be deleted is valid
+                dbContext.Remove(company);
+                dbContext.SaveChanges();
                 response.HasError = false;
             }
             catch (Exception ex) {
@@ -124,19 +155,6 @@ namespace personnel_tracking_webapi.Controllers
                 response.ErrorMessage = ex.Message;
             }
             return Ok(response);
-        }
-
-        /// <summary>
-        /// With the deletion confirmed, deletes the company and returns the index
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpDelete]
-        public async Task<IActionResult> DeleteConfirmed(int id) {
-            var company = await dbContext.Companies.FindAsync(id);
-            dbContext.Companies.Remove(company);
-            await dbContext.SaveChangesAsync();
-            return RedirectToAction(nameof(Get));
         }
     }
 }

@@ -1,7 +1,8 @@
 ﻿$(() => {
     $(document).ready(() => {
-        $.get('Area/Index.html', (e) => {
-            $('#container-main').append(e);
+        $("#CompanyPage").click(() => {
+            var company = $.get('Company/Index.html');
+            $('#container-main').empty().append(company);
         });
     });
 });

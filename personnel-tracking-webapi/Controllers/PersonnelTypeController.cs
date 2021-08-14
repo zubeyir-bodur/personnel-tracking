@@ -31,7 +31,6 @@ namespace personnel_tracking_webapi.Controllers
         public IActionResult Get()
         {
             ResponseModel response = new ResponseModel();
-
             try
             {
                 var ptList = dbContext.PersonnelTypes.ToList();
@@ -42,7 +41,6 @@ namespace personnel_tracking_webapi.Controllers
                 response.HasError = true;
                 response.ErrorMessage = ex.Message;
             }
-
             return Ok(response);
         }
     }
