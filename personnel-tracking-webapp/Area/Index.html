@@ -1,10 +1,5 @@
-﻿
-
-<div class="row" id="container-area">
+﻿<div class="row" id="container-area">
     <div class="col-12">
-        
-        <div id="qrcode"></div>
-
         <br />
         <button type="button" class="btn btn-primary" id="create-button">
             Create
@@ -39,8 +34,7 @@
                             </div>
                             <div class="form-group">
                                 <br />
-                                <label for="qr-code">QR Code Image</label>
-                                <input type="file" class="form-control-file" id="qr-code">
+                                <p> QR Code will be created after you submitted.</p>
                             </div>
 
                         </form>
@@ -52,6 +46,36 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="qr-code-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="QRCode-title">QR Code:</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <img id="qr-code-img" class="rounded mx-auto d-block">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="print-code-button">Print</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="loading-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p  class="text-lg-center">Loading</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <div class="modal fade" id="edit-data-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -81,12 +105,6 @@
                                 <label for="longitude-input-edit">Longitude</label>
                                 <input type="number" class="form-control" id="longitude-input-edit" step=".000000000001">
                             </div>
-                            <div class="form-group">
-                                <br />
-                                <label for="qr-code-edit">QR Code Image</label>
-                                <input type="file" class="form-control-file" id="qr-code-edit">
-                            </div>
-
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -121,6 +139,7 @@
                 </table>
             </div>
         </div>
+        <div id="qr-code" style="display: none"></div>
     </div>
 </div>
 
@@ -128,41 +147,22 @@
     // TODO: Companies list at create table
     // QR Code configuration
 
-    function generateQRCode() {
-
-        var code = new QRCode(document.getElementById("qrcode"), JSON.stringify ({
-                "src": "Images/Sun.png",
-                "name": "sun1",
-                "hOffset": 250,
-                "vOffset": 250,
-                "alignment": "center"
-            },
-        ));
-        return code;
-    }
-    var code = generateQRCode();
-
-
-
-    var p;
-    var canvas = document.createElement("canvas");
-    var img1 = code._oDrawing._elImage;
-
-    function getBase64Image() {
-        canvas.width = img1.width;
-        canvas.height = img1.height;
-        var ctx = canvas.getContext("2d");
-        ctx.drawImage(img1, 0, 0);
-        var dataURL = canvas.toDataURL("image/png");
-        alert("from getbase64 function" + dataURL);
-        return dataURL;
-    } 
-
-
-
-
     var companyList;
-    ConfigurateCompanyList();
+
+    initialize();
+
+    function initialize() {
+        constructTable();
+        ConfigurateCompanyList();
+    }
+
+
+    function generateQRCode(values) {
+        return code = new QRCode(document.getElementById("qr-code"), JSON.stringify (values));
+    }
+
+    // Print function
+
 
     $('#submit-button').click(() => {
         console.log("submit-button-create")
@@ -174,23 +174,15 @@
             var area = $("#area-input").val();
             var latitude = $("#latitude-input").val();
             var longitude = $("#longitude-input").val();
-            var qr_code = $("#qr-code").val();
             var values = {
                 company: company,
                 area: area,
                 latitude: parseFloat(latitude),
                 longitude: parseFloat(longitude),
-                //qr_code: qr_code
             }
-
-            //var image = new Image();
-            //image.src = getBase64Image();
-            //document.body.appendChild(image);
-
-            console.log(values);
-            sendData(values);
-
             $('#create-data-modal').modal('hide');
+            $('#loading-modal').modal('show');
+            openCodeModal(values);
         });
     }); 
 
@@ -198,7 +190,26 @@
         $('#create-data-modal').modal('show');
     })
 
-    constructTable();
+    function openCodeModal(values) {
+        var code = generateQRCode(values);
+        let dataUrl;        
+        setTimeout(() => {
+            $('#loading-modal').modal('hide');
+            $("#qr-code-modal").modal('show');
+            dataUrl = code._oDrawing._elImage.src;
+            $("#qr-code-img").attr('src', dataUrl);
+            var newVal = {
+                company: values.company,
+                area: values.area,
+                latitude: values.latitude,
+                longitude: values.longitude,
+                qr_code: dataUrl
+            }
+            sendData(newVal);
+        }, 2000);
+
+    }
+
 
     function constructTable() {
         $.ajax({
@@ -224,13 +235,14 @@
                 "columnDefs": [{
                     "targets": -1,
                     "data": null,
-                    "defaultContent": "<button id='edit-button'>Edit</button> <button id='delete-button'>Delete</button>"
+                    "defaultContent": "<img id='row-img' src='' width='50px'> <button style='margin-left:50px' class='btn btn-primary' id='edit-button'>Edit</button> <button style='margin-right:-120px' class='btn btn-secondary' id='delete-button'>Delete</button>"
                 }]
             });
             console.log(dataset);
             return dataset;
         });
     }
+
     var seletected_area_id;
     $('#table-area').on('click', '#edit-button', function () {
         var datatable = $('#table-area').DataTable();
@@ -254,14 +266,12 @@
             var area = $("#area-input-edit").val();
             var latitude = $("#latitude-input-edit").val();
             var longitude = $("#longitude-input-edit").val();
-            // var qr_code = $("#qr-code").val();
             var values = {
                 areaId: seletected_area_id,
                 company: company,
                 area: area,
                 latitude: parseFloat(latitude),
                 longitude: parseFloat(longitude),
-                //qr_code: qr_code
             }
 
             console.log(values);

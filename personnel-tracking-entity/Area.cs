@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
@@ -18,8 +19,9 @@ namespace personnel_tracking_entity
         public decimal Latitude { get; set; }
         public decimal Longitude { get; set; }
         public byte[] QrCode { get; set; }
-
+        [JsonIgnore]
         public virtual Company Company { get; set; }
+        [JsonIgnore]
         public virtual ICollection<Tracking> Trackings { get; set; }
     }
 }

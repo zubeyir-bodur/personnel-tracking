@@ -52,6 +52,8 @@ namespace personnel_tracking_webapi.Controllers
             Console.WriteLine(areaDto.company);
             Console.WriteLine(areaDto.latitude);
             Console.WriteLine(areaDto.longitude);
+            Console.WriteLine(areaDto.qr_code);
+            
             try {
                 Area newArea = new Area();
                 Company company = dbContext.Companies.Where<Company>(u => u.CompanyName == areaDto.company).FirstOrDefault();
@@ -72,7 +74,17 @@ namespace personnel_tracking_webapi.Controllers
                 Console.WriteLine(dbContext.Areas.Where(u => true).ToList()[i].AreaName);
                 Console.WriteLine(".");
             }
-            response.Data = dbContext.Areas.ToList();
+
+
+
+            response.Data = dbContext.Areas.Select(u => new { 
+                u.AreaId,
+                u.AreaName,
+                u.CompanyId,
+                u.Latitude,
+                u.Longitude,
+                u.QrCode
+            }).ToList(); 
             return Ok(response);
         }
 
@@ -88,7 +100,7 @@ namespace personnel_tracking_webapi.Controllers
                 area.CompanyId = company.CompanyId;
                 area.Latitude = Convert.ToDecimal(areaDto.latitude);
                 area.Longitude = Convert.ToDecimal(areaDto.longitude);
-          //      area.QrCode = areaDto.QrCode;
+                
                 dbContext.Update<Area>(area);
 
             } catch (Exception e) {
@@ -96,14 +108,21 @@ namespace personnel_tracking_webapi.Controllers
                 response.ErrorMessage = e.Message;
             }
 
-            Console.WriteLine("Affected row number is " + dbContext.SaveChanges());
+         //   Console.WriteLine("Affected row number is " + dbContext.SaveChanges());
             Console.WriteLine("******");
             for (int i = 0; i < dbContext.Areas.ToList().Count; i++) {
                 Console.WriteLine(dbContext.Areas.Where(u => true).ToList()[i].AreaName);
                 Console.WriteLine(".");
             }
 
-            response.Data = dbContext.Areas.ToList();
+            response.Data = dbContext.Areas.Select(u => new {
+                u.AreaId,
+                u.AreaName,
+                u.CompanyId,
+                u.Latitude,
+                u.Longitude,
+                u.QrCode
+            }).ToList();
             return Ok(response);
         }
 
@@ -126,7 +145,14 @@ namespace personnel_tracking_webapi.Controllers
                 Console.WriteLine(".");
             }
 
-            response.Data = dbContext.Areas.ToList();
+            response.Data = dbContext.Areas.Select(u => new {
+                u.AreaId,
+                u.AreaName,
+                u.CompanyId,
+                u.Latitude,
+                u.Longitude,
+                u.QrCode
+            }).ToList();
             return Ok(response);
         }
         
@@ -148,6 +174,6 @@ namespace personnel_tracking_webapi.Controllers
         public string area { get; set; }
         public double latitude { get; set; }
         public double longitude { get; set; }
-        //Add qr code
+        public string qr_code { get; set; }
     }
 }
