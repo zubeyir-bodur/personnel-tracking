@@ -1,5 +1,120 @@
-﻿<div class="row" id="container-area">
+﻿
+
+<div class="row" id="container-area">
     <div class="col-12">
+        
+        <div id="qrcode"></div>
+
+        <br />
+        <button type="button" class="btn btn-primary" id="create-button">
+            Create
+        </button>
+
+        <div class="modal fade" id="create-data-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Create new area</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="create-form">
+                            <div class="form-group">
+                                <label for="company-input">Companies</label>
+                                <select class="form-control" id="company-input">
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="area-input">Area Name</label>
+                                <input type="text" class="form-control" id="area-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="latitude-input">Latitude</label>
+                                <input type="number" class="form-control" id="latitude-input" step=".000000000001">
+                            </div>
+                            <div class="form-group">
+                                <label for="longitude-input">Longitude</label>
+                                <input type="number" class="form-control" id="longitude-input" step=".000000000001">
+                            </div>
+                            <div class="form-group">
+                                <br />
+                                <label for="qr-code">QR Code Image</label>
+                                <input type="file" class="form-control-file" id="qr-code">
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="submit-button" form="create-form">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="edit-data-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">
+                            Edit area:<h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-form">
+                            <div class="form-group">
+                                <label for="company-input">Companies</label>
+                                <select class="form-control" id="company-input-edit">
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="area-input-edit">Area Name</label>
+                                <input type="text" class="form-control" id="area-input-edit">
+                            </div>
+                            <div class="form-group">
+                                <label for="latitude-input-edit">Latitude</label>
+                                <input type="number" class="form-control" id="latitude-input-edit" step=".000000000001">
+                            </div>
+                            <div class="form-group">
+                                <label for="longitude-input-edit">Longitude</label>
+                                <input type="number" class="form-control" id="longitude-input-edit" step=".000000000001">
+                            </div>
+                            <div class="form-group">
+                                <br />
+                                <label for="qr-code-edit">QR Code Image</label>
+                                <input type="file" class="form-control-file" id="qr-code-edit">
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="submit-button-edit" form="edit-form">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="delete-data-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Create new area</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure to delete this area?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
+                        <a class="btn btn-danger btn-ok" id="submit-button-delete">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card-body">
             <div class="table-responsive">
                 <table id="table-area" class="table w-100">
@@ -10,15 +125,229 @@
 </div>
 
 <script>
-    var dataset = [];
-    $.ajax({
-        url: "http://localhost:5000/api/area",
-        headers: {
-            "Authorization": "Bearer token"
-        }
-    }).done((response) => {
-        for (var i = 0; i < response.data.length; i++) {
-            var obj = response.data[i];
+    // TODO: Companies list at create table
+    // QR Code configuration
+
+    function generateQRCode() {
+
+        var code = new QRCode(document.getElementById("qrcode"), JSON.stringify ({
+                "src": "Images/Sun.png",
+                "name": "sun1",
+                "hOffset": 250,
+                "vOffset": 250,
+                "alignment": "center"
+            },
+        ));
+        return code;
+    }
+    var code = generateQRCode();
+
+
+
+    var p;
+    var canvas = document.createElement("canvas");
+    var img1 = code._oDrawing._elImage;
+
+    function getBase64Image() {
+        canvas.width = img1.width;
+        canvas.height = img1.height;
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img1, 0, 0);
+        var dataURL = canvas.toDataURL("image/png");
+        alert("from getbase64 function" + dataURL);
+        return dataURL;
+    } 
+
+
+
+
+    var companyList;
+    ConfigurateCompanyList();
+
+    $('#submit-button').click(() => {
+        console.log("submit-button-create")
+        var form = document.getElementById("create-form");
+        form.addEventListener('submit', (e) => {
+
+            e.preventDefault();
+            var company = $('#company-input').val();
+            var area = $("#area-input").val();
+            var latitude = $("#latitude-input").val();
+            var longitude = $("#longitude-input").val();
+            var qr_code = $("#qr-code").val();
+            var values = {
+                company: company,
+                area: area,
+                latitude: parseFloat(latitude),
+                longitude: parseFloat(longitude),
+                //qr_code: qr_code
+            }
+
+            //var image = new Image();
+            //image.src = getBase64Image();
+            //document.body.appendChild(image);
+
+            console.log(values);
+            sendData(values);
+
+            $('#create-data-modal').modal('hide');
+        });
+    }); 
+
+    $("#create-button").click(() => {
+        $('#create-data-modal').modal('show');
+    })
+
+    constructTable();
+
+    function constructTable() {
+        $.ajax({
+            url: "http://localhost:5000/api/area",
+            headers: {
+                "Authorization": "Bearer token"
+            }
+        }).done((response) => {
+            var dataset = JsonTo2DArray(response);
+            $('#table-area').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Turkish.json'
+                },
+                data: dataset,
+                columns: [
+                    { title: "Sıra No" },
+                    { title: "Firma Adı" },
+                    { title: "Bölge Adı" },
+                    { title: "Enlem" },
+                    { title: "Boylam" },
+                    { title: "QR Kod" }
+                ],
+                "columnDefs": [{
+                    "targets": -1,
+                    "data": null,
+                    "defaultContent": "<button id='edit-button'>Edit</button> <button id='delete-button'>Delete</button>"
+                }]
+            });
+            console.log(dataset);
+            return dataset;
+        });
+    }
+    var seletected_area_id;
+    $('#table-area').on('click', '#edit-button', function () {
+        var datatable = $('#table-area').DataTable();
+        var data = datatable.row($(this).parents('tr')).data();
+        seletected_area_id = data[0];
+        $('#company-input-edit').val(data[1]);
+        $('#area-input-edit').val(data[2]);
+        $('#latitude-input-edit').val(data[3]);
+        $('#longitude-input-edit').val(data[4]);
+        $("#edit-data-modal").modal('show');
+    });
+
+    $("#submit-button-edit").click(() => {
+        console.log("submit-button-edit")
+        var form = document.getElementById("edit-form");
+        form.addEventListener('submit', (e) => {
+
+            e.preventDefault();
+
+            var company = $('#company-input-edit').val();
+            var area = $("#area-input-edit").val();
+            var latitude = $("#latitude-input-edit").val();
+            var longitude = $("#longitude-input-edit").val();
+            // var qr_code = $("#qr-code").val();
+            var values = {
+                areaId: seletected_area_id,
+                company: company,
+                area: area,
+                latitude: parseFloat(latitude),
+                longitude: parseFloat(longitude),
+                //qr_code: qr_code
+            }
+
+            console.log(values);
+            updateValue(values);
+
+            $('#edit-data-modal').modal('hide');
+        });
+    });
+
+
+    $('#table-area').on('click', '#delete-button', function () {
+        var datatable = $('#table-area').DataTable();
+        var data = datatable.row($(this).parents('tr')).data();
+        seletected_area_id = data[0];
+        $("#delete-data-modal").modal('show');
+    });
+
+    $('#submit-button-delete').click(() => {
+        var values = {
+            areaId: seletected_area_id
+        };
+        console.log(values);
+        deleteValue(values);
+
+        $('#delete-data-modal').modal('hide');
+
+    })
+
+
+    function deleteValue(values) {
+        var settings = {
+            "url": "http://localhost:5000/api/area",
+            "method": "DELETE",
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer token"
+            },
+            "data": JSON.stringify(values),
+        };
+        $.ajax(settings).done((response) => {
+            var newData = JsonTo2DArray(response);
+            var datatable = $('#table-area').DataTable();
+            datatable.clear().rows.add(newData).draw();
+        });
+    }
+
+    function updateValue(values) {
+        var settings = {
+            "url": "http://localhost:5000/api/area",
+            "method": "PUT",
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer token"
+            },
+            "data": JSON.stringify(values),
+        };
+        $.ajax(settings).done((response) => {
+            var newData = JsonTo2DArray(response);
+            var datatable = $('#table-area').DataTable();
+            datatable.clear().rows.add(newData).draw();
+        });
+    }
+
+
+    function sendData(values) {
+        var settings = {
+            "url": "http://localhost:5000/api/area",
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer token"
+            },
+            "data": JSON.stringify(values),
+        };
+
+        $.ajax(settings).done((response) => {
+            var newData = JsonTo2DArray(response);
+            var datatable = $('#table-area').DataTable();
+            datatable.clear().rows.add(newData).draw();
+        });
+    }
+
+    function JsonTo2DArray(json) {
+        var dataset = [];
+        for (var i = 0; i < json.data.length; i++) {
+            var obj = json.data[i];
             let j = 0;
             dataset[i] = [];
             for (var m in obj) {
@@ -26,20 +355,22 @@
                 j++;
             }
         }
-        $('#table-area').DataTable({
-            language: {
-                url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Turkish.json'
-            },
-            data: dataset,
-            columns: [
-                { title: "Sıra No" },
-                { title: "Firma Adı" },
-                { title: "Bölge Adı" },
-                { title: "Enlem" },
-                { title: "Boylam" },
-                { title: "QR Kod" }
-            ]
-        });
-    });
+        return dataset;
+    }
+
+    function ConfigurateCompanyList() {
+        $.ajax({
+            url: "http://localhost:5000/api/company",
+            headers: {
+                "Authorization": "Bearer token"
+            }
+        }).done((response) => {
+            for (var i = 0; i < response.data.length; i++) {
+                $("#company-input").append(`<option>${response.data[i].companyName}</option>`);
+                $("#company-input-edit").append(`<option>${response.data[i].companyName}</option>`);
+            }   
+        })
+    }
+
 
 </script>

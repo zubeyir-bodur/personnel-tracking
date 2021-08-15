@@ -24,51 +24,71 @@ namespace personnel_tracking_webapi.Controllers
             ResponseModel response = new ResponseModel();
 
             try {
-                var areaList = dbContext.Areas.Where(u => true).ToList();
-                response.Data = areaList;
+                var areaList = dbContext.Areas.ToList();
+                var areaDTOList = new List<AreaDTO>();
+                for(int i = 0; i < areaList.Count; i++) {
+                    areaDTOList.Add(new AreaDTO {
+                        areaId = areaList[i].AreaId,
+                        area = areaList[i].AreaName,
+                        company = dbContext.Companies.Where(u => u.CompanyId == areaList[i].CompanyId).FirstOrDefault().CompanyName,
+                        latitude = Convert.ToDouble(areaList[i].Latitude),
+                        longitude = Convert.ToDouble(areaList[i].Longitude)
+                    });
+                }
+                response.Data = areaDTOList;
             } catch (Exception ex) {
                 response.HasError = true;
                 response.ErrorMessage = ex.Message;
             }
-
+            Console.WriteLine("Get");
             return Ok(response);
         }
 
         // TODO: Rearrange here later
         [HttpPost]
-        public IActionResult Post(Area areaDto) {
+        public IActionResult Post([FromBody]AreaDTO areaDto) {
             ResponseModel response = new ResponseModel();
-
+            Console.WriteLine(areaDto.area);
+            Console.WriteLine(areaDto.company);
+            Console.WriteLine(areaDto.latitude);
+            Console.WriteLine(areaDto.longitude);
             try {
                 Area newArea = new Area();
-                newArea.AreaId = areaDto.AreaId;
-                newArea.CompanyId = areaDto.CompanyId;
-                newArea.Latitude = areaDto.Latitude;
-                newArea.Longitude = areaDto.Longitude;
-                newArea.QrCode = areaDto.QrCode;
-               
+                Company company = dbContext.Companies.Where<Company>(u => u.CompanyName == areaDto.company).FirstOrDefault();
+                newArea.AreaName = areaDto.area;
+                newArea.CompanyId = company.CompanyId;
+                
+                newArea.Latitude = Convert.ToDecimal(areaDto.latitude);
+                newArea.Longitude = Convert.ToDecimal(areaDto.longitude);
+
                 dbContext.Add<Area>(newArea);
-               
-                response.Data = newArea;
             } catch (Exception e) {
                 response.HasError = true;
                 response.ErrorMessage = e.Message;
             }
-
+            Console.WriteLine("Affected row number is " + dbContext.SaveChanges());
+            Console.WriteLine("******");
+            for(int i = 0; i < dbContext.Areas.ToList().Count; i++) {
+                Console.WriteLine(dbContext.Areas.Where(u => true).ToList()[i].AreaName);
+                Console.WriteLine(".");
+            }
+            response.Data = dbContext.Areas.ToList();
             return Ok(response);
         }
 
         
         [HttpPut]
-        public IActionResult Put(Area areaDto) {
+        public IActionResult Put(AreaDTO areaDto) {
             ResponseModel response = new ResponseModel();
 
             try {
-                Area area = dbContext.Areas.Where(u => u.AreaId == areaDto.AreaId).FirstOrDefault();
-                area.CompanyId = areaDto.CompanyId;
-                area.Latitude = areaDto.Latitude;
-                area.Longitude = areaDto.Longitude;
-                area.QrCode = areaDto.QrCode;
+                Area area = dbContext.Areas.Where(u => u.AreaId == areaDto.areaId).FirstOrDefault();
+                Company company = dbContext.Companies.Where<Company>(u => u.CompanyName == areaDto.company).FirstOrDefault();
+                area.AreaName = areaDto.area;
+                area.CompanyId = company.CompanyId;
+                area.Latitude = Convert.ToDecimal(areaDto.latitude);
+                area.Longitude = Convert.ToDecimal(areaDto.longitude);
+          //      area.QrCode = areaDto.QrCode;
                 dbContext.Update<Area>(area);
 
             } catch (Exception e) {
@@ -76,22 +96,37 @@ namespace personnel_tracking_webapi.Controllers
                 response.ErrorMessage = e.Message;
             }
 
+            Console.WriteLine("Affected row number is " + dbContext.SaveChanges());
+            Console.WriteLine("******");
+            for (int i = 0; i < dbContext.Areas.ToList().Count; i++) {
+                Console.WriteLine(dbContext.Areas.Where(u => true).ToList()[i].AreaName);
+                Console.WriteLine(".");
+            }
+
+            response.Data = dbContext.Areas.ToList();
             return Ok(response);
         }
 
         [HttpDelete]
-        public IActionResult Delete(Area areaDto)
+        public IActionResult Delete(AreaDTO areaDto)
         {
             ResponseModel response = new ResponseModel();
 
             try {
-                Area area = dbContext.Areas.Where(u => u.AreaId == areaDto.AreaId).FirstOrDefault();
+                Area area = dbContext.Areas.Where(u => u.AreaId == areaDto.areaId).FirstOrDefault();
                 dbContext.Areas.Remove(area);
             } catch (Exception e) {
                 response.HasError = true;
                 response.ErrorMessage = e.Message;
             }
+            Console.WriteLine("Affected row number is " + dbContext.SaveChanges());
+            Console.WriteLine("******");
+            for (int i = 0; i < dbContext.Areas.ToList().Count; i++) {
+                Console.WriteLine(dbContext.Areas.Where(u => true).ToList()[i].AreaName);
+                Console.WriteLine(".");
+            }
 
+            response.Data = dbContext.Areas.ToList();
             return Ok(response);
         }
         
@@ -106,5 +141,13 @@ namespace personnel_tracking_webapi.Controllers
 
             return Ok(response);
         }
+    }
+    public class AreaDTO {
+        public int areaId { get; set; }
+        public string company { get; set; }
+        public string area { get; set; }
+        public double latitude { get; set; }
+        public double longitude { get; set; }
+        //Add qr code
     }
 }

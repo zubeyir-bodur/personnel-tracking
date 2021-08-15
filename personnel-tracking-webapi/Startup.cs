@@ -39,7 +39,8 @@ namespace personnel_tracking_webapi
             }
             app.UseCors();
             app.UseRouting();
-
+           
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

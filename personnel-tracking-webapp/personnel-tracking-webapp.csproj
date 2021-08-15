@@ -70,6 +70,7 @@
     <Content Include="Area\index.js" />
     <Content Include="img\brand.png" />
     <Content Include="img\qr-code.png" />
+    <Content Include="lib\datatables\buttons.dataTables.min.css" />
     <Content Include="lib\datatables\DataTables-1.10.25\css\dataTables.bootstrap.css" />
     <Content Include="lib\datatables\DataTables-1.10.25\css\dataTables.bootstrap.min.css" />
     <Content Include="lib\datatables\DataTables-1.10.25\css\dataTables.bootstrap4.css" />
@@ -111,10 +112,13 @@
     <Content Include="lib\datatables\DataTables-1.10.25\js\dataTables.semanticui.min.js" />
     <Content Include="lib\datatables\DataTables-1.10.25\js\jquery.dataTables.js" />
     <Content Include="lib\datatables\DataTables-1.10.25\js\jquery.dataTables.min.js" />
+    <Content Include="lib\datatables\dataTables.buttons.min.js" />
     <Content Include="lib\datatables\datatables.css" />
     <Content Include="lib\datatables\datatables.js" />
     <Content Include="lib\datatables\datatables.min.css" />
     <Content Include="lib\datatables\datatables.min.js" />
+    <Content Include="lib\qrcode\qrcode.js" />
+    <Content Include="lib\qrcode\qrcode.min.js" />
     <Content Include="Tracking\Index.html" />
     <Content Include="Tracking\Index.js" />
     <Content Include="PersonnelType\Index.html" />
@@ -441,6 +445,7 @@
     <Content Include="lib\bootstrap\scss\bootstrap-reboot.scss" />
     <Content Include="lib\bootstrap\scss\bootstrap-utilities.scss" />
     <Content Include="lib\bootstrap\scss\bootstrap.scss" />
+    <Content Include="lib\datatables\EF.Reverse.POCO.v3.ttinclude" />
     <None Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -449,6 +454,7 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
