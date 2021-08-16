@@ -25,24 +25,28 @@
                 }
             }).done((response) => {
                 var dataset = JsonTo2DArray(response);
-                $('#table-personnel').DataTable({
+                var t = $('#table-personnel').DataTable({
                  
                     data: dataset,
                     columns: [
+
                         { title: "#" },
                         { title: "Personnel id" },
                         { title: "Company id" },
                         { title: "Personel type" },
                         { title: "identity" },
                         { title: "Name" },
-                        { title: "Surname" }
+                        { title: "Surname" },
+                        { title: "actions" }
                     ],
                     "columnDefs": [{
                         "targets": -1,
                         "data": null,
                         "defaultContent": "<button id='edit-button'>Edit</button> <button id='delete-button'>Delete</button>"
                     }]
+             
                 });
+          
                 alert(dataset);
                 return dataset;
             });
@@ -54,8 +58,15 @@
                 var obj = json.data[i];
                 let j = 0;
                 dataset[i] = [];
+
+                //Need to find a better way to do this
+                dataset[i][0] = i + 1;
+                j++;
+
                 for (var m in obj) {
-                    dataset[i][j] = obj[m];
+                    
+                        dataset[i][j] = obj[m];
+                  
                     j++;
                 }
             }

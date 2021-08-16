@@ -41,8 +41,7 @@ namespace personnel_tracking_webapi.Controllers
                         IdentityNumber = personnelList[i].IdentityNumber,
                         PersonnelName = personnelList[i].PersonnelName,
                         PersonnelSurname = personnelList[i].PersonnelSurname,
-                        UserName = personnelList[i].UserName,
-                        Password = personnelList[i].Password,
+                    
                         //Need to actually get the company and the tracking not just the ids
 
 
@@ -72,8 +71,7 @@ namespace personnel_tracking_webapi.Controllers
                 newPersonnel.IdentityNumber = personnelDTO.IdentityNumber;
                 newPersonnel.PersonnelName = personnelDTO.PersonnelName;
                 newPersonnel.PersonnelSurname = personnelDTO.PersonnelSurname;
-                newPersonnel.UserName = personnelDTO.UserName;
-                newPersonnel.Password = personnelDTO.Password;
+              
 
                 dbContext.Add<Personnel>(newPersonnel);
             }
@@ -102,8 +100,6 @@ namespace personnel_tracking_webapi.Controllers
                 personnel.IdentityNumber = personnelDTO.IdentityNumber;
                 personnel.PersonnelName = personnelDTO.PersonnelName;
                 personnel.PersonnelSurname = personnelDTO.PersonnelSurname;
-                personnel.UserName = personnelDTO.UserName;
-                personnel.Password = personnelDTO.Password;
                 dbContext.Update<Personnel>(personnel);
 
             }
@@ -147,8 +143,7 @@ namespace personnel_tracking_webapi.Controllers
         public int IdentityNumber { get; set; }
         public string PersonnelName { get; set; }
         public string PersonnelSurname { get; set; }
-        public string UserName { get; set; }
-        public string Password { get; set; }
+       
 
         //maybe add virtual ones too?
     }
