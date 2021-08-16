@@ -164,27 +164,26 @@
     // Print function
 
 
-    $('#submit-button').click(() => {
-        console.log("submit-button-create")
-        var form = document.getElementById("create-form");
-        form.addEventListener('submit', (e) => {
+    
+    var form = document.getElementById("create-form");
+    form.addEventListener('submit', (e) => {
 
-            e.preventDefault();
-            var company = $('#company-input').val();
-            var area = $("#area-input").val();
-            var latitude = $("#latitude-input").val();
-            var longitude = $("#longitude-input").val();
-            var values = {
-                company: company,
-                area: area,
-                latitude: parseFloat(latitude),
-                longitude: parseFloat(longitude),
-            }
-            $('#create-data-modal').modal('hide');
-            $('#loading-modal').modal('show');
-            openCodeModal(values);
-        });
-    }); 
+        e.preventDefault();
+        var company = $('#company-input').val();
+        var area = $("#area-input").val();
+        var latitude = $("#latitude-input").val();
+        var longitude = $("#longitude-input").val();
+        var values = {
+            company: company,
+            area: area,
+            latitude: parseFloat(latitude),
+            longitude: parseFloat(longitude),
+        }
+        $('#create-data-modal').modal('hide');
+        $('#loading-modal').modal('show');
+        openCodeModal(values);
+    });
+
 
     $("#create-button").click(() => {
         $('#create-data-modal').modal('show');
@@ -235,10 +234,11 @@
                 "columnDefs": [{
                     "targets": -1,
                     "data": null,
-                    "defaultContent": "<img id='row-img' src='' width='50px'> <button style='margin-left:50px' class='btn btn-primary' id='edit-button'>Edit</button> <button style='margin-right:-120px' class='btn btn-secondary' id='delete-button'>Delete</button>"
+                    "render": function (data, type, row, meta) {
+                        return `<img id='row-img' src='data:image/png;base64,${data[5]}' width='50px'> <button style='margin-left:50px' class='btn btn-primary' id='edit-button'>Edit</button> <button style='margin-right:-120px' class='btn btn-secondary' id='delete-button'>Delete</button>`;
+                    }
                 }]
             });
-            console.log(dataset);
             return dataset;
         });
     }
@@ -255,32 +255,36 @@
         $("#edit-data-modal").modal('show');
     });
 
-    $("#submit-button-edit").click(() => {
-        console.log("submit-button-edit")
-        var form = document.getElementById("edit-form");
-        form.addEventListener('submit', (e) => {
+    
+    var form = document.getElementById("edit-form");
+    form.addEventListener('submit', (e) => {
 
-            e.preventDefault();
+        e.preventDefault();
 
-            var company = $('#company-input-edit').val();
-            var area = $("#area-input-edit").val();
-            var latitude = $("#latitude-input-edit").val();
-            var longitude = $("#longitude-input-edit").val();
-            var values = {
-                areaId: seletected_area_id,
-                company: company,
-                area: area,
-                latitude: parseFloat(latitude),
-                longitude: parseFloat(longitude),
-            }
+        var company = $('#company-input-edit').val();
+        var area = $("#area-input-edit").val();
+        var latitude = $("#latitude-input-edit").val();
+        var longitude = $("#longitude-input-edit").val();
+        var values = {
+            areaId: seletected_area_id,
+            company: company,
+            area: area,
+            latitude: parseFloat(latitude),
+            longitude: parseFloat(longitude),
+        }
+        updateValue(values);
 
-            console.log(values);
-            updateValue(values);
-
-            $('#edit-data-modal').modal('hide');
-        });
+        $('#edit-data-modal').modal('hide');
     });
+   
 
+
+    
+    $('#table-area').on('click', '#row-img', function () {
+        var datatable = $('#table-area').DataTable();
+        var data = datatable.row($(this).parents('tr')).data();
+        showQRCode(data[5]);
+    });
 
     $('#table-area').on('click', '#delete-button', function () {
         var datatable = $('#table-area').DataTable();
@@ -293,14 +297,14 @@
         var values = {
             areaId: seletected_area_id
         };
-        console.log(values);
         deleteValue(values);
 
         $('#delete-data-modal').modal('hide');
 
     })
 
-
+    
+    
     function deleteValue(values) {
         var settings = {
             "url": "http://localhost:5000/api/area",
@@ -329,6 +333,7 @@
             "data": JSON.stringify(values),
         };
         $.ajax(settings).done((response) => {
+           
             var newData = JsonTo2DArray(response);
             var datatable = $('#table-area').DataTable();
             datatable.clear().rows.add(newData).draw();
@@ -382,5 +387,9 @@
         })
     }
 
+    function showQRCode(dataUrl) {
+        $("#qr-code-img").attr('src', "data:image/png;base64," + dataUrl);
+        $("#qr-code-modal").modal('show');
+    }
 
 </script>

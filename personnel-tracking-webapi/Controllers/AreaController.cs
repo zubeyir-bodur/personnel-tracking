@@ -25,35 +25,28 @@ namespace personnel_tracking_webapi.Controllers
 
             try {
                 var areaList = dbContext.Areas.ToList();
-                var areaDTOList = new List<AreaDTO>();
-                for(int i = 0; i < areaList.Count; i++) {
-                    areaDTOList.Add(new AreaDTO {
-                        areaId = areaList[i].AreaId,
-                        area = areaList[i].AreaName,
-                        company = dbContext.Companies.Where(u => u.CompanyId == areaList[i].CompanyId).FirstOrDefault().CompanyName,
-                        latitude = Convert.ToDouble(areaList[i].Latitude),
-                        longitude = Convert.ToDouble(areaList[i].Longitude)
-                    });
-                }
+                var areaDTOList = dbContext.Areas.Select(u => new {
+                    u.AreaId,
+                    u.Company.CompanyName,
+                    u.AreaName,
+                    u.Latitude,
+                    u.Longitude,
+                    u.QrCode
+                }) ;
+
                 response.Data = areaDTOList;
             } catch (Exception ex) {
                 response.HasError = true;
                 response.ErrorMessage = ex.Message;
             }
-            Console.WriteLine("Get");
             return Ok(response);
         }
 
-        // TODO: Rearrange here later
+
         [HttpPost]
         public IActionResult Post([FromBody]AreaDTO areaDto) {
             ResponseModel response = new ResponseModel();
-            Console.WriteLine(areaDto.area);
-            Console.WriteLine(areaDto.company);
-            Console.WriteLine(areaDto.latitude);
-            Console.WriteLine(areaDto.longitude);
-            Console.WriteLine(areaDto.qr_code);
-            
+
             try {
                 Area newArea = new Area();
                 Company company = dbContext.Companies.Where<Company>(u => u.CompanyName == areaDto.company).FirstOrDefault();
@@ -62,25 +55,20 @@ namespace personnel_tracking_webapi.Controllers
                 
                 newArea.Latitude = Convert.ToDecimal(areaDto.latitude);
                 newArea.Longitude = Convert.ToDecimal(areaDto.longitude);
+                newArea.QrCode = Convert.FromBase64String(areaDto.qr_code.Substring(22));
 
                 dbContext.Add<Area>(newArea);
+
             } catch (Exception e) {
                 response.HasError = true;
                 response.ErrorMessage = e.Message;
             }
             Console.WriteLine("Affected row number is " + dbContext.SaveChanges());
-            Console.WriteLine("******");
-            for(int i = 0; i < dbContext.Areas.ToList().Count; i++) {
-                Console.WriteLine(dbContext.Areas.Where(u => true).ToList()[i].AreaName);
-                Console.WriteLine(".");
-            }
 
-
-
-            response.Data = dbContext.Areas.Select(u => new { 
+            response.Data = dbContext.Areas.Select(u => new {
                 u.AreaId,
+                u.Company.CompanyName,
                 u.AreaName,
-                u.CompanyId,
                 u.Latitude,
                 u.Longitude,
                 u.QrCode
@@ -108,17 +96,12 @@ namespace personnel_tracking_webapi.Controllers
                 response.ErrorMessage = e.Message;
             }
 
-         //   Console.WriteLine("Affected row number is " + dbContext.SaveChanges());
-            Console.WriteLine("******");
-            for (int i = 0; i < dbContext.Areas.ToList().Count; i++) {
-                Console.WriteLine(dbContext.Areas.Where(u => true).ToList()[i].AreaName);
-                Console.WriteLine(".");
-            }
+            Console.WriteLine("Affected row number is " + dbContext.SaveChanges());
 
             response.Data = dbContext.Areas.Select(u => new {
                 u.AreaId,
+                u.Company.CompanyName,
                 u.AreaName,
-                u.CompanyId,
                 u.Latitude,
                 u.Longitude,
                 u.QrCode
@@ -139,16 +122,11 @@ namespace personnel_tracking_webapi.Controllers
                 response.ErrorMessage = e.Message;
             }
             Console.WriteLine("Affected row number is " + dbContext.SaveChanges());
-            Console.WriteLine("******");
-            for (int i = 0; i < dbContext.Areas.ToList().Count; i++) {
-                Console.WriteLine(dbContext.Areas.Where(u => true).ToList()[i].AreaName);
-                Console.WriteLine(".");
-            }
 
             response.Data = dbContext.Areas.Select(u => new {
                 u.AreaId,
+                u.Company.CompanyName,
                 u.AreaName,
-                u.CompanyId,
                 u.Latitude,
                 u.Longitude,
                 u.QrCode
