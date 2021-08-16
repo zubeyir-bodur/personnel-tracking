@@ -1,1 +1,106 @@
-﻿
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+</head>
+<body>
+    <link href="lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="lib/datatables/datatables.css" rel="stylesheet" />
+    <link href="lib/datatables/DataTables-1.10.25/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <script src="lib/jquery/dist/jquery.min.js"></script>
+    <script src="lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="lib/datatables/datatables.min.js"></script>
+    <script src="lib/datatables/DataTables-1.10.25/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            $.ajax({
+                "url": " http://localhost:5000/api/leave",
+                "headers": {
+                    "Authorization": "Bearer Bearer"
+                },
+                "type": "GET",
+                "datatype": 'json',
+                "success": function (response) {
+                    $('#table-leave').DataTable({
+
+                        data: response.data,
+
+                        columns: [
+                            { 'data': 'leaveId' },
+                            { 'data': 'personnelId' },
+                            { 'data': 'leaveStart' },
+                            { 'data': 'leaveEnd' },
+                            {
+                                'data': 'leaveId',
+                                "render": function (leaveId, type, full, meta) {
+                                    return '<div><button type="button" class="btn btn-primary" >Edit</button> <button type="button" class="btn btn-danger" id="deleteLeave">Delete</button></div>'
+                                }
+                            },
+
+                        ]
+                    });
+
+                }
+            });
+
+            alert("comeheree");
+            $(".btn-danger").click(function () {
+                $("#myModal").modal('show');
+            });
+
+
+        });
+
+    </script>
+    <div class="row" id="container-leave">
+        <div class="col-12">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="table-leave" class="table w-100">
+                        <thead>
+                            <tr>
+                                <th>LeaveId</th>
+                                <th>PersonnelId</th>
+                                <th>LeaveStart</th>
+                                <th>LeaveEnd</th>
+                                <th></th>
+                            </tr>
+
+                        </thead>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="bs-example">
+            <!-- Modal HTML -->
+            <div id="myModal" class="modal fade" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Modal Title</h5>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <p>This is a simple Bootstrap modal. Click the "Cancel button", "cross icon" or "dark gray area" to close or hide the modal.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+</html>
+
+

@@ -3,10 +3,15 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>personnel_tracking_webapi</RootNamespace>
+    <StartupObject>personnel_tracking_webapi.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\personnel-tracking-entity\personnel-tracking-entity.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Filters\" />
   </ItemGroup>
 
 
