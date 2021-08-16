@@ -69,6 +69,7 @@
   <ItemGroup>
     <Content Include="img\brand.png" />
     <Content Include="img\qr-code.png" />
+    <Content Include="Index.js" />
     <Content Include="lib\datatables\DataTables-1.10.25\css\dataTables.bootstrap.css" />
     <Content Include="lib\datatables\DataTables-1.10.25\css\dataTables.bootstrap.min.css" />
     <Content Include="lib\datatables\DataTables-1.10.25\css\dataTables.bootstrap4.css" />
@@ -126,7 +127,6 @@
     <Content Include="Company\Index.js" />
     <Content Include="Area\Index.html" />
     <Content Include="Index.html" />
-    <Content Include="Index.js" />
     <Content Include="lib\bootstrap\dist\css\bootstrap-grid.css" />
     <Content Include="lib\bootstrap\dist\css\bootstrap-grid.min.css" />
     <Content Include="lib\bootstrap\dist\css\bootstrap-grid.rtl.css" />

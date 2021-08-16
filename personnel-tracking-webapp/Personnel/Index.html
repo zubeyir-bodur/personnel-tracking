@@ -1,1 +1,64 @@
 ﻿
+    <div class="row" id="container-area">
+        <div class="col-12">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="table-personnel" class="table w-100">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        $(document).ready(function () {
+            createTable();
+
+        });
+        function createTable() {
+            alert("here");
+            $.ajax({
+                url: "http://localhost:5000/api/personnel",
+                headers: {
+                    "Authorization": "Bearer Bearer"
+                }
+            }).done((response) => {
+                var dataset = JsonTo2DArray(response);
+                $('#table-personnel').DataTable({
+                 
+                    data: dataset,
+                    columns: [
+                        { title: "#" },
+                        { title: "Personnel id" },
+                        { title: "Company id" },
+                        { title: "Personel type" },
+                        { title: "identity" },
+                        { title: "Name" },
+                        { title: "Surname" }
+                    ],
+                    "columnDefs": [{
+                        "targets": -1,
+                        "data": null,
+                        "defaultContent": "<button id='edit-button'>Edit</button> <button id='delete-button'>Delete</button>"
+                    }]
+                });
+                alert(dataset);
+                return dataset;
+            });
+        }
+
+        function JsonTo2DArray(json) {
+            var dataset = [];
+            for (var i = 0; i < json.data.length; i++) {
+                var obj = json.data[i];
+                let j = 0;
+                dataset[i] = [];
+                for (var m in obj) {
+                    dataset[i][j] = obj[m];
+                    j++;
+                }
+            }
+            return dataset;
+        }
+    </script>
