@@ -62,7 +62,7 @@ namespace personnel_tracking_webapi.Controllers
 
 
         [HttpPost]
-        public IActionResult Post([FromBody] Tracking t)
+        public IActionResult Post(Tracking t)
         {
             ResponseModel response = new ResponseModel();
 
