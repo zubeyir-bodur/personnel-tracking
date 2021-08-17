@@ -13,7 +13,7 @@ namespace personnel_tracking_webapi.Controllers
 {
     [Route("api/company")]
     [ApiController]
-    //[TokenCheck]
+    [TokenCheck]
     public class CompanyController : ControllerBase
     {
         private readonly PersonnelTrackingDBContext dbContext;
@@ -33,7 +33,12 @@ namespace personnel_tracking_webapi.Controllers
             ResponseModel response = new ResponseModel();
             try
             {
-                response.Data = dbContext.Set<Company>().Include(c => c.Areas).Include(c => c.Personnel).ToList();
+                var companyDTOList = dbContext.Companies.Select(u => new
+                {
+                    u.CompanyId,
+                    u.CompanyName
+                }).ToList();
+                response.Data = companyDTOList;
             }
             catch (Exception ex)
             {
@@ -48,26 +53,17 @@ namespace personnel_tracking_webapi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Post(Company company)
+        public IActionResult Post([FromBody]CompanyDTO companyDto)
         {
             var response = new ResponseModel();
             try
             {
-                // don't add the same company twice
-                bool exists = dbContext.Companies.
-                    FirstOrDefault(c => company.CompanyName.Equals(c.CompanyName)) != null;
-                if (!exists)
+                var newCompany = new Company
                 {
-                    dbContext.Add(company);
-                    dbContext.SaveChanges();
-                    response.Data = company;
-                }
-                else {
-                    response.HasError = true;
-                    response.ErrorMessage = "Same entry already exists";
-                    response.Data = company;
-                }
-                return Ok(response);
+                    CompanyId = companyDto.CompanyId,
+                    CompanyName = companyDto.CompanyName
+                };
+                dbContext.Add<Company>(newCompany).State = EntityState.Added;
             }
             catch (Exception ex)
             {
@@ -75,6 +71,13 @@ namespace personnel_tracking_webapi.Controllers
                 response.ErrorMessage = ex.Message;
                 return NotFound(response);
             }
+            Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
+
+            response.Data = dbContext.Companies.Select(u => new {
+                u.CompanyId,
+                u.CompanyName
+            }).ToList();
+            return Ok(response);
         }
 
         /// <summary>
@@ -82,67 +85,81 @@ namespace personnel_tracking_webapi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut]
-        public IActionResult Put(Company company)
+        public IActionResult Put(CompanyDTO companyDto)
         {
             var response = new ResponseModel();
             try
             {
-
-                bool exists = dbContext.Companies.
-                    FirstOrDefault(c => c.CompanyId == company.CompanyId) != null;
-                if (exists)
+                var newCompany = new Company
                 {
-                    dbContext.Update(company);
-                    dbContext.SaveChanges();
-                    response.Data = company;
-                }
-                else {
-                    response.HasError = true;
-                    response.ErrorMessage = "Company edit error";
-                }
-                return Ok(response);
+                    CompanyId = companyDto.CompanyId,
+                    CompanyName = companyDto.CompanyName
+                };
+                dbContext.Update<Company>(newCompany).State = EntityState.Modified;
             }
             catch (Exception ex)
             {
                 response.HasError = true;
                 response.ErrorMessage = ex.Message;
+                return NotFound(response);
             }
+            Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
+
+            response.Data = dbContext.Companies.Select(u => new {
+                u.CompanyId,
+                u.CompanyName
+            }).ToList();
             return Ok(response);
         }
 
         /// <summary>
-        /// Checks if the id is valid and asks user's permission to delete
+        /// Deletes the company from the database
         /// </summary>
         /// <returns></returns>
         [HttpDelete]
-        public IActionResult Delete(int? id)
+        public IActionResult Delete(CompanyDTO companyDto)
         {
-            var response = new ResponseModel();
-            if (id == null)
-            {
-                response.HasError = true;
-                response.ErrorMessage = "ID was missing";
-                return NotFound(response);
-            }
+            ResponseModel response = new ResponseModel();
+
             try
             {
-                var company = dbContext.Companies.FirstOrDefault(c => c.CompanyId == id);
-                if (company == null)
-                {
-                    response.HasError = true;
-                    response.ErrorMessage = "The company to be deleted was not found";
-                    return NotFound(response);
-                }
-                response.Data = company; // company to be deleted is valid
-                dbContext.Remove(company);
-                dbContext.SaveChanges();
-                response.HasError = false;
+                var company = dbContext.Companies.Where(u => u.CompanyId == companyDto.CompanyId).FirstOrDefault();
+                dbContext.Companies.Remove(company).State = EntityState.Deleted;
             }
-            catch (Exception ex) {
+            catch (Exception e)
+            {
                 response.HasError = true;
-                response.ErrorMessage = ex.Message;
+                response.ErrorMessage = e.Message;
             }
+            Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
+            response.Data = dbContext.Companies.Select(u => new {
+                u.CompanyId,
+                u.CompanyName
+            }).ToList();
             return Ok(response);
         }
+
+        /* No wizard base admin page
+        public IActionResult SaveChanges()
+        {
+            ResponseModel response = new ResponseModel();
+            try
+            {
+                dbContext.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                response.HasError = true;
+                response.ErrorMessage = e.Message;
+            }
+
+            return Ok(response);
+        }*/
+    }
+
+    public class CompanyDTO
+    {
+        public int CompanyId { get; set; }
+        public string CompanyName { get; set; }
     }
 }
