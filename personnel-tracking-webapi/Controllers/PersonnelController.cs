@@ -43,7 +43,7 @@ namespace personnel_tracking_webapi.Controllers
                         PersonnelSurname = personnelList[i].PersonnelSurname,
                     
                         //Need to actually get the company and the tracking not just the ids
-
+                        //Use include("company")
 
                     }) ;
                 }
@@ -116,20 +116,42 @@ namespace personnel_tracking_webapi.Controllers
         [HttpDelete]
         public IActionResult Delete(PersonnelDTO personnelDTO)
         {
+            Console.WriteLine("here");
             ResponseModel response = new ResponseModel();
 
             try
             {
                 Personnel personnel = dbContext.Personnel.Where(u => u.PersonnelId == personnelDTO.PersonnelId).FirstOrDefault();
-                dbContext.Personnel.Remove(personnel);
+                dbContext.Personnel.Remove(personnel).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+                //save
+           
             }
             catch (Exception e)
             {
                 response.HasError = true;
                 response.ErrorMessage = e.Message;
             }
-           
+
+            dbContext.SaveChanges();
             response.Data = dbContext.Personnel.ToList();
+            ///save chanege
+ 
+            return Ok(response);
+        }
+
+        public IActionResult SaveChanges()
+        {
+            ResponseModel response = new ResponseModel();
+            try
+            {
+                dbContext.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                response.HasError = true;
+                response.ErrorMessage = e.Message;
+            }
+
             return Ok(response);
         }
     }

@@ -1,75 +1,299 @@
-﻿
-    <div class="row" id="container-area">
-        <div class="col-12">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table id="table-personnel" class="table w-100">
-                    </table>
+﻿<div class="row" id="container-area">
+    <div class="col-12">
+        <br />
+        <button type="button" class="btn btn-primary" id="create-button">
+            Create
+        </button>
+
+        <div class="modal fade" id="create-data-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Create new personnel</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="create-form">
+                            <div class="form-group">
+                                <label for="company-input">Companies</label>
+                                <select class="form-control" id="company-input">
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="personnelType-input">Personnel type</label>
+                                <select class="form-control" id="personnelType-input">
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="area-input">Name</label>
+                                <input type="text" class="form-control" id="personnel_name">
+                            </div>
+                            <div class="form-group">
+                                <label for="latitude-input">Surname</label>
+                                <input type="number" class="form-control" id="personnel_surname" >
+                            </div>
+                            <div class="form-group">
+                                <label for="longitude-input">Identity number</label>
+                                <input type="number" class="form-control" id="personnel_IDnumber">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="submit-button" form="create-form">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="loading-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p class="text-lg-center">Loading</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="edit-data-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">
+                            Edit area:</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-form">
+                            <div class="form-group">
+                                <label for="company-input">Companies</label>
+                                <select class="form-control" id="company-input-edit">
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="personnelType-input">Personnel Type</label>
+                                <select class="form-control" id="personnelType-input-edit">
+                                </select>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="personnel-name-input-edit"> Name</label>
+                                <input type="text" class="form-control" id="personnel-name-input-edit">
+                            </div>
+                            <div class="form-group">
+                                <label for="personnel-surname-input-edit">Surname</label>
+                                <input type="text" class="form-control" id="personnel-surname-input-edi">
+                            </div>
+                            <div class="form-group">
+                                <label for="id-input-edit">Identity number</label>
+                                <input type="text" class="form-control" id="id-input-edit">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="submit-button-edit" form="edit-form">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="delete-data-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Create new area</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure to delete this area?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
+                        <a class="btn btn-danger btn-ok" id="submit-button-delete">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="container-area">
+            <div class="col-12">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="table-personnel" class="table w-100">
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-
-    <script>
-        $(document).ready(function () {
-            createTable();
-
-        });
-        function createTable() {
-            alert("here");
-            $.ajax({
-                url: "http://localhost:5000/api/personnel",
-                headers: {
-                    "Authorization": "Bearer Bearer"
-                }
-            }).done((response) => {
-                var dataset = JsonTo2DArray(response);
-                var t = $('#table-personnel').DataTable({
-                 
-                    data: dataset,
-                    columns: [
-
-                        { title: "#" },
-                        { title: "Personnel id" },
-                        { title: "Company id" },
-                        { title: "Personel type" },
-                        { title: "identity" },
-                        { title: "Name" },
-                        { title: "Surname" },
-                        { title: "actions" }
-                    ],
-                    "columnDefs": [{
-                        "targets": -1,
-                        "data": null,
-                        "defaultContent": "<button id='edit-button'>Edit</button> <button id='delete-button'>Delete</button>"
-                    }]
-             
-                });
-          
-                alert(dataset);
-                return dataset;
+        <script>
+            $(document).ready(function () {
+                createTable();
+                getCompanyList()
             });
-        }
+            function createTable() {
+                alert("here");
+                $.ajax({
+                    url: "http://localhost:5000/api/personnel",
+                    headers: {
+                        "Authorization": "Bearer Bearer"
+                    }
+                }).done((response) => {
+                    var dataset = JsonTo2DArray(response);
+                    var t = $('#table-personnel').DataTable({
 
-        function JsonTo2DArray(json) {
-            var dataset = [];
-            for (var i = 0; i < json.data.length; i++) {
-                var obj = json.data[i];
-                let j = 0;
-                dataset[i] = [];
+                        data: dataset,
+                        columns: [
 
-                //Need to find a better way to do this
-                dataset[i][0] = i + 1;
-                j++;
+                            { title: "#" },
+                            { title: "Personnel id" },
+                            { title: "Company id" },
+                            { title: "Personel type" },
+                            { title: "identity" },
+                            { title: "Name" },
+                            { title: "Surname" },
+                            { title: "actions" }
+                        ],
+                        "columnDefs": [{
+                            "targets": -1,
+                            "data": null,
+                            "defaultContent": "<a class=\"btn btn-danger\" id=\"delete-button\" data-toggle=\"modal\" data-target=\"#myDeleteModal\">Delete</a> <a class=\"btn btn-primary\"id=\"editModelB\" style=\"margin - left: 2 % \" data-toggle=\"modal\" data-target=\#myModa\">Edit</a>"
+                        }]
 
-                for (var m in obj) {
-                    
-                        dataset[i][j] = obj[m];
-                  
-                    j++;
-                }
+                    });
+
+                    alert(dataset);
+                    return dataset;
+                });
             }
-            return dataset;
-        }
-    </script>
+
+            function JsonTo2DArray(json) {
+                var dataset = [];
+                for (var i = 0; i < json.data.length; i++) {
+                    var obj = json.data[i];
+                    let j = 0;
+                    dataset[i] = [];
+
+                    //Need to find a better way to do this
+                    dataset[i][0] = i + 1;
+                    j++;
+
+                    for (var m in obj) {
+
+                        dataset[i][j] = obj[m];
+
+                        j++;
+                    }
+                }
+                return dataset;
+            }
+
+            function deleteValue(values) {
+                alert("here");
+
+                var settings = {
+                    "url": "http://localhost:5000/api/personnel",
+                    "method": "Delete",
+                    "headers": {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer Bearer"
+                    },
+                    "data": JSON.stringify(values),
+                };
+                $.ajax(settings).done((response) => {
+                    var newData = JsonTo2DArray(response);
+                    var datatable = $('#table-personnel').DataTable();
+                    datatable.clear().rows.add(newData).draw();
+                    alert(response);
+                });
+            }
+
+
+            function getCompanyList() {
+                $.ajax({
+                    url: "http://localhost:5000/api/company",
+                    headers: {
+                        "Authorization": "Bearer token"
+                    }
+                }).done((response) => {
+                    for (var i = 0; i < response.data.length; i++) {
+                        $("#company-input").append(`<option>${response.data[i].companyName}</option>`);
+                        $("#company-input-edit").append(`<option>${response.data[i].companyName}</option>`);
+                    }
+                });
+            }
+
+            function getPersonnelTypeList() {
+                $.ajax({
+                    url: "http://localhost:5000/api/personnelType",
+                    headers: {
+                        "Authorization": "Bearer token"
+                    }
+                }).done((response) => {
+                    for (var i = 0; i < response.data.length; i++) {
+                        $("#company-input").append(`<option>${response.data[i].companyName}</option>`);
+                        $("#company-input-edit").append(`<option>${response.data[i].companyName}</option>`);
+                    }
+                });
+            }
+
+
+            //Button clicks
+            $("#create-button").click(() => {
+                $('#create-data-modal').modal('show');
+            });
+
+            //delete 
+            var selected_personnel_id;
+            $('#table-personnel').on('click', '#delete-button', function () {
+                var datatable = $('#table-personnel').DataTable();
+                var data = datatable.row($(this).parents('tr')).data();
+
+                selected_personnel_id = data[1];
+                console.log(data[0]);
+                alert(selected_personnel_id);
+               $("#delete-data-modal").modal('show');
+            });
+          
+
+            $('#submit-button-delete').click(() => {
+                var values = {
+                    personnelId: selected_personnel_id
+                };
+                console.log(values);
+                deleteValue(values);
+
+                $('#delete-data-modal').modal('hide');
+
+            });
+
+          
+            $('#submit-button').click(() => {
+                console.log("submit-button-create")
+                var form = document.getElementById("create-form");
+                form.addEventListener('submit', (e) => {
+
+                    e.preventDefault();
+                    var personnel_name = $('#personnel_name').val();
+                    var personnel_surname = $("#personnel_surname").val();
+                    var latitude = $("#latitude-input").val();
+                    var longitude = $("#longitude-input").val();
+                    var values = {
+                        company: company,
+                        area: area,
+                        latitude: parseFloat(latitude),
+                        longitude: parseFloat(longitude),
+                    }
+                    $('#create-data-modal').modal('hide');
+                    $('#loading-modal').modal('show');
+                    openCodeModal(values);
+                });
+            });
+            
+        </script>
