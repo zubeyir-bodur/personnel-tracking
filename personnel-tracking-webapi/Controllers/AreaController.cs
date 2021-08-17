@@ -12,7 +12,7 @@ namespace personnel_tracking_webapi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [TokenCheck]
+    //[TokenCheck]
     public class AreaController : ControllerBase
     {
         private readonly PersonnelTrackingDBContext dbContext;
