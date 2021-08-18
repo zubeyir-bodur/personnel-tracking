@@ -46,11 +46,13 @@
         //Add Model
         $("#showAddModelB").click(function () {
             $("#myAddModal").modal('show');
+            ConfiguratePersonnelList();
         });
 
         $("#submit-added-leave").click(()=> {
             var leave = {};
-            leave.PersonnelId = Number($('#leave-add-personnelId').val());
+            leave.PersonnelId = Number($('#personnel-input').val());
+            alert(leave.PersonnelId);
             leave.leaveStart = $('#leave-add-start').val();
             leave.leaveEnd = $('#leave-add-end').val();
             $.ajax({
@@ -74,7 +76,18 @@
             });
             $('#myAddModal').modal('hide');
         });
-
+        function ConfiguratePersonnelList() {
+            $.ajax({
+                url: "http://localhost:5000/api/personnel",
+                headers: {
+                    "Authorization": "Bearer Bearer"
+                }
+            }).done((response) => {
+                for (var i = 0; i < response.data.length; i++) {
+                    $("#personnel-input").append($('<option>').val(response.data[i].personnelId).text(response.data[i].personnelName + " " + response.data[i].personnelSurname));
+                }
+            })
+        }
         //My Delete Model
         $('#table-leave').on('click', '#deleteModelB', function () {
             var datatable = $('#table-leave').DataTable();
@@ -92,7 +105,7 @@
             $('#myDeleteModal').modal('hide');
         })
         $('.cancel').click(() => {
-            $('#myDeleteModal').modal('hide');
+            $('.modal').modal('hide');
         })
 
         function deleteValue(values) {
@@ -231,8 +244,9 @@
                             <div class="modal-body">
                                 <form id="add-leave-form">
                                     <div class="form-group">
-                                        <label for="leave-add-personnelId"> Enter Personnel Id </label>
-                                        <input type="text" id="leave-add-personnelId" class="form-control" placeholder="Id">
+                                        <label for="personnel-input"> Chose Personnel  </label>
+                                        <select class="form-control" id="personnel-input">
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <label for="leave-add-start">Enter leave start date</label>
