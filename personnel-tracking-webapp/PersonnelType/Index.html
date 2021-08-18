@@ -93,7 +93,17 @@
         </div>
     </div>
 </div>
+<style>
+    #delete-button {
+        float: right;
+        margin-left: 5%;
+        margin-right: 2%;
+    }
 
+    #edit-button {
+        float: right;
+    }
+</style>
 <script>
     constructTable();
     var createform = document.getElementById("create-form");
@@ -171,7 +181,15 @@
                 columns: [
                     { title: "Serial Number" },
                     { title: "Role" }
-                ]
+                ],
+                "columnDefs": [{
+                    "targets": -1,
+                    "data": null,
+                    "render": function (data, type, row, meta) {
+                        return data[1] + `<button class='btn btn-danger' id='delete-button'>Delete</button>` +
+                            `<button class='btn btn-primary' id='edit-button'>Edit</button>`;
+                    }
+                }]
             });
         });
     }
