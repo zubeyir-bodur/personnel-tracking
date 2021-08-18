@@ -36,7 +36,9 @@ namespace personnel_tracking_webapi.Controllers
                     u.PersonnelType.PersonnelTypeName,
                     u.IdentityNumber,
                     u.PersonnelName,
-                    u.PersonnelSurname
+                    u.PersonnelSurname,
+                    u.UserName,
+                    u.Password
                     });
            
                 response.Data = personnelDTOList;
@@ -86,9 +88,10 @@ namespace personnel_tracking_webapi.Controllers
                 u.PersonnelType.PersonnelTypeName,
                 u.IdentityNumber,
                 u.PersonnelName,
+
                 u.PersonnelSurname,
-                u.Password,
-                u.UserName
+                u.UserName,
+                u.Password
             });
             
             return Ok(response);
@@ -105,10 +108,13 @@ namespace personnel_tracking_webapi.Controllers
                 Company company = dbContext.Companies.Where<Company>(u => u.CompanyName == personnelDTO.company).FirstOrDefault();
                 PersonnelType personnelType = dbContext.PersonnelTypes.Where<PersonnelType>(u => u.PersonnelTypeName == personnelDTO.personnelType).FirstOrDefault();
 
-                personnel.PersonnelId = personnelDTO.personnelId;
+                personnel.CompanyId = company.CompanyId;
+                personnel.PersonnelTypeId = personnelType.PersonnelTypeId;
                 personnel.IdentityNumber = personnelDTO.identityNumber;
                 personnel.PersonnelName = personnelDTO.personnelName;
                 personnel.PersonnelSurname = personnelDTO.personnelSurname;
+                personnel.UserName = personnelDTO.username;
+                personnel.Password = personnelDTO.password;
                 dbContext.Update<Personnel>(personnel);
 
             }
@@ -125,7 +131,9 @@ namespace personnel_tracking_webapi.Controllers
                 u.PersonnelType.PersonnelTypeName,
                 u.IdentityNumber,
                 u.PersonnelName,
-                u.PersonnelSurname
+                u.PersonnelSurname,
+                u.UserName,
+                u.Password
             });
             return Ok(response);
         }
@@ -156,7 +164,9 @@ namespace personnel_tracking_webapi.Controllers
                 u.PersonnelType.PersonnelTypeName,
                 u.IdentityNumber,
                 u.PersonnelName,
-                u.PersonnelSurname
+                u.PersonnelSurname,
+                u.Password,
+                u.UserName
             });
             ///save chanege
 

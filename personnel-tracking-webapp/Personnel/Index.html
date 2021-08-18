@@ -35,7 +35,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="idNum-input">Identity number</label>
-                                <input type="number" class="form-control" id="personnel_IDnumber">
+                                <input type="text" class="form-control" id="personnel_IDnumber">
                             </div>
                             <div class="form-group">
                                 <label for="username-input">Username</label>
@@ -89,7 +89,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="id-input-edit">Identity number</label>
-                                <input type="number" class="form-control" id="id-input-edit">
+                                <input type="text" class="form-control" id="id-input-edit">
                             </div>
                             <div class="form-group"> 
                                 <label for="username-edit">Username</label>
@@ -168,6 +168,8 @@
                             { title: "identity" },
                             { title: "Name" },
                             { title: "Surname" },
+                            { title: "Username" },
+                            { title: "Password" },
                             { title: "actions" }
                         ],
                         "columnDefs": [{
@@ -270,6 +272,25 @@
             
             }
 
+            function updateData(values)
+            {
+                var settings = {
+                    "url": "http://localhost:5000/api/personnel",
+                    "method": "PUT",
+                    "headers": {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer token"
+                    },
+                    "data": JSON.stringify(values),
+                };
+                $.ajax(settings).done((response) => {
+
+                    var newData = JsonTo2DArray(response);
+                    var datatable = $('#table-personnel').DataTable();
+                    datatable.clear().rows.add(newData).draw();
+                });
+            }
+
            
 
 
@@ -306,13 +327,41 @@
             $('#table-personnel').on('click', '#editModelB', function () {
                 var datatable = $('#table-personnel').DataTable();
                 var data = datatable.row($(this).parents('tr')).data();
-                seletected_area_id = data[1];
+                selected_personnel_id = data[1];
                 $('#company-input-edit').val(data[2]);
                 $('#personnelType-input-edit').val(data[3]);
                 $('#id-input-edit').val(data[4]);
                 $('#personnel-name-input-edit').val(data[5]);
-                $('#personnel-surname-input-edit').val(data[6]); 
+                $('#personnel-surname-input-edit').val(data[6]);
+                $('#username-edit').val(data[7]);
+                $('#password-edit').val(data[8]);
                 $("#edit-data-modal").modal('show');
+            });
+
+            $('#submit-button-edit').click(() => {
+
+                var personnelId = selected_personnel_id
+
+                var company = $('#company-input-edit').val();
+                var personnelType = $("#personnelType-input-edit").val();
+                var identityNum = $("#id-input-edit").val();
+                var name = $("#personnel-name-input-edit").val();
+                var surname = $("#personnel-surname-input-edit").val();
+                var username = $("#username-edit").val();
+                var password = $('#password-edit').val();
+                var values = {
+                    personnelId: personnelId,
+                    company: company,
+                    personnelType: personnelType,
+                    username: username,
+                    password: password,
+                    identityNumber: parseInt(identityNum),
+                    personnelName: name,
+                    personnelSurname: surname
+                }
+                updateData(values);
+
+                $('#edit-data-modal').modal('hide');
             });
 
 
