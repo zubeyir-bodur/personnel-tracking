@@ -51,7 +51,6 @@
                     </div>
                     <div class="modal-body">
                         <form id="edit-form">
-                            <!--Add personnels and areas?-->
                             <div class="form-group">
                                 <label for="company-input-edit">Company Name</label>
                                 <input type="text" class="form-control" id="company-input-edit">
@@ -111,11 +110,9 @@
     var createform = document.getElementById("create-form");
     createform.addEventListener('submit', (e) => {
         e.preventDefault();
-        var company = $('#company-input').val();
-        console.log(company);
-        // todo add personnel and areas
+        var companyName = $('#company-input').val();
         var values = {
-            company: company
+            companyName: companyName
         };
         $('#create-data-modal').modal('hide');
         $('#loading-modal').modal('show');
@@ -126,7 +123,6 @@
     });
 
     $("#create-button").click(() => {
-        console.log("clicked");
         $('#create-data-modal').modal('show');
     });
 
@@ -135,7 +131,6 @@
         var datatable = $('#table-company').DataTable();
         var data = datatable.row($(this).parents('tr')).data();
         seletected_company_id = data[0];
-        console.log(seletected_company_id);
         $('#company-input-edit').val(data[1]);
         $("#edit-data-modal").modal('show');
     });
@@ -151,17 +146,19 @@
         updateValue(values);
         $('#edit-data-modal').modal('hide');
     });
-
+    var selected_company_name;
     $('#table-company').on('click', '#delete-button', function () {
         var datatable = $('#table-company').DataTable();
         var data = datatable.row($(this).parents('tr')).data();
         seletected_company_id = data[0];
+        selected_company_name = data[1];
         $("#delete-data-modal").modal('show');
     });
 
-    $('#submit-button-delete').click( () => {
+    $('#submit-button-delete').click(() => {
         var values = {
-            companyId: seletected_company_id
+            companyId: seletected_company_id,
+            companyName: selected_company_name
         };
         deleteValue(values);
         $('#delete-data-modal').modal('hide');
@@ -250,7 +247,7 @@
     }
 
     function JsonTo2DArray(json) {
-        var dataset = [];
+        var dataset = [[]];
         for (var i = 0; i < json.data.length; i++) {
             var obj = json.data[i];
             let j = 0;

@@ -1,15 +1,93 @@
-﻿<div class="row" id="container-personneltype">
+﻿<div class="row" id="container-personnelType">
     <div class="col-12">
+
+        <br>
+        <button type="button" class="btn btn-primary" id="create-button">
+            Create
+        </button>
+
+        <!-- Create Modal -->
+        <div class="modal fade" id="create-data-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Create a new role</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="create-form">
+                            <div class="form-group">
+                                <label for="personnelType-input">Role Name</label>
+                                <input type="text" class="form-control" id="personnelType-input">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="submit-button" form="create-form">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Loading Modal-->
+        <div class="modal fade" id="loading-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p class="text-lg-center">Loading</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Edit Modal-->
+        <div class="modal fade" id="edit-data-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Edit Company</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-form">
+                            <div class="form-group">
+                                <label for="personnelType-input-edit">Company Name</label>
+                                <input type="text" class="form-control" id="personnelType-input-edit">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="submit-button-edit" form="edit-form">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Delete Modal-->
+        <div class="modal fade" id="delete-data-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Delete role</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
+                        <a class="btn btn-danger btn-ok" id="submit-button-delete">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--The table-->
         <div class="card-body">
             <div class="table-responsive">
-                <table id="table-personneltype" class="table w-100">
-                    <thead>
-                        <tr>
-                            <td>Serial No</td>
-                            <td>Role</td>
-                            <td>Personnels</td>
-                        </tr>
-                    </thead>
+                <table id="table-personnelType" class="table w-100">
                 </table>
             </div>
         </div>
@@ -17,26 +95,150 @@
 </div>
 
 <script>
-    $(document).ready( () => {
-        $.ajax({
-            "url": " http://localhost:5000/api/personnel-type",
-            "type": "GET",
-            "dataType": 'json',
-            "headers": { Authorization: "Bearer " + localStorage.getItem("token") },
-            "success": function (response) {
-                console.log(response);
-                $('#table-personneltype').DataTable({
+    constructTable();
+    var createform = document.getElementById("create-form");
+    createform.addEventListener('submit', (e) => {
+        e.preventDefault();
+        var personnelTypeName = $('#personnelType-input').val();
+        var values = {
+            personnelTypeName: personnelTypeName
+        };
+        $('#create-data-modal').modal('hide');
+        $('#loading-modal').modal('show');
+        setTimeout(() => {
+            sendData(values);
+            $('#loading-modal').modal('hide');
+        }, 2000);
+    });
 
-                    data: response.data,
-                    language: {
-                        url: 'cdn.datatables.net/plug-ins/1.10.25/i18n/English.json'
-                    },
-                    columns: [
-                        { 'data': 'personnelTypeId' },
-                        { 'data': 'personnelTypeName' }
-                    ]
-                });
+    $("#create-button").click(() => {
+        $('#create-data-modal').modal('show');
+    });
+
+    var selected_personnelType_id;
+    $('#table-personnelType').on('click', '#edit-button', function () {
+        var datatable = $('#table-personnelType').DataTable();
+        var data = datatable.row($(this).parents('tr')).data();
+        selected_personnelType_id = data[0];
+        $('#personnelType-input-edit').val(data[1]);
+        $("#edit-data-modal").modal('show');
+    });
+
+    var form = document.getElementById("edit-form");
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        var personnelTypeName = $('#personnelType-input-edit').val();
+        var values = {
+            personnelTypeId: selected_personnelType_id,
+            personnelTypeName: personnelTypeName
+        };
+        updateValue(values);
+        $('#edit-data-modal').modal('hide');
+    });
+
+    var selected_personnelType_name;
+    $('#table-personnelType').on('click', '#delete-button', function () {
+        var datatable = $('#table-personnelType').DataTable();
+        var data = datatable.row($(this).parents('tr')).data();
+        selected_personnelType_id = data[0];
+        selected_personnelType_name = data[1];
+        $("#delete-data-modal").modal('show');
+    });
+
+    $('#submit-button-delete').click(() => {
+        var values = {
+            personnelTypeId: selected_personnelType_id,
+            personnelTypeName: selected_personnelType_name
+        };
+        deleteValue(values);
+        $('#delete-data-modal').modal('hide');
+    });
+    
+    function constructTable() {
+        var settings = {
+            url: "http://localhost:5000/api/personnelType",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
             }
+        };
+        $.ajax(settings).done((response) => {
+            var dataset = JsonTo2DArray(response);
+            $('#table-personnelType').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/English.json'
+                },
+                data: dataset,
+                columns: [
+                    { title: "Serial Number" },
+                    { title: "Role" }
+                ]
+            });
         });
-    })
+    }
+    
+    function deleteValue(values) {
+        var settings = {
+            "url": "http://localhost:5000/api/personnelType",
+            "method": "DELETE",
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
+            "data": JSON.stringify(values),
+        };
+        $.ajax(settings).done((response) => {
+            var newData = JsonTo2DArray(response);
+            var datatable = $('#table-personnelType').DataTable();
+            datatable.clear().rows.add(newData).draw();
+        });
+    }
+
+    function updateValue(values) {
+        var settings = {
+            "url": "http://localhost:5000/api/personnelType",
+            "method": "PUT",
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
+            "data": JSON.stringify(values),
+        };
+        $.ajax(settings).done((response) => {
+            var newData = JsonTo2DArray(response);
+            var datatable = $('#table-personnelType').DataTable();
+            datatable.clear().rows.add(newData).draw();
+        });
+    }
+
+    function sendData(values) {
+        var settings = {
+            "url": "http://localhost:5000/api/personnelType",
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
+            "data": JSON.stringify(values),
+        };
+
+        $.ajax(settings).done((response) => {
+            var newData = JsonTo2DArray(response);
+            var datatable = $('#table-personnelType').DataTable();
+            datatable.clear().rows.add(newData).draw();
+        });
+    }
+
+    function JsonTo2DArray(json) {
+        var dataset = [[]];
+        for (var i = 0; i < json.data.length; i++) {
+            var obj = json.data[i];
+            let j = 0;
+            dataset[i] = [];
+            for (var m in obj) {
+                dataset[i][j] = obj[m];
+                j++;
+            }
+        }
+        return dataset;
+    }
 </script>
