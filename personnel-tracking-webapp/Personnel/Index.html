@@ -26,31 +26,30 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="area-input">Name</label>
+                                <label for="name-input">Name</label>
                                 <input type="text" class="form-control" id="personnel_name">
                             </div>
                             <div class="form-group">
-                                <label for="latitude-input">Surname</label>
-                                <input type="number" class="form-control" id="personnel_surname" >
+                                <label for="surname-input">Surname</label>
+                                <input type="text" class="form-control" id="personnel_surname">
                             </div>
                             <div class="form-group">
-                                <label for="longitude-input">Identity number</label>
+                                <label for="idNum-input">Identity number</label>
                                 <input type="number" class="form-control" id="personnel_IDnumber">
+                            </div>
+                            <div class="form-group">
+                                <label for="username-input">Username</label>
+                                <input type="text" class="form-control" id="personnel_userName">
+                            </div>
+                            <div class="form-group">
+                                <label for="password-input">Password</label>
+                                <input type="text" class="form-control" id="personnel_password">
                             </div>
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary" id="submit-button" form="create-form">Submit</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="loading-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-sm">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <p class="text-lg-center">Loading</p>
                     </div>
                 </div>
             </div>
@@ -86,11 +85,19 @@
                             </div>
                             <div class="form-group">
                                 <label for="personnel-surname-input-edit">Surname</label>
-                                <input type="text" class="form-control" id="personnel-surname-input-edi">
+                                <input type="text" class="form-control" id="personnel-surname-input-edit">
                             </div>
                             <div class="form-group">
                                 <label for="id-input-edit">Identity number</label>
-                                <input type="text" class="form-control" id="id-input-edit">
+                                <input type="number" class="form-control" id="id-input-edit">
+                            </div>
+                            <div class="form-group"> 
+                                <label for="username-edit">Username</label>
+                                <input type="text" class="form-control" id="username-edit">
+                            </div>
+                            <div class="form-group">
+                                <label for="password-edit">Password</label>
+                                <input type="text" class="form-control" id="password-edit">
                             </div>
                         </form>
                     </div>
@@ -106,11 +113,11 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="staticBackdropLabel">Create new area</h5>
+                        <h5 class="modal-title" id="staticBackdropLabel">Delete Personnel</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p>Are you sure to delete this area?</p>
+                        <p>Are you sure to delete this personnel?</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
@@ -135,10 +142,13 @@
         <script>
             $(document).ready(function () {
                 createTable();
-                getCompanyList()
+                getCompanyList();
+                getPersonnelTypeList();
             });
+
+            //Functions
             function createTable() {
-                alert("here");
+              //  alert("here");
                 $.ajax({
                     url: "http://localhost:5000/api/personnel",
                     headers: {
@@ -168,7 +178,7 @@
 
                     });
 
-                    alert(dataset);
+                 //   alert(dataset);
                     return dataset;
                 });
             }
@@ -194,8 +204,7 @@
                 return dataset;
             }
 
-            function deleteValue(values) {
-                alert("here");
+            function deleteValue(value) {
 
                 var settings = {
                     "url": "http://localhost:5000/api/personnel",
@@ -204,13 +213,13 @@
                         "Content-Type": "application/json",
                         "Authorization": "Bearer Bearer"
                     },
-                    "data": JSON.stringify(values),
+                    "data": JSON.stringify(value),
                 };
                 $.ajax(settings).done((response) => {
                     var newData = JsonTo2DArray(response);
                     var datatable = $('#table-personnel').DataTable();
                     datatable.clear().rows.add(newData).draw();
-                    alert(response);
+                 //   alert(response);
                 });
             }
 
@@ -237,11 +246,31 @@
                     }
                 }).done((response) => {
                     for (var i = 0; i < response.data.length; i++) {
-                        $("#company-input").append(`<option>${response.data[i].companyName}</option>`);
-                        $("#company-input-edit").append(`<option>${response.data[i].companyName}</option>`);
+                        $("#personnelType-input").append(`<option>${response.data[i].personnelTypeName}</option>`);
+                        $("#personnelType-input-edit").append(`<option>${response.data[i].personnelTypeName}</option>`);
                     }
                 });
             }
+            function sendDataPOST(values) {
+                var settings = {
+                    "url": "http://localhost:5000/api/personnel",
+                    "method": "POST",
+                    "headers": {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer token"
+                    },
+                    "data": JSON.stringify(values),
+                };
+
+                $.ajax(settings).done((response) => {
+                    var newData = JsonTo2DArray(response);
+                    var datatable = $('#table-personnel').DataTable();
+                    datatable.clear().rows.add(newData).draw();
+                });
+            
+            }
+
+           
 
 
             //Button clicks
@@ -257,7 +286,7 @@
 
                 selected_personnel_id = data[1];
                 console.log(data[0]);
-                alert(selected_personnel_id);
+               // alert(selected_personnel_id);
                $("#delete-data-modal").modal('show');
             });
           
@@ -273,27 +302,46 @@
 
             });
 
-          
-            $('#submit-button').click(() => {
-                console.log("submit-button-create")
-                var form = document.getElementById("create-form");
-                form.addEventListener('submit', (e) => {
+            //Edit
+            $('#table-personnel').on('click', '#editModelB', function () {
+                var datatable = $('#table-personnel').DataTable();
+                var data = datatable.row($(this).parents('tr')).data();
+                seletected_area_id = data[1];
+                $('#company-input-edit').val(data[2]);
+                $('#personnelType-input-edit').val(data[3]);
+                $('#id-input-edit').val(data[4]);
+                $('#personnel-name-input-edit').val(data[5]);
+                $('#personnel-surname-input-edit').val(data[6]); 
+                $("#edit-data-modal").modal('show');
+            });
 
-                    e.preventDefault();
-                    var personnel_name = $('#personnel_name').val();
-                    var personnel_surname = $("#personnel_surname").val();
-                    var latitude = $("#latitude-input").val();
-                    var longitude = $("#longitude-input").val();
-                    var values = {
-                        company: company,
-                        area: area,
-                        latitude: parseFloat(latitude),
-                        longitude: parseFloat(longitude),
-                    }
-                    $('#create-data-modal').modal('hide');
-                    $('#loading-modal').modal('show');
-                    openCodeModal(values);
+
+
+            //Create new
+            $('#submit-button').click(() => {
+                var personnel_name = $('#personnel_name').val();
+                var personnel_surname = $("#personnel_surname").val();
+                var company = $("#company-input").val();
+                var personnelType = $("#personnelType-input").val();
+                var identityNum = $("#personnel_IDnumber").val();
+                var username = $("#personnel_userName").val();
+                var password = $("#personnel_password").val();
+                var values = {
+                    company: company,
+                    personnelType: personnelType,
+                    username: username,
+                    password: password,
+                    identityNumber: parseInt(identityNum),
+                    personnelName: personnel_name,
+                    personnelSurname: personnel_surname
+                 }
+                 $('#create-data-modal').modal('hide');
+           
+                $('#create-form').each(function () {
+                    this.reset();
                 });
+                 sendDataPOST(values);
+              
             });
             
         </script>

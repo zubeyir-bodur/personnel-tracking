@@ -15,8 +15,6 @@ namespace personnel_tracking_webapi
     public class Startup
     {
 
-        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -27,18 +25,12 @@ namespace personnel_tracking_webapi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors(options =>
-            {
-                options.AddPolicy(name: MyAllowSpecificOrigins,
-                                  builder =>
-                                  {
-                                      builder.WithOrigins("http://localhost:63896",
-                                                          "http://localhost:5000").AllowAnyHeader()
-                                                  .AllowAnyMethod();
-                                  });
-            });
 
             services.AddControllers();
+            services.AddCors(policy => policy.AddDefaultPolicy(options => {
+                options.AllowCredentials().AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowed(origin => true);
+            }));
+
         }
     
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,12 +41,13 @@ namespace personnel_tracking_webapi
                 app.UseDeveloperExceptionPage();
             }
 
-          
+            app.UseCors();
+
             app.UseRouting();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             
-            app.UseCors(MyAllowSpecificOrigins);
+            
 
             app.UseAuthorization();
 

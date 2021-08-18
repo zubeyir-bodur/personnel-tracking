@@ -30,23 +30,15 @@ namespace personnel_tracking_webapi.Controllers
             try
             {
                 var personnelList = dbContext.Personnel.ToList();
-                var personnelDTOList = new List<PersonnelDTO>();
-                for (int i = 0; i < personnelList.Count; i++)
-                {
-                    personnelDTOList.Add(new PersonnelDTO
-                    {
-                        PersonnelId = personnelList[i].PersonnelId,
-                        CompanyId = personnelList[i].CompanyId,
-                        PersonnelTypeId = personnelList[i].PersonnelTypeId,
-                        IdentityNumber = personnelList[i].IdentityNumber,
-                        PersonnelName = personnelList[i].PersonnelName,
-                        PersonnelSurname = personnelList[i].PersonnelSurname,
-                    
-                        //Need to actually get the company and the tracking not just the ids
-                        //Use include("company")
-
-                    }) ;
-                }
+                var personnelDTOList = dbContext.Personnel.Select(u => new {
+                    u.PersonnelId,
+                    u.Company.CompanyName,
+                    u.PersonnelType.PersonnelTypeName,
+                    u.IdentityNumber,
+                    u.PersonnelName,
+                    u.PersonnelSurname
+                    });
+           
                 response.Data = personnelDTOList;
             }
             catch (Exception ex)
@@ -65,13 +57,18 @@ namespace personnel_tracking_webapi.Controllers
             try
             {
                 Personnel newPersonnel = new Personnel();
-                newPersonnel.PersonnelId = personnelDTO.PersonnelId;
-                newPersonnel.CompanyId = personnelDTO.CompanyId;
-                newPersonnel.PersonnelTypeId = personnelDTO.PersonnelTypeId;
-                newPersonnel.IdentityNumber = personnelDTO.IdentityNumber;
-                newPersonnel.PersonnelName = personnelDTO.PersonnelName;
-                newPersonnel.PersonnelSurname = personnelDTO.PersonnelSurname;
-              
+                Company company = dbContext.Companies.Where<Company>(u => u.CompanyName == personnelDTO.company).FirstOrDefault();
+                PersonnelType personnelType = dbContext.PersonnelTypes.Where<PersonnelType>(u => u.PersonnelTypeName == personnelDTO.personnelType).FirstOrDefault();
+
+                newPersonnel.IdentityNumber = personnelDTO.identityNumber;
+                newPersonnel.PersonnelName = personnelDTO.personnelName;
+                newPersonnel.PersonnelSurname = personnelDTO.personnelSurname;
+                newPersonnel.UserName = personnelDTO.username;
+                newPersonnel.Password = personnelDTO.password;
+                newPersonnel.CompanyId = company.CompanyId;
+                newPersonnel.PersonnelTypeId = personnelType.PersonnelTypeId;
+
+
 
                 dbContext.Add<Personnel>(newPersonnel);
             }
@@ -80,8 +77,20 @@ namespace personnel_tracking_webapi.Controllers
                 response.HasError = true;
                 response.ErrorMessage = e.Message;
             }
-          
-            response.Data = dbContext.Personnel.ToList();
+
+            dbContext.SaveChanges();
+           
+            response.Data = dbContext.Personnel.Select(u => new {
+                u.PersonnelId,
+                u.Company.CompanyName,
+                u.PersonnelType.PersonnelTypeName,
+                u.IdentityNumber,
+                u.PersonnelName,
+                u.PersonnelSurname,
+                u.Password,
+                u.UserName
+            });
+            
             return Ok(response);
         }
 
@@ -92,14 +101,14 @@ namespace personnel_tracking_webapi.Controllers
 
             try
             {
-                Personnel personnel = dbContext.Personnel.Where(u => u.PersonnelId == personnelDTO.PersonnelId).FirstOrDefault();
+                Personnel personnel = dbContext.Personnel.Where(u => u.PersonnelId == personnelDTO.personnelId).FirstOrDefault();
+                Company company = dbContext.Companies.Where<Company>(u => u.CompanyName == personnelDTO.company).FirstOrDefault();
+                PersonnelType personnelType = dbContext.PersonnelTypes.Where<PersonnelType>(u => u.PersonnelTypeName == personnelDTO.personnelType).FirstOrDefault();
 
-                personnel.PersonnelId = personnelDTO.PersonnelId;
-                personnel.CompanyId = personnelDTO.CompanyId;
-                personnel.PersonnelTypeId = personnelDTO.PersonnelTypeId;
-                personnel.IdentityNumber = personnelDTO.IdentityNumber;
-                personnel.PersonnelName = personnelDTO.PersonnelName;
-                personnel.PersonnelSurname = personnelDTO.PersonnelSurname;
+                personnel.PersonnelId = personnelDTO.personnelId;
+                personnel.IdentityNumber = personnelDTO.identityNumber;
+                personnel.PersonnelName = personnelDTO.personnelName;
+                personnel.PersonnelSurname = personnelDTO.personnelSurname;
                 dbContext.Update<Personnel>(personnel);
 
             }
@@ -108,8 +117,16 @@ namespace personnel_tracking_webapi.Controllers
                 response.HasError = true;
                 response.ErrorMessage = e.Message;
             }
+            dbContext.SaveChanges();
 
-            response.Data = dbContext.Personnel.ToList();
+            response.Data = dbContext.Personnel.Select(u => new {
+                u.PersonnelId,
+                u.Company.CompanyName,
+                u.PersonnelType.PersonnelTypeName,
+                u.IdentityNumber,
+                u.PersonnelName,
+                u.PersonnelSurname
+            });
             return Ok(response);
         }
 
@@ -121,7 +138,7 @@ namespace personnel_tracking_webapi.Controllers
 
             try
             {
-                Personnel personnel = dbContext.Personnel.Where(u => u.PersonnelId == personnelDTO.PersonnelId).FirstOrDefault();
+                Personnel personnel = dbContext.Personnel.Where(u => u.PersonnelId == personnelDTO.personnelId).FirstOrDefault();
                 dbContext.Personnel.Remove(personnel).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
                 //save
            
@@ -133,9 +150,16 @@ namespace personnel_tracking_webapi.Controllers
             }
 
             dbContext.SaveChanges();
-            response.Data = dbContext.Personnel.ToList();
+            response.Data = dbContext.Personnel.Select(u => new {
+                u.PersonnelId,
+                u.Company.CompanyName,
+                u.PersonnelType.PersonnelTypeName,
+                u.IdentityNumber,
+                u.PersonnelName,
+                u.PersonnelSurname
+            });
             ///save chanege
- 
+
             return Ok(response);
         }
 
@@ -159,13 +183,15 @@ namespace personnel_tracking_webapi.Controllers
 
     public class PersonnelDTO
     {
-        public int PersonnelId { get; set; }
-        public int CompanyId { get; set; }
-        public int PersonnelTypeId { get; set; }
-        public int IdentityNumber { get; set; }
-        public string PersonnelName { get; set; }
-        public string PersonnelSurname { get; set; }
-       
+        public int personnelId { get; set; }
+        public string company { get; set; }
+        public string personnelType { get; set; }
+        public int identityNumber { get; set; }
+        public string personnelName { get; set; }
+        public string personnelSurname { get; set; }
+        public string username { get; set; }
+        public string password { get; set; }
+
 
         //maybe add virtual ones too?
     }
