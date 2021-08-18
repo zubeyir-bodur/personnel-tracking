@@ -53,7 +53,7 @@ namespace personnel_tracking_webapi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Post([FromBody]CompanyDTO companyDto)
+        public IActionResult Post(CompanyDTO companyDto)
         {
             var response = new ResponseModel();
             try
@@ -64,6 +64,7 @@ namespace personnel_tracking_webapi.Controllers
                     CompanyName = companyDto.CompanyName
                 };
                 dbContext.Add<Company>(newCompany).State = EntityState.Added;
+                Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
             }
             catch (Exception ex)
             {
@@ -71,7 +72,6 @@ namespace personnel_tracking_webapi.Controllers
                 response.ErrorMessage = ex.Message;
                 return NotFound(response);
             }
-            Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
 
             response.Data = dbContext.Companies.Select(u => new {
                 u.CompanyId,
@@ -96,6 +96,7 @@ namespace personnel_tracking_webapi.Controllers
                     CompanyName = companyDto.CompanyName
                 };
                 dbContext.Update<Company>(newCompany).State = EntityState.Modified;
+                Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
             }
             catch (Exception ex)
             {
@@ -103,7 +104,6 @@ namespace personnel_tracking_webapi.Controllers
                 response.ErrorMessage = ex.Message;
                 return NotFound(response);
             }
-            Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
 
             response.Data = dbContext.Companies.Select(u => new {
                 u.CompanyId,
@@ -125,13 +125,13 @@ namespace personnel_tracking_webapi.Controllers
             {
                 var company = dbContext.Companies.Where(u => u.CompanyId == companyDto.CompanyId).FirstOrDefault();
                 dbContext.Companies.Remove(company).State = EntityState.Deleted;
+                Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
             }
             catch (Exception e)
             {
                 response.HasError = true;
                 response.ErrorMessage = e.Message;
             }
-            Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
             response.Data = dbContext.Companies.Select(u => new {
                 u.CompanyId,
                 u.CompanyName
