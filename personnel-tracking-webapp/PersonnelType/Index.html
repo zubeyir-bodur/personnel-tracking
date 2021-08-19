@@ -84,6 +84,24 @@
             </div>
         </div>
 
+        <!-- Error Modal-->
+        <div class="modal fade" id="error-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-danger" id="staticBackdropLabel">Error!</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="error-message">An error has ocurred!</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ok</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!--The table-->
         <div class="card-body">
             <div class="table-responsive">
@@ -105,7 +123,9 @@
     }
 </style>
 <script>
-    constructTable();
+    loadingFunction(() => {
+        constructTable();
+    }, 2000);
     var createform = document.getElementById("create-form");
     createform.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -114,10 +134,8 @@
             personnelTypeName: personnelTypeName
         };
         $('#create-data-modal').modal('hide');
-        $('#loading-modal').modal('show');
-        setTimeout(() => {
+        loadingFunction(() => {
             sendData(values);
-            $('#loading-modal').modal('hide');
         }, 2000);
     });
 
@@ -205,9 +223,7 @@
             "data": JSON.stringify(values),
         };
         $.ajax(settings).done((response) => {
-            var newData = JsonTo2DArray(response);
-            var datatable = $('#table-personnelType').DataTable();
-            datatable.clear().rows.add(newData).draw();
+            processResponse(response);
         });
     }
 
@@ -222,9 +238,7 @@
             "data": JSON.stringify(values),
         };
         $.ajax(settings).done((response) => {
-            var newData = JsonTo2DArray(response);
-            var datatable = $('#table-personnelType').DataTable();
-            datatable.clear().rows.add(newData).draw();
+            processResponse(response);
         });
     }
 
@@ -240,9 +254,7 @@
         };
 
         $.ajax(settings).done((response) => {
-            var newData = JsonTo2DArray(response);
-            var datatable = $('#table-personnelType').DataTable();
-            datatable.clear().rows.add(newData).draw();
+            processResponse(response);
         });
     }
 
@@ -258,5 +270,23 @@
             }
         }
         return dataset;
+    }
+
+    function loadingFunction(func, ms) {
+        $('#loading-modal').modal('show');
+        setTimeout(() => {
+            func();
+            $('#loading-modal').modal('hide');
+        }, ms);
+    }
+
+    function processResponse(response) {
+        if (response.hasError) {
+            $('#error-message').text(response.errorMessage);
+            $('#error-modal').modal('show');
+        }
+        var newData = JsonTo2DArray(response);
+        var datatable = $('#table-personnelType').DataTable();
+        datatable.clear().rows.add(newData).draw();
     }
 </script>

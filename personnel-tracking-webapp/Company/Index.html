@@ -74,11 +74,29 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p>Are you sure? All related personnel and areas will be deleted along with the company!</p>
+                        <p>Are you sure?</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
                         <a class="btn btn-danger btn-ok" id="submit-button-delete">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Modal-->
+        <div class="modal fade" id="error-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-danger" id="staticBackdropLabel">Error!</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="error-message">An error has ocurred!</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ok</button>
                     </div>
                 </div>
             </div>
@@ -106,7 +124,9 @@
 </style>
 
 <script>
-    constructTable();
+    loadingFunction(() => {
+        constructTable();
+    }, 2000);
     var createform = document.getElementById("create-form");
     createform.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -115,10 +135,8 @@
             companyName: companyName
         };
         $('#create-data-modal').modal('hide');
-        $('#loading-modal').modal('show');
-        setTimeout(() => {
+        loadingFunction(() => {
             sendData(values);
-            $('#loading-modal').modal('hide');
         }, 2000);
     });
 
@@ -146,6 +164,7 @@
         updateValue(values);
         $('#edit-data-modal').modal('hide');
     });
+
     var selected_company_name;
     $('#table-company').on('click', '#delete-button', function () {
         var datatable = $('#table-company').DataTable();
@@ -171,6 +190,10 @@
                 "Authorization": "Bearer " + localStorage.getItem("token")
             }
         }).done((response) => {
+            if (response.hasError) {
+                $('#error-message').val(response.errorMessage);
+                $('#error-modal').modal('show');
+            }
             var dataset = JsonTo2DArray(response);
             $('#table-company').DataTable({
                 language: {
@@ -205,9 +228,7 @@
             "data": JSON.stringify(values),
         };
         $.ajax(settings).done((response) => {
-            var newData = JsonTo2DArray(response);
-            var datatable = $('#table-company').DataTable();
-            datatable.clear().rows.add(newData).draw();
+            processResponse(response);
         });
     }
 
@@ -222,9 +243,7 @@
             "data": JSON.stringify(values),
         };
         $.ajax(settings).done((response) => {
-            var newData = JsonTo2DArray(response);
-            var datatable = $('#table-company').DataTable();
-            datatable.clear().rows.add(newData).draw();
+            processResponse(response);
         });
     }
 
@@ -238,11 +257,8 @@
             },
             "data": JSON.stringify(values),
         };
-
         $.ajax(settings).done((response) => {
-            var newData = JsonTo2DArray(response);
-            var datatable = $('#table-company').DataTable();
-            datatable.clear().rows.add(newData).draw();
+            processResponse(response);
         });
     }
 
@@ -258,5 +274,23 @@
             }
         }
         return dataset;
+    }
+
+    function loadingFunction(func, ms) {
+        $('#loading-modal').modal('show');
+        setTimeout(() => {
+            func();
+            $('#loading-modal').modal('hide');
+        }, ms);
+    }
+
+    function processResponse(response) {
+        if (response.hasError) {
+            $('#error-message').text(response.errorMessage);
+            $('#error-modal').modal('show');
+        }
+        var newData = JsonTo2DArray(response);
+        var datatable = $('#table-company').DataTable();
+        datatable.clear().rows.add(newData).draw();
     }
 </script>
