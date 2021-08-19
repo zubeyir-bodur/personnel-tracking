@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
@@ -15,8 +16,10 @@ namespace personnel_tracking_entity
 
         public int CompanyId { get; set; }
         public string CompanyName { get; set; }
-
+        
+        [JsonIgnore]
         public virtual ICollection<Area> Areas { get; set; }
+        [JsonIgnore]
         public virtual ICollection<Personnel> Personnel { get; set; }
     }
 }

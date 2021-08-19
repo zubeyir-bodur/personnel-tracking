@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 namespace personnel_tracking_webapi
 {
     public class Startup
@@ -25,9 +24,7 @@ namespace personnel_tracking_webapi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddNewtonsoftJson(options => 
-                options.SerializerSettings.ReferenceLoopHandling = 
-                Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+            services.AddControllers();
             services.AddCors(policy => policy.AddDefaultPolicy(options => {
                 options.AllowCredentials().AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowed(origin => true);
             }));
@@ -40,9 +37,10 @@ namespace personnel_tracking_webapi
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            app.UseRouting();
             app.UseCors();
+            app.UseRouting();
+           
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
