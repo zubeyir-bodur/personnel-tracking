@@ -45,6 +45,10 @@ namespace personnel_tracking_webapi.Controllers
             {
                 response.HasError = true;
                 response.ErrorMessage = ex.Message;
+                if (ex.InnerException != null)
+                {
+                    response.ErrorMessage += ": " + ex.InnerException.Message;
+                }
             }
             return Ok(response);
         }
@@ -64,16 +68,26 @@ namespace personnel_tracking_webapi.Controllers
                     PersonnelTypeId = personnelTypeDto.PersonnelTypeId,
                     PersonnelTypeName = personnelTypeDto.PersonnelTypeName
                 };
-                dbContext.Add<PersonnelType>(newPersonnelType).State = EntityState.Added;
-                Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
+                // don't add same company twice
+                bool exists = dbContext.PersonnelTypes.
+                    FirstOrDefault(pt => pt.PersonnelTypeName.Equals(personnelTypeDto.PersonnelTypeName)) != null;
+                if (exists)
+                    throw new Exception("Same role already exists.");
+                else
+                {
+                    dbContext.Add<PersonnelType>(newPersonnelType).State = EntityState.Added;
+                    Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
+                }
             }
             catch (Exception ex)
             {
                 response.HasError = true;
                 response.ErrorMessage = ex.Message;
-                return NotFound(response);
+                if (ex.InnerException != null)
+                {
+                    response.ErrorMessage += ": " + ex.InnerException.Message;
+                }
             }
-
             response.Data = dbContext.PersonnelTypes.Select(u => new {
                 u.PersonnelTypeId,
                 u.PersonnelTypeName
@@ -103,7 +117,10 @@ namespace personnel_tracking_webapi.Controllers
             {
                 response.HasError = true;
                 response.ErrorMessage = ex.Message;
-                return NotFound(response);
+                if (ex.InnerException != null)
+                {
+                    response.ErrorMessage += ": " + ex.InnerException.Message;
+                }
             }
 
             response.Data = dbContext.PersonnelTypes.Select(u => new {
@@ -132,6 +149,10 @@ namespace personnel_tracking_webapi.Controllers
             {
                 response.HasError = true;
                 response.ErrorMessage = e.Message;
+                if (e.InnerException != null)
+                {
+                    response.ErrorMessage += ": " + e.InnerException.Message;
+                }
             }
             response.Data = dbContext.PersonnelTypes.Select(u => new {
                 u.PersonnelTypeId,

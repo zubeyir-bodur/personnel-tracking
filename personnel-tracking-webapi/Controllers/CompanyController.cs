@@ -44,6 +44,10 @@ namespace personnel_tracking_webapi.Controllers
             {
                 response.HasError = true;
                 response.ErrorMessage = ex.Message;
+                if (ex.InnerException != null)
+                {
+                    response.ErrorMessage += ": " + ex.InnerException.Message;
+                }
             }
             return Ok(response);
         }
@@ -63,16 +67,26 @@ namespace personnel_tracking_webapi.Controllers
                     CompanyId = companyDto.CompanyId,
                     CompanyName = companyDto.CompanyName
                 };
-                dbContext.Add<Company>(newCompany).State = EntityState.Added;
-                Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
+                // don't add same company twice
+                bool exists = dbContext.Companies.
+                    FirstOrDefault(c => c.CompanyName.Equals(companyDto.CompanyName) ) != null;
+                if (exists) 
+                    throw new Exception("Same company already exists.");
+                else
+                {
+                    dbContext.Add<Company>(newCompany).State = EntityState.Added;
+                    Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
+                }
             }
             catch (Exception ex)
             {
                 response.HasError = true;
                 response.ErrorMessage = ex.Message;
-                return NotFound(response);
+                if (ex.InnerException != null)
+                {
+                    response.ErrorMessage += ": " + ex.InnerException.Message;
+                }
             }
-
             response.Data = dbContext.Companies.Select(u => new {
                 u.CompanyId,
                 u.CompanyName
@@ -102,9 +116,11 @@ namespace personnel_tracking_webapi.Controllers
             {
                 response.HasError = true;
                 response.ErrorMessage = ex.Message;
-                return NotFound(response);
+                if (ex.InnerException != null)
+                {
+                    response.ErrorMessage += ": " + ex.InnerException.Message;
+                }
             }
-
             response.Data = dbContext.Companies.Select(u => new {
                 u.CompanyId,
                 u.CompanyName
@@ -123,14 +139,17 @@ namespace personnel_tracking_webapi.Controllers
 
             try
             {
-                var company = dbContext.Companies.Where(u => u.CompanyId == companyDto.CompanyId).FirstOrDefault();
+                var company = dbContext.Companies.FirstOrDefault(u => u.CompanyId == companyDto.CompanyId);
                 dbContext.Companies.Remove(company).State = EntityState.Deleted;
                 Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 response.HasError = true;
-                response.ErrorMessage = e.Message;
+                response.ErrorMessage = ex.Message;
+                if (ex.InnerException != null) {
+                    response.ErrorMessage += ": " + ex.InnerException.Message;
+                }
             }
             response.Data = dbContext.Companies.Select(u => new {
                 u.CompanyId,
