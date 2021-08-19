@@ -10,5 +10,10 @@
                 $('#container-main').empty().append(obj);
             });
         });
+        $("#AreaPage").click(() => {
+            $.get('Area/Index.html', (obj) => {
+                $('#container-main').empty().append(obj);
+            });
+        });
     });
 });

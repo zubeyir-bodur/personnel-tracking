@@ -69,19 +69,15 @@ namespace personnel_tracking_webapi.Controllers
                 };
                 // don't add same company twice
                 bool exists = dbContext.Companies.
-                    FirstOrDefault(c => c.CompanyName.Equals(companyDto.CompanyName) ) != null;
-                if (exists) 
+                    FirstOrDefault(c => c.CompanyName.Equals(companyDto.CompanyName)) != null;
+                if (exists)
                     throw new Exception("Same company already exists.");
                 else
                 {
                     dbContext.Add<Company>(newCompany).State = EntityState.Added;
                     Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
                 }
-                else {
-                    response.HasError = true;
-                    response.ErrorMessage = "Same entry already exists";
-                    response.Data = companyDto; // send back the dto
-                }
+            }
             catch (Exception ex)
             {
                 response.HasError = true;
@@ -89,8 +85,8 @@ namespace personnel_tracking_webapi.Controllers
                 if (ex.InnerException != null)
                 {
                     response.ErrorMessage += ": " + ex.InnerException.Message;
+                }
             }
-        }
             response.Data = dbContext.Companies.Select(u => new {
                 u.CompanyId,
                 u.CompanyName
