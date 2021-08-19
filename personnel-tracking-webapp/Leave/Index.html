@@ -52,7 +52,6 @@
         $("#submit-added-leave").click(()=> {
             var leave = {};
             leave.PersonnelId = Number($('#personnel-input').val());
-            alert(leave.PersonnelId);
             leave.leaveStart = $('#leave-add-start').val();
             leave.leaveEnd = $('#leave-add-end').val();
             $.ajax({
@@ -65,9 +64,13 @@
                 "headers": {
                     "Authorization": "Bearer token"
                 },
-                success: function (result) {
+                success: function (response) {
 
-                    console.log(result);
+                    console.log(response);
+                    var newData = response.data;
+                    console.log(newData);
+                    var datatable = $('#table-leave').DataTable();
+                    datatable.clear().rows.add(newData).draw();
                 },
                 error: function (msg) {
 
@@ -86,6 +89,7 @@
                 for (var i = 0; i < response.data.length; i++) {
                     $("#personnel-input").append($('<option>').val(response.data[i].personnelId).text(response.data[i].personnelName + " " + response.data[i].personnelSurname));
                 }
+
             })
         }
         //My Delete Model
@@ -119,7 +123,10 @@
                 "data": JSON.stringify(values),
             };
             $.ajax(settings).done((response) => {
-                console.log(response);
+                var newData = response.data;
+                console.log(newData);
+                var datatable = $('#table-leave').DataTable();
+                datatable.clear().rows.add(newData).draw();
             });
         }
 
@@ -158,13 +165,12 @@
                 "data": JSON.stringify(values),
             };
             $.ajax(settings).done((response) => {
-                console.log(JSON.stringify(response));
+                var newData =response.data;
+                console.log(newData);
+                var datatable = $('#table-leave').DataTable();
+                datatable.clear().rows.add(newData).draw();
             });
         }
-
-
-
-
 
     </script>
     <div class="row" id="container-leave">

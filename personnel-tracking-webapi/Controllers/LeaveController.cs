@@ -73,7 +73,20 @@ namespace personnel_tracking_webapi.Controllers
                 response.HasError = true;
                 response.ErrorMessage = ex.Message;
             }
-
+            var leaveList = dbContext.Set<Leave>().ToList();
+            var leaveDTOlist = new List<LeaveDTO>();
+            for (int i = 0; i < leaveList.Count; i++)
+            {
+                leaveDTOlist.Add(new LeaveDTO
+                {
+                    leaveId = leaveList[i].LeaveId,
+                    personnelName = dbContext.Personnel.Where(e => e.PersonnelId == leaveList[i].PersonnelId).FirstOrDefault().PersonnelName,
+                    personnelSurname = dbContext.Personnel.Where(e => e.PersonnelId == leaveList[i].PersonnelId).FirstOrDefault().PersonnelSurname,
+                    leaveStart = leaveList[i].LeaveStart,
+                    leaveEnd = leaveList[i].LeaveEnd,
+                });
+            }
+            response.Data = leaveDTOlist;
             return Ok(response);
         }
 
@@ -100,7 +113,20 @@ namespace personnel_tracking_webapi.Controllers
                 response.HasError = true;
                 response.ErrorMessage = ex.Message;
             }
-
+            var leaveList = dbContext.Set<Leave>().ToList();
+            var leaveDTOlist = new List<LeaveDTO>();
+            for (int i = 0; i < leaveList.Count; i++)
+            {
+                leaveDTOlist.Add(new LeaveDTO
+                {
+                    leaveId = leaveList[i].LeaveId,
+                    personnelName = dbContext.Personnel.Where(e => e.PersonnelId == leaveList[i].PersonnelId).FirstOrDefault().PersonnelName,
+                    personnelSurname = dbContext.Personnel.Where(e => e.PersonnelId == leaveList[i].PersonnelId).FirstOrDefault().PersonnelSurname,
+                    leaveStart = leaveList[i].LeaveStart,
+                    leaveEnd = leaveList[i].LeaveEnd,
+                });
+            }
+            response.Data = leaveDTOlist;
             return Ok(response);
         }
 
@@ -121,7 +147,20 @@ namespace personnel_tracking_webapi.Controllers
                 response.HasError = true;
                 response.ErrorMessage = ex.Message;
             }
-
+            var leaveList = dbContext.Set<Leave>().ToList();
+            var leaveDTOlist = new List<LeaveDTO>();
+            for (int i = 0; i < leaveList.Count; i++)
+            {
+                leaveDTOlist.Add(new LeaveDTO
+                {
+                    leaveId = leaveList[i].LeaveId,
+                    personnelName = dbContext.Personnel.Where(e => e.PersonnelId == leaveList[i].PersonnelId).FirstOrDefault().PersonnelName,
+                    personnelSurname = dbContext.Personnel.Where(e => e.PersonnelId == leaveList[i].PersonnelId).FirstOrDefault().PersonnelSurname,
+                    leaveStart = leaveList[i].LeaveStart,
+                    leaveEnd = leaveList[i].LeaveEnd,
+                });
+            }
+            response.Data = leaveDTOlist;
             return Ok(response);
         }
 
