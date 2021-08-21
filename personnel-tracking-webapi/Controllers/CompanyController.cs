@@ -74,9 +74,9 @@ namespace personnel_tracking_webapi.Controllers
                     throw new Exception("Same company already exists.");
                 else
                 {
-                    dbContext.Add<Company>(newCompany).State = EntityState.Added;
+                dbContext.Add<Company>(newCompany).State = EntityState.Added;
                     Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
-                }
+            }
             }
             catch (Exception ex)
             {
@@ -85,7 +85,7 @@ namespace personnel_tracking_webapi.Controllers
                 if (ex.InnerException != null)
                 {
                     response.ErrorMessage += ": " + ex.InnerException.Message;
-                }
+            }
             }
             response.Data = dbContext.Companies.Select(u => new {
                 u.CompanyId,
@@ -111,7 +111,7 @@ namespace personnel_tracking_webapi.Controllers
                 };
                 dbContext.Update<Company>(newCompany).State = EntityState.Modified;
                 Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
-                }
+            }
             catch (Exception ex)
             {
                 response.HasError = true;
@@ -156,7 +156,7 @@ namespace personnel_tracking_webapi.Controllers
                 u.CompanyName
             }).ToList();
             return Ok(response);
-                }
+        }
 
         /* No wizard base admin page
         public IActionResult SaveChanges()
@@ -174,7 +174,7 @@ namespace personnel_tracking_webapi.Controllers
 
             return Ok(response);
         }*/
-        }
+    }
 
     public class CompanyDTO
     {

@@ -1,1 +1,466 @@
-﻿
+﻿<div class="row" id="container-personnel">
+    <div class="col-12">
+        <br />
+        <button type="button" class="btn btn-primary" id="create-button">
+            Create
+        </button>
+
+        <div class="modal fade" id="create-data-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Create new personnel</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="create-form">
+
+                            <div class="form-group">
+                                <label for="company-input">Companies</label>
+                                <select class="form-control" id="company-input">
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="personnelType-input">Personnel type</label>
+                                <select class="form-control" id="personnelType-input">
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="name-input">Name</label>
+                                <input type="text" class="form-control needs-validation-create" id="personnel_name" required >
+                            </div>
+                            <div class="form-group">
+                                <label for="surname-input">Surname</label>
+                                <input type="text" class="form-control needs-validation-create" id="personnel_surname" required>
+
+                            </div>
+                            <div class="form-group">
+                                <label for="idNum-input">Identity number</label>
+                                <input type="text" class="form-control needs-validation-create" id="personnel_IDnumber" required>
+                                <div class="error-id" style="display: none">Please enter a number</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="username-input">Username</label>
+                                <input type="text" class="form-control needs-validation-create" id="personnel_userName" required>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password-input">Password</label>
+                                <input type="text" class="form-control needs-validation-create" id="personnel_password" required>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="submit-button" form="create-form">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="edit-data-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">
+                            Edit area:</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-form">
+                            <div class="form-group">
+                                <label for="company-input">Companies</label>
+                                <select class="form-control" id="company-input-edit" required>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="personnelType-input">Personnel Type</label>
+                                <select class="form-control" id="personnelType-input-edit" required>
+                                </select>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="personnel-name-input-edit"> Name</label>
+                                <input type="text" class="form-control needs-validation-edit" id="personnel-name-input-edit" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="personnel-surname-input-edit">Surname</label>
+                                <input type="text" class="form-control needs-validation-edit" id="personnel-surname-input-edit" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="id-input-edit">Identity number</label>
+                                <input type="text" class="form-control needs-validation-edit" id="id-input-edit" required>
+                                <div class="error-id-edit" style="display: none">Please enter a number</div>
+
+                            </div>
+                            <div class="form-group"> 
+                                <label for="username-edit">Username</label>
+                                <input type="text" class="form-control needs-validation-edit" id="username-edit" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password-edit">Password</label>
+                                <input type="text" class="form-control needs-validation-edit" id="password-edit" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="submit-button-edit" form="edit-form">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="delete-data-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Delete Personnel</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure to delete this personnel?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
+                        <a class="btn btn-danger btn-ok" id="submit-button-delete">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="container-area">
+            <div class="col-12">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="table-personnel" class="table w-100">
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <script>
+            var formCreate = [];
+            $(document).ready(function () {
+                createTable();
+                getCompanyList();
+                getPersonnelTypeList();
+                formCreate = document.querySelectorAll('.needs-validation-create');
+            });
+
+           
+
+            //Functions
+            function createTable() {
+              //  alert("here");
+                $.ajax({
+                    url: "http://localhost:5000/api/personnel",
+                    headers: {
+                        "Authorization": "Bearer Bearer"
+                    }
+                }).done((response) => {
+                    var dataset = JsonTo2DArray(response);
+                    var t = $('#table-personnel').DataTable({
+
+                        data: dataset,
+                        columns: [
+
+                            { title: "#" },
+                            { title: "Personnel id" },
+                            { title: "Company id" },
+                            { title: "Personel type" },
+                            { title: "identity" },
+                            { title: "Name" },
+                            { title: "Surname" },
+                            { title: "Username" },
+                            { title: "Password" },
+                            { title: "actions" }
+                        ],
+                        "columnDefs": [{
+                            "targets": -1,
+                            "data": null,
+                            "defaultContent": "<a class=\"btn btn-danger\" id=\"delete-button\" data-toggle=\"modal\" data-target=\"#myDeleteModal\">Delete</a> <a class=\"btn btn-primary\"id=\"editModelB\" style=\"margin - left: 2 % \" data-toggle=\"modal\" data-target=\#myModa\">Edit</a>"
+                        }]
+
+                    });
+
+                 //   alert(dataset);
+                    return dataset;
+                });
+            }
+
+            function JsonTo2DArray(json) {
+                var dataset = [];
+                for (var i = 0; i < json.data.length; i++) {
+                    var obj = json.data[i];
+                    let j = 0;
+                    dataset[i] = [];
+
+                    //Need to find a better way to do this
+                    dataset[i][0] = i + 1;
+                    j++;
+
+                    for (var m in obj) {
+
+                        dataset[i][j] = obj[m];
+
+                        j++;
+                    }
+                }
+                return dataset;
+            }
+
+            function deleteValue(value) {
+
+                var settings = {
+                    "url": "http://localhost:5000/api/personnel",
+                    "method": "DELETE",
+                    "headers": {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer Bearer"
+                    },
+                    "data": JSON.stringify(value),
+                };
+                $.ajax(settings).done((response) => {
+                    var newData = JsonTo2DArray(response);
+                    var datatable = $('#table-personnel').DataTable();
+                    datatable.clear().rows.add(newData).draw();
+                 //   alert(response);
+                });
+            }
+
+
+            function getCompanyList() {
+                $.ajax({
+                    url: "http://localhost:5000/api/company",
+                    headers: {
+                        "Authorization": "Bearer token"
+                    }
+                }).done((response) => {
+                    for (var i = 0; i < response.data.length; i++) {
+                        $("#company-input").append(`<option>${response.data[i].companyName}</option>`);
+                        $("#company-input-edit").append(`<option>${response.data[i].companyName}</option>`);
+                    }
+                });
+            }
+
+            function getPersonnelTypeList() {
+                $.ajax({
+                    url: "http://localhost:5000/api/personnelType",
+                    headers: {
+                        "Authorization": "Bearer token"
+                    }
+                }).done((response) => {
+                    for (var i = 0; i < response.data.length; i++) {
+                        $("#personnelType-input").append(`<option>${response.data[i].personnelTypeName}</option>`);
+                        $("#personnelType-input-edit").append(`<option>${response.data[i].personnelTypeName}</option>`);
+                    }
+                });
+            }
+            function sendDataPOST(values) {
+                var settings = {
+                    "url": "http://localhost:5000/api/personnel",
+                    "method": "POST",
+                    "headers": {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer token"
+                    },
+                    "data": JSON.stringify(values),
+                };
+
+                $.ajax(settings).done((response) => {
+                    var newData = JsonTo2DArray(response);
+                    var datatable = $('#table-personnel').DataTable();
+                    datatable.clear().rows.add(newData).draw();
+                });
+            
+            }
+
+            function updateData(values)
+            {
+                var settings = {
+                    "url": "http://localhost:5000/api/personnel",
+                    "method": "PUT",
+                    "headers": {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer token"
+                    },
+                    "data": JSON.stringify(values),
+                };
+                $.ajax(settings).done((response) => {
+
+                    var newData = JsonTo2DArray(response);
+                    var datatable = $('#table-personnel').DataTable();
+                    datatable.clear().rows.add(newData).draw();
+                });
+            }
+
+           
+
+
+            //Button clicks
+            $("#create-button").click(() => {
+                $('#create-data-modal').modal('show');
+            });
+
+            //delete 
+            var selected_personnel_id;
+            $('#table-personnel').on('click', '#delete-button', function () {
+                var datatable = $('#table-personnel').DataTable();
+                var data = datatable.row($(this).parents('tr')).data();
+
+                selected_personnel_id = data[1];
+      
+               $("#delete-data-modal").modal('show');
+            });
+          
+
+            $('#submit-button-delete').click(() => {
+                var values = {
+                    personnelId: selected_personnel_id
+                };
+                console.log(values);
+                deleteValue(values);
+
+                $('#delete-data-modal').modal('hide');
+
+            });
+
+            //Edit
+            $('#table-personnel').on('click', '#editModelB', function () {
+                var datatable = $('#table-personnel').DataTable();
+                var data = datatable.row($(this).parents('tr')).data();
+                selected_personnel_id = data[1];
+                $('#company-input-edit').val(data[2]);
+                $('#personnelType-input-edit').val(data[3]);
+                $('#id-input-edit').val(data[4]);
+                $('#personnel-name-input-edit').val(data[5]);
+                $('#personnel-surname-input-edit').val(data[6]);
+                $('#username-edit').val(data[7]);
+                $('#password-edit').val(data[8]);
+                $("#edit-data-modal").modal('show');
+            });
+
+            $('#submit-button-edit').click(() => {
+
+                var found = false;
+                //Clearing out error inputs
+                $('.needs-validation-edit').each(function (i, obj) {
+
+                    $(obj).css("border", "1px solid #ced4da");
+
+                });
+                $(".error-id-edit").css('display', 'none');
+
+                //Marking empty fields
+                $('.needs-validation-edit').each(function (i, obj) {
+                    if ($(obj).val() === "") {
+                        found = true;
+                        $(obj).css("border", "1px solid red")
+                    }
+                });
+
+                if (!found) {
+
+                    var personnelId = selected_personnel_id
+
+                    var company = $('#company-input-edit').val();
+                    var personnelType = $("#personnelType-input-edit").val();
+                    var identityNum = $("#id-input-edit").val();
+                    var name = $("#personnel-name-input-edit").val();
+                    var surname = $("#personnel-surname-input-edit").val();
+                    var username = $("#username-edit").val();
+                    var password = $('#password-edit').val();
+                    let isnum = /^\d+$/.test(identityNum);
+                    if (!isnum) {
+                        $(".error-id-edit").css('color', 'red');
+                        $(".error-id-edit").css('display', 'block');
+                        $("#personnel_IDnumber").css("border", "1px solid red");
+                    }
+                    else {
+
+                        var values = {
+                            personnelId: personnelId,
+                            company: company,
+                            personnelType: personnelType,
+                            username: username,
+                            password: password,
+                            identityNumber: parseInt(identityNum),
+                            personnelName: name,
+                            personnelSurname: surname
+                        }
+                        updateData(values);
+
+                        $('#edit-data-modal').modal('hide');
+                    }
+                }
+            });
+
+
+
+            //Create new
+            $('#submit-button').click(() => {
+
+                var found = false;
+                //Clearing out error inputs
+                $('.needs-validation-create').each(function (i, obj) {
+               
+                    $(obj).css("border", "1px solid #ced4da");
+                    
+                });
+                $(".error-id").css('display', 'none');
+
+                //Mark empty inputs
+                $('.needs-validation-create').each(function (i, obj) {
+                    if ($(obj).val() === "") {
+                        found = true;
+                        $(obj).css("border", "1px solid red")
+                    }
+                });
+               
+                if (!found) {
+                    var personnel_name = $('#personnel_name').val();
+                    var personnel_surname = $("#personnel_surname").val();
+                    var company = $("#company-input").val();
+                    var personnelType = $("#personnelType-input").val();
+                    var identityNum = $("#personnel_IDnumber").val();
+                    var username = $("#personnel_userName").val();
+                    var password = $("#personnel_password").val();
+                    let isnum = /^\d+$/.test(identityNum);
+                    if (!isnum) {
+                        $(".error-id").css('color', 'red');
+                        $(".error-id").css('display', 'block');
+                        $("#personnel_IDnumber").css("border", "1px solid red");
+                    }
+                    else {
+
+                        var values = {
+                            company: company,
+                            personnelType: personnelType,
+                            username: username,
+                            password: password,
+                            identityNumber: parseInt(identityNum),
+                            personnelName: personnel_name,
+                            personnelSurname: personnel_surname
+                        }
+                        $('#create-data-modal').modal('hide');
+
+                        $('#create-form').each(function () {
+                            this.reset();
+                        });
+
+                       
+
+                        sendDataPOST(values);
+                    }
+                }
+            });
+            
+        </script>

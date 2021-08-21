@@ -48,7 +48,7 @@ namespace personnel_tracking_webapi.Controllers
                 if (ex.InnerException != null)
                 {
                     response.ErrorMessage += ": " + ex.InnerException.Message;
-                }
+            }
             }
             return Ok(response);
         }
@@ -75,9 +75,9 @@ namespace personnel_tracking_webapi.Controllers
                     throw new Exception("Same role already exists.");
                 else
                 {
-                    dbContext.Add<PersonnelType>(newPersonnelType).State = EntityState.Added;
-                    Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
-                }
+                dbContext.Add<PersonnelType>(newPersonnelType).State = EntityState.Added;
+                Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
+            }
             }
             catch (Exception ex)
             {

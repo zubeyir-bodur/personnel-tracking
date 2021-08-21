@@ -15,5 +15,10 @@
                 $('#container-main').empty().append(obj);
             });
         });
+        $("#PersonnelPage").click(() => {
+            $.get('Personnel/Index.html', (obj) => {
+                $('#container-main').empty().append(obj);
+            });
+        });
     });
 });
