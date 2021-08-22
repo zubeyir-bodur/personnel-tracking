@@ -123,9 +123,7 @@
     }
 </style>
 <script>
-    loadingFunction(() => {
-        constructTable();
-    }, 2000);
+    constructTable();
     var createform = document.getElementById("create-form");
     createform.addEventListener('submit', (e) => {
         e.preventDefault();

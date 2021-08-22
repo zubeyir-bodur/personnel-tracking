@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace personnel_tracking_webapi.Controllers
 {
-    [Route("api/company")]
+    [Route("api/[controller]")]
     [ApiController]
     [TokenCheck]
     public class CompanyController : ControllerBase
