@@ -13,41 +13,40 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="create-form">
-
+                        <form id="create-form" class="needs-validation" novalidate>
                             <div class="form-group">
                                 <label for="company-input">Companies</label>
-                                <select class="form-control" id="company-input">
+                                <select class="form-control validate-me" id="company-input">
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="personnelType-input">Personnel type</label>
-                                <select class="form-control" id="personnelType-input">
+                                <select class="form-control validate-me" id="personnelType-input">
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="name-input">Name</label>
-                                <input type="text" class="form-control needs-validation-create" id="personnel_name" required >
+                                <input type="text" class="form-control validate-me" id="personnel_name" required>
                             </div>
                             <div class="form-group">
                                 <label for="surname-input">Surname</label>
-                                <input type="text" class="form-control needs-validation-create" id="personnel_surname" required>
+                                <input type="text" class="form-control validate-me" id="personnel_surname" required>
 
                             </div>
                             <div class="form-group">
                                 <label for="idNum-input">Identity number</label>
-                                <input type="text" class="form-control needs-validation-create" id="personnel_IDnumber" required>
+                                <input type="number" class="form-control validate-me" id="personnel_IDnumber" required>
                                 <div class="error-id" style="display: none">Please enter a number</div>
                             </div>
                             <div class="form-group">
                                 <label for="username-input">Username</label>
-                                <input type="text" class="form-control needs-validation-create" id="personnel_userName" required>
+                                <input type="text" class="form-control validate-me username" id="personnel_userName" required>
                                 <div class="error-username" style="display: none">This username is already being used!</div>
                             </div>
 
                             <div class="form-group">
                                 <label for="password-input">Password</label>
-                                <input type="text" class="form-control needs-validation-create" id="personnel_password" required>
+                                <input type="text" class="form-control validate-me" id="personnel_password" required>
                             </div>
 
                         </form>
@@ -70,42 +69,42 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="edit-form">
+                        <form id="edit-form" class=" edit needs-validation" novalidate>
                             <div class="form-group">
                                 <label for="company-input">Companies</label>
-                                <select class="form-control" id="company-input-edit" required>
+                                <select class="form-control validate-me" id="company-input-edit" required>
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <label for="personnelType-input">Personnel Type</label>
-                                <select class="form-control" id="personnelType-input-edit" required>
+                                <select class="form-control validate-me" id="personnelType-input-edit" required>
                                 </select>
                             </div>
 
 
                             <div class="form-group">
                                 <label for="personnel-name-input-edit"> Name</label>
-                                <input type="text" class="form-control needs-validation-edit" id="personnel-name-input-edit" required>
+                                <input type="text" class="form-control validate-me" id="personnel-name-input-edit" required>
                             </div>
                             <div class="form-group">
                                 <label for="personnel-surname-input-edit">Surname</label>
-                                <input type="text" class="form-control needs-validation-edit" id="personnel-surname-input-edit" required>
+                                <input type="text" class="form-control validate-me" id="personnel-surname-input-edit" required>
                             </div>
                             <div class="form-group">
                                 <label for="id-input-edit">Identity number</label>
-                                <input type="text" class="form-control needs-validation-edit" id="id-input-edit" required>
+                                <input type="text" class="form-control validate-me" id="id-input-edit" required>
                                 <div class="error-id-edit" style="display: none">Please enter a number</div>
 
                             </div>
                             <div class="form-group">
                                 <label for="username-edit">Username</label>
-                                <input type="text" class="form-control needs-validation-edit" id="username-edit" required>
+                                <input type="text" class="form-control validate-me" id="username-edit" required>
                                 <div class="error-username-edit" style="display: none">This username is already being used!</div>
                             </div>
                             <div class="form-group">
                                 <label for="password-edit">Password</label>
-                                <input type="text" class="form-control needs-validation-edit" id="password-edit" required>
+                                <input type="text" class="form-control validate-me" id="password-edit" required>
                             </div>
                         </form>
                     </div>
@@ -146,19 +145,160 @@
         </div>
     </div>
 </div>
+<style>
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
 
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
         <script>
-            var formCreate = [];
+            var username_before;
+            var selected_personnel_id;
             $(document).ready(function () {
                 createTable();
                 getCompanyList();
                 getPersonnelTypeList();
                 formCreate = document.querySelectorAll('.needs-validation-create');
+                var forms = document.querySelectorAll('.needs-validation')
+
+                // Loop over them and prevent submission
+                Array.prototype.slice.call(forms)
+                    .forEach(function (form) {
+                        form.addEventListener('submit', function (event) {
+                            if (!form.checkValidity()) {
+                                event.preventDefault()
+                                event.stopPropagation()
+                                form.classList.add('was-validated');
+                            }
+                            else
+                            {
+                                form.classList.remove('was-validated');
+                                var validate_me = document.querySelectorAll('.validate-me');
+                                for (var i = 0; i < validate_me.length; i++) {
+                                    validate_me[i].classList.add('is-valid');
+                                }
+                                console.log(form);
+                                if (!$(form).hasClass("edit")) {
+                                    submitNew(event);
+                                }
+                                else {
+                                    updatePersonnel(event);
+                                }
+                                
+                            }
+                        }, false)
+                    });
             });
 
            
 
             //Functions
+            async function updatePersonnel(event)
+            {
+             
+                event.preventDefault();
+                var personnelId = selected_personnel_id
+                var company = $('#company-input-edit').val();
+                var personnelType = $("#personnelType-input-edit").val();
+                var identityNum = $("#id-input-edit").val();
+                var name = $("#personnel-name-input-edit").val();
+                var surname = $("#personnel-surname-input-edit").val();
+                var username = $("#username-edit").val();
+                var value =
+                {
+                    username: username,
+                }
+                var unique = await checkUserName(value)
+                if (!unique && username_before != username) {
+                    $(".error-username-edit").css('color', 'red');
+                    $(".error-username-edit").css('display', 'block');
+                    $("#username-edit").removeClass('is-valid');
+                    $("#username-edit").addClass('is-invalid');
+
+                }
+                else
+                {
+                    var password = $('#password-edit').val();
+                    var values = {
+                        personnelId: personnelId,
+                        company: company,
+                        personnelType: personnelType,
+                        username: username,
+                        password: password,
+                        identityNumber: parseInt(identityNum),
+                        personnelName: name,
+                        personnelSurname: surname
+                    }
+
+                    var validate_me = document.querySelectorAll('.validate-me');
+                    for (var i = 0; i < validate_me.length; i++)
+                    {
+                        validate_me[i].classList.remove('is-valid');
+                        validate_me[i].classList.remove('is-invalid');
+                    }
+                    $(".error-username-edit").css('display', 'none');
+                    updateData(values);
+
+                    $('#edit-data-modal').modal('hide');
+                }
+
+                
+            }
+            async function submitNew(event) {
+                event.preventDefault();
+                $(".error-username").css('display', 'none');
+                var personnel_name = $('#personnel_name').val();
+                var personnel_surname = $("#personnel_surname").val();
+                var company = $("#company-input").val();
+                var personnelType = $("#personnelType-input").val();
+                var identityNum = $("#personnel_IDnumber").val();
+
+                //Check if username is unique
+                var username = $("#personnel_userName").val();
+                var val =
+                {
+                    username: username
+                }
+                var unique = await checkUserName(val);
+
+                if (!unique) {
+                    $(".username").removeClass('is-valid');
+                    $(".username").addClass('is-invalid');
+                    $(".error-username").css('color', 'red');
+                    $(".error-username").css('display', 'block');
+                }
+                else {
+                    console.log("here");
+                    var password = $("#personnel_password").val();
+                    var values = {
+                        company: company,
+                        personnelType: personnelType,
+                        username: username,
+                        password: password,
+                        identityNumber: parseInt(identityNum),
+                        personnelName: personnel_name,
+                        personnelSurname: personnel_surname
+                    }
+
+                    var validate_me = document.querySelectorAll('.validate-me');
+                    for (var i = 0; i < validate_me.length; i++) {
+                        validate_me[i].classList.remove('is-valid');
+                    }
+
+                    $('#create-form').each(function () {
+                        this.reset();
+                    });
+                    $('#create-data-modal').modal('hide');
+                    sendDataPOST(values);
+                }
+            }
+            
             function createTable() {
                 $.ajax({
                     url: "http://localhost:5000/api/personnel",
@@ -330,12 +470,13 @@
 
 
             //Button clicks
+            //Create
             $("#create-button").click(() => {
                 $('#create-data-modal').modal('show');
             });
 
             //delete 
-            var selected_personnel_id;
+           
             $('#table-personnel').on('click', '#delete-button', function () {
                 var datatable = $('#table-personnel').DataTable();
                 var data = datatable.row($(this).parents('tr')).data();
@@ -374,154 +515,6 @@
                 $("#edit-data-modal").modal('show');
             });
 
-            var form_edit = document.getElementById("edit-form");
-            form_edit.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                var found = false;
-                //Clearing out error inputs
-                $('.needs-validation-edit').each(function (i, obj) {
-
-                    $(obj).css("border", "1px solid #ced4da");
-
-                });
-                $(".error-id-edit").css('display', 'none');
-                $(".error-username-edit").css('display', 'none');
-
-                //Marking empty fields
-                $('.needs-validation-edit').each(function (i, obj) {
-                    if ($(obj).val() === "") {
-                        found = true;
-                        $(obj).css("border", "1px solid red")
-                    }
-                });
-
-                if (!found) {
-
-                    var personnelId = selected_personnel_id
-
-                    var company = $('#company-input-edit').val();
-                    var personnelType = $("#personnelType-input-edit").val();
-                    var identityNum = $("#id-input-edit").val();
-                    let isnum = /^\d+$/.test(identityNum);
-                    if (!isnum) {
-                        $(".error-id-edit").css('color', 'red');
-                        $(".error-id-edit").css('display', 'block');
-                        $("#personnel_IDnumber").css("border", "1px solid red");
-                    }
-                    else {
-                        var name = $("#personnel-name-input-edit").val();
-                        var surname = $("#personnel-surname-input-edit").val();
-                        var username = $("#username-edit").val();
-                        var value =
-                        {
-                            username: username,
-                        }
-                        var unique = await checkUserName(value)
-                        if (!unique && username_before != username)
-                        {
-                            $(".error-username-edit").css('color', 'red');
-                            $(".error-username-edit").css('display', 'block');
-                            $("#personnel_userName").css("border", "1px solid red");
-
-                        }
-                        else
-                        {
-                            var password = $('#password-edit').val();
-                            var values = {
-                                personnelId: personnelId,
-                                company: company,
-                                personnelType: personnelType,
-                                username: username,
-                                password: password,
-                                identityNumber: parseInt(identityNum),
-                                personnelName: name,
-                                personnelSurname: surname
-                            }
-                            updateData(values);
-
-                            $('#edit-data-modal').modal('hide');
-                        }
-                    }
-                }
-            });
-
-
-
-            //Create new
-            var form = document.getElementById("create-form");
-            form.addEventListener('submit', async (e) => {
-
-                e.preventDefault();
-                var found = false;
-                //Clearing out error inputs
-                $('.needs-validation-create').each(function (i, obj) {
-               
-                    $(obj).css("border", "1px solid #ced4da");
-                    
-                });
-                $(".error-id").css('display', 'none');
-                $(".error-username").css('display', 'none');
-
-                //Mark empty inputs
-                $('.needs-validation-create').each(function (i, obj) {
-                    if ($(obj).val() === "") {
-                        found = true;
-                        $(obj).css("border", "1px solid red")
-                    }
-                });
-               
-                if (!found)
-                {
-                    var personnel_name = $('#personnel_name').val();
-                    var personnel_surname = $("#personnel_surname").val();
-                    var company = $("#company-input").val();
-                    var personnelType = $("#personnelType-input").val();
-                    var identityNum = $("#personnel_IDnumber").val();
-
-                    //Check if id is a number
-                    let isnum = /^\d+$/.test(identityNum);
-                    if (!isnum)
-                    {
-                        $(".error-id").css('color', 'red');
-                        $(".error-id").css('display', 'block');
-                        $("#personnel_IDnumber").css("border", "1px solid red");
-                    }
-                    else {
-                        //Check if username is unique
-                        var username = $("#personnel_userName").val();
-                        var val = {
-                            username: username
-                        }
-                        var unique = await checkUserName(val);
-                        console.log(unique);
-                        if (!unique) {
-                                $(".error-username").css('color', 'red');
-                                $(".error-username").css('display', 'block');
-                                $("#personnel_userName").css("border", "1px solid red");
-
-                            }
-                            else
-                           {
-                               console.log("here");
-                                var password = $("#personnel_password").val();
-                                var values = {
-                                    company: company,
-                                    personnelType: personnelType,
-                                    username: username,
-                                    password: password,
-                                    identityNumber: parseInt(identityNum),
-                                    personnelName: personnel_name,
-                                    personnelSurname: personnel_surname
-                                }
-                                $('#create-data-modal').modal('hide');
-
-                            $('#create-form').each(function () {
-                                this.reset();
-                            });
-                                sendDataPOST(values);
-                                }
-                     }
-                }
-            });
+           
             
         </script>
