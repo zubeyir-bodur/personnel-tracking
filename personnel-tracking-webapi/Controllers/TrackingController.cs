@@ -77,7 +77,24 @@ namespace personnel_tracking_webapi.Controllers
                 response.ErrorMessage = ex.Message;
             }
 
-            return Ok(response);
+            var trackingList = dbContext.Set<Tracking>().ToList();
+            var trackingDTOList = new List<TrackingDTO>();
+            for (int i = 0; i < trackingList.Count; i++)
+            {
+                trackingDTOList.Add(new TrackingDTO
+                {
+                    trackingId = trackingList[i].TrackingId,
+                    personnelName = dbContext.Personnel.Where(e => e.PersonnelId == trackingList[i].PersonnelId).FirstOrDefault().PersonnelName,
+                    personnelSurname = dbContext.Personnel.Where(e => e.PersonnelId == trackingList[i].PersonnelId).FirstOrDefault().PersonnelSurname,
+                    areaName = dbContext.Areas.Where(a => a.AreaId == trackingList[i].AreaId).FirstOrDefault().AreaName,
+                    entranceDate = trackingList[i].EntranceDate,
+                    exitDate = trackingList[i].ExitDate,
+                    autoExit = trackingList[i].AutoExit,
+                });
+            }
+
+            response.Data = trackingDTOList;
+           return Ok(response);
         }
 
         [HttpPut]
@@ -91,6 +108,8 @@ namespace personnel_tracking_webapi.Controllers
                 {
                     Tracking trackingData = dbContext.Set<Tracking>().Where(p => p.TrackingId == t.TrackingId).FirstOrDefault<Tracking>();
 
+                    trackingData.PersonnelId = t.PersonnelId;
+                    trackingData.AreaId = t.AreaId;
                     trackingData.EntranceDate = t.EntranceDate;
                     trackingData.ExitDate = t.ExitDate;
                     trackingData.AutoExit = t.AutoExit;
@@ -105,6 +124,23 @@ namespace personnel_tracking_webapi.Controllers
                 response.ErrorMessage = ex.Message;
             }
 
+            var trackingList = dbContext.Set<Tracking>().ToList();
+            var trackingDTOList = new List<TrackingDTO>();
+            for (int i = 0; i < trackingList.Count; i++)
+            {
+                trackingDTOList.Add(new TrackingDTO
+                {
+                    trackingId = trackingList[i].TrackingId,
+                    personnelName = dbContext.Personnel.Where(e => e.PersonnelId == trackingList[i].PersonnelId).FirstOrDefault().PersonnelName,
+                    personnelSurname = dbContext.Personnel.Where(e => e.PersonnelId == trackingList[i].PersonnelId).FirstOrDefault().PersonnelSurname,
+                    areaName = dbContext.Areas.Where(a => a.AreaId == trackingList[i].AreaId).FirstOrDefault().AreaName,
+                    entranceDate = trackingList[i].EntranceDate,
+                    exitDate = trackingList[i].ExitDate,
+                    autoExit = trackingList[i].AutoExit,
+                });
+            }
+
+            response.Data = trackingDTOList;
             return Ok(response);
         }
 
@@ -125,6 +161,23 @@ namespace personnel_tracking_webapi.Controllers
                 response.ErrorMessage = ex.Message;
             }
 
+            var trackingList = dbContext.Set<Tracking>().ToList();
+            var trackingDTOList = new List<TrackingDTO>();
+            for (int i = 0; i < trackingList.Count; i++)
+            {
+                trackingDTOList.Add(new TrackingDTO
+                {
+                    trackingId = trackingList[i].TrackingId,
+                    personnelName = dbContext.Personnel.Where(e => e.PersonnelId == trackingList[i].PersonnelId).FirstOrDefault().PersonnelName,
+                    personnelSurname = dbContext.Personnel.Where(e => e.PersonnelId == trackingList[i].PersonnelId).FirstOrDefault().PersonnelSurname,
+                    areaName = dbContext.Areas.Where(a => a.AreaId == trackingList[i].AreaId).FirstOrDefault().AreaName,
+                    entranceDate = trackingList[i].EntranceDate,
+                    exitDate = trackingList[i].ExitDate,
+                    autoExit = trackingList[i].AutoExit,
+                });
+            }
+
+            response.Data = trackingDTOList;
             return Ok(response);
         }
 
