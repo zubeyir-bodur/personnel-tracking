@@ -299,8 +299,8 @@
                 });
             }
 
-            function checkUserName(values) {
-
+          async function checkUserName(values) {
+                var returnVal;
                 var settings = {
                     "url": "http://localhost:5000/api/personnel/checkUsername",
                     "method": "GET",
@@ -310,19 +310,20 @@
                     },
                     "data": values,
                 };
-                $.ajax(settings).done((response) => {
+                await $.ajax(settings).done((response) => {
                     console.log(response.data);
                     if (String(response.data) == "Does not exist") {
 
                         console.log("true");
-                        return true;
+                        returnVal = true;
                     }
                     else {
                         console.log("false");
-                        return false;
+                        returnVal = false;
                     }
                        
                 });
+                return returnVal;
             }
 
            
@@ -374,7 +375,7 @@
             });
 
             var form_edit = document.getElementById("edit-form");
-            form_edit.addEventListener('submit', (e) => {
+            form_edit.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 var found = false;
                 //Clearing out error inputs
@@ -415,7 +416,8 @@
                         {
                             username: username,
                         }
-                        if (!checkUserName(username) && username_before != username)
+                        var unique = await checkUserName(value)
+                        if (!unique && username_before != username)
                         {
                             $(".error-username-edit").css('color', 'red');
                             $(".error-username-edit").css('display', 'block');
@@ -447,7 +449,7 @@
 
             //Create new
             var form = document.getElementById("create-form");
-            form.addEventListener('submit', (e) => {
+            form.addEventListener('submit', async (e) => {
 
                 e.preventDefault();
                 var found = false;
@@ -490,34 +492,34 @@
                         var val = {
                             username: username
                         }
-                        var unique = checkUserName(val);
-                        //alert(unique);
-                        if (false) {
-                            alert("stop!!" + username);
-                            $(".error-username").css('color', 'red');
-                            $(".error-username").css('display', 'block');
-                            $("#personnel_userName").css("border", "1px solid red");
+                        var unique = await checkUserName(val);
+                        console.log(unique);
+                        if (!unique) {
+                                $(".error-username").css('color', 'red');
+                                $(".error-username").css('display', 'block');
+                                $("#personnel_userName").css("border", "1px solid red");
 
-                        }
-                        else
-                        {
-                            var password = $("#personnel_password").val();
-                            var values = {
-                                company: company,
-                                personnelType: personnelType,
-                                username: username,
-                                password: password,
-                                identityNumber: parseInt(identityNum),
-                                personnelName: personnel_name,
-                                personnelSurname: personnel_surname
                             }
-                            $('#create-data-modal').modal('hide');
+                            else
+                           {
+                               console.log("here");
+                                var password = $("#personnel_password").val();
+                                var values = {
+                                    company: company,
+                                    personnelType: personnelType,
+                                    username: username,
+                                    password: password,
+                                    identityNumber: parseInt(identityNum),
+                                    personnelName: personnel_name,
+                                    personnelSurname: personnel_surname
+                                }
+                                $('#create-data-modal').modal('hide');
 
-                        $('#create-form').each(function () {
-                            this.reset();
-                        });
-                            sendDataPOST(values);
-                        }
+                            $('#create-form').each(function () {
+                                this.reset();
+                            });
+                                sendDataPOST(values);
+                                }
                      }
                 }
             });
