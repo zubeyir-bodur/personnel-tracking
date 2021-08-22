@@ -20,5 +20,14 @@
                 $('#container-main').empty().append(obj);
             });
         });
+        $('#Leave').click(function (e) {
+            e.preventDefault();
+            $.get('Leave/Index.html', (e) => {
+                $('#container-main').html(e);
+            }); return false;
+        });
     });
 });
+
+
+

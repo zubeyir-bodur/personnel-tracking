@@ -40,8 +40,8 @@ namespace personnel_tracking_webapi.Controllers
                     u.PersonnelSurname,
                     u.UserName,
                     u.Password
-                    });
-           
+                });
+
                 response.Data = personnelDTOList;
             }
             catch (Exception ex)
@@ -79,7 +79,7 @@ namespace personnel_tracking_webapi.Controllers
             }
 
             dbContext.SaveChanges();
-           
+
             response.Data = dbContext.Personnel.Select(u => new {
                 u.PersonnelId,
                 u.Company.CompanyName,
@@ -90,7 +90,7 @@ namespace personnel_tracking_webapi.Controllers
                 u.UserName,
                 u.Password
             });
-            
+
             return Ok(response);
         }
 
@@ -146,7 +146,7 @@ namespace personnel_tracking_webapi.Controllers
                 Personnel personnel = dbContext.Personnel.Where(u => u.PersonnelId == personnelDTO.personnelId).FirstOrDefault();
                 dbContext.Personnel.Remove(personnel).State = EntityState.Deleted;
                 //save
-           
+
             }
             catch (Exception e)
             {
