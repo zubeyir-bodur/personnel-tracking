@@ -165,8 +165,9 @@ namespace personnel_tracking_webapi.Controllers
                 u.IdentityNumber,
                 u.PersonnelName,
                 u.PersonnelSurname,
-                u.Password,
-                u.UserName
+                u.UserName,
+                u.Password
+                
             });
             ///save chanege
 
