@@ -173,6 +173,24 @@ namespace personnel_tracking_webapi.Controllers
             return Ok(response);
         }
 
+        //Check if user with given username exists
+
+        [HttpGet("checkUsername")]
+        public IActionResult checkUsername( string username)
+        {
+            ResponseModel response = new ResponseModel();
+            Personnel personnel = dbContext.Personnel.Where(u => u.UserName == username).FirstOrDefault();
+            if (personnel == null)
+            {
+                response.Data = "Does not exist";
+            }
+            else
+            {
+                response.Data = "Exists";
+            }
+            return Ok(response);
+        }
+
         public IActionResult SaveChanges()
         {
             ResponseModel response = new ResponseModel();
