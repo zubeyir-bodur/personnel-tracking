@@ -1,1 +1,386 @@
-﻿
+﻿<div class="row" id="container-area">
+    <div class="col-12">
+        <div class="modal fade" id="delete-data-modal" role="dialog" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Delete Selected Tracking</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure to delete this tracking?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancel-button-delete">Cancel</button>
+                        <button type="button" class="btn btn-danger" id="submit-button-delete">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="edit-data-modal" role="dialog" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Edit Selected Tracking</h5>
+                    </div>
+                    <div class="modal-body">
+                        <label for="editPersonnelID">Personnel List</label>
+                        <select style="margin-top: 10px;" class="form-control" id="editPersonnelID">
+                        </select>
+                        <label style="margin-right: 10px; margin-top: 10px;" for="editAreaID">Area List</label>
+                        <select style="margin-top: 10px;" class="form-control" id="editAreaID">
+                        </select>
+                        <label style="margin-right: 10px; margin-top: 20px;">Entrance Date</label>
+                        <input type="datetime-local" id="edit-entrance-date"><br>
+                        <label style="margin-top: 10px; margin-right: 45px;">Exit Date       </label>
+                        <input type="datetime-local" id="edit-exit-date" style="margin-top: 10px;"><br>
+                        <label style="margin-top: 10px; margin-right: 45px;">Auto Exit       </label>
+                        <input type="checkbox" id="edit-auto-exit" style="margin-top: 10px;">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancel-button-edit">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="submit-button-edit">Edit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="create-data-modal" role="dialog" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Create New Tracking</h5>
+                    </div>
+                    <div class="modal-body">
+                        <label for="createPersonnelID">Personnel List</label>
+                        <select style="margin-top: 10px;" class="form-control" id="createPersonnelID">
+                        </select>
+                        <label style="margin-right: 10px; margin-top: 10px;" for="createAreaID">Area List</label>
+                        <select style="margin-top: 10px;" class="form-control" id="createAreaID">
+                        </select>
+                        <label style="margin-right: 10px; margin-top: 20px;">Entrance Date</label>
+                        <input type="datetime-local" id="createEntranceDate" style="margin-top: 20px;"><br>
+                        <label style="margin-top: 10px; margin-right: 45px;">Exit Date  </label>
+                        <input type="datetime-local" id="createExitDate" style="margin-top: 10px;"><br>
+                        <label style="margin-top: 10px; margin-right: 45px;">Auto Exit </label>
+                        <input type="checkbox" id="createAutoExit" style="margin-top: 10px;">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancel-button-create">Cancel</button>
+                        <button type="button" class="btn btn-success" id="submit-button-create">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="table-tracking" class="table w-100">
+                    <thead>
+                        <tr>
+                            <th>Tracking ID</th>
+                            <th>Personnel Name</th>
+                            <th>Personnel Surname</th>
+                            <th>Area Name</th>
+                            <th>Entrance Date</th>
+                            <th>Exit Date</th>
+                            <th>Auto Exit</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <button input="button" class="btn btn-success" id="createNewTracking">Create</button>
+    </div>
+</div>
+
+
+<script>
+
+
+    $(document).ready(function () {
+
+
+        $.ajax({
+
+            "url": "http://localhost:5000/api/tracking",
+            "type": "GET",
+            "datatype": 'json',
+            headers: {
+                "Authorization": "Bearer token"
+            },
+            "success": function (response) {
+
+                $('#table-tracking').DataTable({
+
+                    data: response.data,
+
+                    columns: [
+                        { 'data': 'trackingId' },
+                        { 'data': 'personnelName' },
+                        { 'data': 'personnelSurname' },
+                        { 'data': 'areaName' },
+                        { 'data': 'entranceDate' },
+                        { 'data': 'exitDate' },
+                        { 'data': 'autoExit' },
+                        {
+                            data: null,
+                            className: "center",
+                            defaultContent: '<button class="btn btn-primary" id="edit-tracking">Edit</button>  <button class="btn btn-danger" id="remove-tracking">Delete</button>'
+                       }
+
+                    ]
+                });
+            }
+
+        });
+
+        configureAreaList();
+        configurePersonnelList();
+
+    });
+
+    var selectedTrackingId;
+    var datatable;
+    var row;
+
+    // Delete a record
+    $('#table-tracking').on('click', '#remove-tracking', function () {
+
+        // get the id of the selected tracking
+        datatable = $('#table-tracking').DataTable();
+        row = datatable.row($(this).parents('tr'));
+        var data = datatable.row($(this).parents('tr')).data();
+        selectedTrackingId = data.trackingId;
+
+        // delete modal show
+        $("#delete-data-modal").modal('show');
+       
+    });
+
+    // cancel button of the delete modal
+    $('#cancel-button-delete').click(() => {
+
+        $('#delete-data-modal').modal('hide');
+
+    });
+
+
+    // deleting tracking
+    $('#submit-button-delete').click(() => {
+
+        var objectTracking = {};
+        objectTracking.trackingId = selectedTrackingId;
+
+        if (objectTracking) {
+
+            $.ajax({
+
+                "url": "http://localhost:5000/api/tracking",
+                "contentType": "application/json; charset=utf-8",
+                "dataType": "json",
+                "data": JSON.stringify(objectTracking),
+                "type": "DELETE",
+                "headers": {
+                    "Authorization": "Bearer token"
+                },
+                success: function (result) {
+
+                    var newData = result.data;
+                    var dataTable = $('#table-tracking').DataTable();
+                    dataTable.clear().rows.add(newData).draw();
+                },
+                error: function (msg) {
+
+                    console.log(msg);
+                }
+
+            });
+        }
+
+        $('#delete-data-modal').modal('hide');
+
+    });
+
+
+    // Edit record
+    $('#table-tracking').on('click', '#edit-tracking', function () {
+
+        // get the selected id of the tracking
+        var datatable = $('#table-tracking').DataTable();
+        var data = datatable.row($(this).parents('tr')).data();
+        selectedTrackingId = data.trackingId;
+
+        // copy the pre values of the info that can be changed to the modal
+        $("#editPersonnelID").attr("value", data.personnelName + " " + data.personnelSurname);
+        $("#editAreaID").attr("value", data.areaName);
+        $("#edit-entrance-date").attr("value", data.entranceDate);
+        $("#edit-exit-date").attr("value", data.exitDate);
+        $("#edit-auto-exit").attr("checked", data.autoExit);
+
+        // show edit modal
+        $("#edit-data-modal").modal('show');
+
+    });
+
+    // cancel button functionality of the edit modal
+    $('#cancel-button-edit').click(() => {
+
+        $('#edit-data-modal').modal('hide');
+
+    });
+
+    // submit button functionality of the edit modal
+    $('#submit-button-edit').click(() => {
+
+        var objectTracking = {};
+        objectTracking.TrackingId = selectedTrackingId;
+        objectTracking.PersonnelId = Number($('#editPersonnelID').val());
+        objectTracking.AreaId = Number($('#editAreaID').val());
+        objectTracking.EntranceDate = $('#edit-entrance-date').val();
+        objectTracking.ExitDate = $('#edit-exit-date').val();
+        objectTracking.AutoExit = $('#edit-auto-exit').is(':checked');
+
+        if (!document.getElementById('edit-entrance-date').value.trim().length) {
+            alert("Please fill the entrance date information");
+            return;
+        }
+
+        if (!document.getElementById('edit-exit-date').value.trim().length) {
+            objectTracking.ExitDate = null;
+        }
+
+        if (objectTracking) {
+
+            $.ajax({
+
+                "url": "http://localhost:5000/api/tracking",
+                "contentType": "application/json; charset=utf-8",
+                "dataType": "json",
+                "data": JSON.stringify(objectTracking),
+                "type": "PUT",
+                "headers": {
+                    "Authorization": "Bearer token"
+                },
+                success: function (result) {
+
+                    console.log(result);
+                    console.log(JSON.stringify(result.data));
+                    var newData = result.data;
+                    console.log(newData);
+                    var dataTable = $('#table-tracking').DataTable();
+                    dataTable.clear().rows.add(newData).draw();
+                },
+                error: function (msg) {
+
+                    console.log(msg);
+                }
+           
+            });
+
+        }
+
+
+        $('#edit-data-modal').modal('hide');
+
+    });
+
+
+    // Create a record
+    $(document).on('click', '#createNewTracking', function () {
+
+        $("#create-data-modal").modal('show');
+
+    });
+
+    $('#cancel-button-create').click(() => {
+
+        $('#delete-data-modal').modal('hide');
+
+    });
+
+    $('#submit-button-create').click(() => {
+
+        var objectTracking = {};
+        objectTracking.PersonnelId = Number($('#createPersonnelID').val());
+        objectTracking.AreaId = Number($('#createAreaID').val());
+        objectTracking.EntranceDate = $('#createEntranceDate').val();
+        objectTracking.ExitDate = $('#createExitDate').val();
+        objectTracking.AutoExit = $('#createAutoExit').is(':checked');
+
+        if (!document.getElementById('createEntranceDate').value.trim().length) {
+            alert("Please fill the entrance date information");
+            return;
+        }
+
+        if (!document.getElementById('createExitDate').value.trim().length) {
+            objectTracking.ExitDate = null;
+        }
+
+        console.log(objectTracking);
+
+        if (objectTracking) {
+            $.ajax({
+
+                "url": "http://localhost:5000/api/tracking",
+                "contentType": "application/json; charset=utf-8",
+                "dataType": "json",
+                "data": JSON.stringify(objectTracking),
+                "type": "POST",
+                "headers": {
+                    "Authorization": "Bearer token"
+                },
+                success: function (result) {
+
+                    var newData = result.data;
+                    var dataTable = $('#table-tracking').DataTable();
+                    dataTable.clear().rows.add(newData).draw();
+             
+                },
+                error: function (msg) {
+
+                    console.log(msg);
+                }
+            });
+        }
+
+        $('#create-data-modal').modal('hide');
+
+    });
+
+
+    function configureAreaList() {
+        $.ajax({
+            url: "http://localhost:5000/api/area",
+            "type": "GET",
+            "datatype": 'json',
+            headers: {
+                "Authorization": "Bearer token"
+            },
+            "success": function (response) {
+                for (var i = 0; i < response.data.length; i++) {
+                    $("#createAreaID").append($('<option>').val(response.data[i].areaId).text(response.data[i].areaName));
+                    $("#editAreaID").append($('<option>').val(response.data[i].areaId).text(response.data[i].areaName));
+                }
+            }
+        });
+
+    }
+
+    function configurePersonnelList() {
+        $.ajax({
+            url: "http://localhost:5000/api/personnel",
+            "type": "GET",
+            "datatype": 'json',
+            headers: {
+                "Authorization": "Bearer token"
+            },
+            "success": function (response) {
+            for (var i = 0; i < response.data.length; i++) {
+                $("#createPersonnelID").append($('<option>').val(response.data[i].personnelId).text(response.data[i].personnelName + " " + response.data[i].personnelSurname));
+                $("#editPersonnelID").append($('<option>').val(response.data[i].personnelId).text(response.data[i].personnelName + " " + response.data[i].personnelSurname));
+                }
+            }
+        });
+
+    }
+
+</script>

@@ -1,1 +1,322 @@
-﻿
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="lib/jquery/dist/jquery.min.js"></script>
+    <script src="lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="lib/datatables/datatables.min.js"></script>
+    <script src="lib/datatables/DataTables-1.10.25/js/dataTables.bootstrap5.min.js"></script>
+</head>
+<body>
+
+    <script>
+        $(document).ready(function () {
+
+            $.ajax({
+                "url": " http://localhost:5000/api/leave",
+                "headers": {
+                    "Authorization": "Bearer Bearer"
+                },
+                "type": "GET",
+                "datatype": 'json',
+                "success": function (response) {
+                    $('#table-leave').DataTable({
+                        responsive: true,
+                        data: response.data,
+                        columns: [
+                            { 'data': 'leaveId' },
+                            { 'data': 'personnelName' },
+                            { 'data': 'personnelSurname' },
+                            { 'data': 'leaveStart' },
+                            { 'data': 'leaveEnd' },
+                            {
+                                "render": function (data, type, full) {
+
+                                    return '<a class="btn btn-danger" id="deleteModelB" data-toggle="modal" data-target="#myDeleteModal">' + 'Delete' + '</a>' + '<a class="btn btn-primary"id="editModelB" style="margin-left:2%" data-toggle="modal" data-target="#myEditModal">' + 'Edit' + '</a>';
+                                }
+                            }
+
+                        ]
+                    });
+
+                }
+            });
+        });
+        //Add Model
+        $("#showAddModelB").click(function () {
+            $("#myAddModal").modal('show');
+            ConfiguratePersonnelList();
+        });
+
+        $("#submit-added-leave").click(()=> {
+            var leave = {};
+            leave.PersonnelId = Number($('#personnel-input').val());
+            leave.leaveStart = $('#leave-add-start').val();
+            leave.leaveEnd = $('#leave-add-end').val();
+            if (leave.leaveEnd == "" || leave.leaveStart == "") {
+                $('#nameError4').show();
+            }
+            else {
+                var date1 = new Date(leave.leaveStart);
+                var date2 = new Date(leave.leaveEnd);
+                if (date1.getTime() > date2.getTime()) {
+                    $('#nameError2').show();
+                    document.getElementById("add-leave-form").reset();
+                }
+                else {
+                    $.ajax({
+
+                        "url": "http://localhost:5000/api/leave",
+                        "contentType": "application/json; charset=utf-8",
+                        "dataType": "json",
+                        "data": JSON.stringify(leave),
+                        "type": "POST",
+                        "headers": {
+                            "Authorization": "Bearer token"
+                        },
+                        success: function (response) {
+
+                            console.log(response);
+                            var newData = response.data;
+                            console.log(newData);
+                            var datatable = $('#table-leave').DataTable();
+                            datatable.clear().rows.add(newData).draw();
+                        },
+                        error: function (msg) {
+
+                            console.log(msg);
+                        }
+                    });
+                    $('#myAddModal').modal('hide');
+                }
+            }
+
+        });
+        function ConfiguratePersonnelList() {
+            $.ajax({
+                url: "http://localhost:5000/api/personnel",
+                headers: {
+                    "Authorization": "Bearer Bearer"
+                }
+            }).done((response) => {
+                let optionsLength = document.getElementById("personnel-input").length;
+                if (optionsLength == 0) {
+                    for (var i = 0; i < response.data.length; i++) {
+                        $("#personnel-input").append($('<option>').val(response.data[i].personnelId).text(response.data[i].personnelName + " " + response.data[i].personnelSurname));
+                    }
+                }
+
+
+            })
+        }
+        //My Delete Model
+        $('#table-leave').on('click', '#deleteModelB', function () {
+            var datatable = $('#table-leave').DataTable();
+            var row = datatable.row($(this).parents('tr'));
+            var data = datatable.row($(this).parents('tr')).data();
+            seletected_leave_id = data.leaveId;
+            $("#myDeleteModal").modal('show');
+        });
+
+        $('#submit-button-delete').click(() => {
+            var values = {
+                leaveId: seletected_leave_id
+            };
+            deleteValue(values);
+            $('#myDeleteModal').modal('hide');
+        })
+        $('.cancel').click(() => {
+            $('.modal').modal('hide');
+        })
+
+        function deleteValue(values) {
+            var settings = {
+                "url": "http://localhost:5000/api/leave",
+                "method": "DELETE",
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer Bearer"
+                },
+                "data": JSON.stringify(values),
+            };
+            $.ajax(settings).done((response) => {
+                var newData = response.data;
+                console.log(newData);
+                var datatable = $('#table-leave').DataTable();
+                datatable.clear().rows.add(newData).draw();
+            });
+        }
+
+        //My Edit  Model
+
+        var selecetedLeaveId;
+        $("#table-leave").on("click", "#editModelB", function () {
+            $("#myEditModal").modal('show');
+            var datatable = $('#table-leave').DataTable();
+            selecetedLeaveId = datatable.row($(this).parents('tr')).data().leaveId;
+        });
+
+        $("#myEditModal").on("click", '#submit-editted-leave', (e) => {
+            e.preventDefault();
+            
+            end = $('#leave-edit-end').val();
+            start = $("#leave-edit-start").val();
+            if (end == "" || start == "") {
+                $('#nameError3').show();
+            }
+            else {
+                var date1 = new Date(start);
+                var date2 = new Date(end);
+                if (date1.getTime() > date2.getTime()) {
+                    $('#nameError').show();
+                    document.getElementById("edit-leave-form").reset();
+                }
+                else {
+                    var values = {
+                        leaveId: selecetedLeaveId,
+                        leaveStart: start,
+                        leaveEnd: end,
+                    }
+                    updateValue(values);
+
+                    $('#myEditModal').modal('hide');
+                }
+            }
+
+
+        });
+
+        function updateValue(values) {
+            var settings = {
+                "url": "http://localhost:5000/api/leave",
+                "method": "PUT",
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer Bearer"
+                },
+                "data": JSON.stringify(values),
+            };
+            $.ajax(settings).done((response) => {
+                var newData =response.data;
+                console.log(newData);
+                var datatable = $('#table-leave').DataTable();
+                datatable.clear().rows.add(newData).draw();
+            });
+        }
+
+    </script>
+    <div class="row" id="container-leave">
+        <div class="col-12">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="table-leave" class="table w-100">
+                        <thead>
+                            <tr>
+                                <th>Leave Id</th>
+                                <th>Personnel Name</th>
+                                <th>Personnel Surname</th>
+                                <th>Leave Start</th>
+                                <th>Leave End</th>
+                                <th></th>
+                            </tr>
+
+                        </thead>
+
+                    </table>
+                    <button class="btn btn-primary" id="showAddModelB">Add Leave </button>
+                </div>
+            </div>
+        </div>
+            <!-- Modal HTML -->
+            <div id="myDeleteModal" class="modal fade" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Delete Leave</h5>
+                            <button type="button" class="btn-close cancel" data-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete this leave entrance?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">Cancel</button>
+                            <button type="button" id ="submit-button-delete" class="btn btn-danger">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="myEditModal" class="modal fade" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit Leave</h5>
+                            <button type="button" class="btn-close cancel" data-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="edit-leave-form">
+                                <div class=”form-group”>
+                                    <label for="leave-edit-start">Enter leave start date</label>
+                                    <input type="date" id="leave-edit-start" class="form-control" placeholder="Start">
+                                </div>
+                                <div class=”form-group”>
+                                    <label for="leave-edit-end">Enter leave end date</label>
+                                    <input type="date" id="leave-edit-end" class="form-control" placeholder="End">
+                                </div>
+                            </form>
+                        </div>
+                        <span id="nameError" style="display:none" class="alert alert-danger" role="alert">
+                            End date should be after start date!
+                        </span>
+                        <span id="nameError3" style="display:none" class="alert alert-danger" role="alert">
+                            You should enter both start and end dates!
+                        </span>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary" id="submit-editted-leave">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <div id="myAddModal" class="modal fade " tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Ad Leave</h5>
+                                <button type="button" class="btn-close cancel" data-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="add-leave-form">
+                                    <div class="form-group">
+                                        <label for="personnel-input"> Chose Personnel  </label>
+                                        <select class="form-control" id="personnel-input">
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="leave-add-start">Enter leave start date</label>
+                                        <input type="date" id="leave-add-start" class="form-control" placeholder="Start">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="leave-add-end">Enter leave end date</label>
+                                        <input type="date" id="leave-add-end" class="form-control" placeholder="End">
+                                    </div>
+                                </form>
+                            </div>
+                            <span id="nameError2" style="display:none" class="alert alert-danger" role="alert">
+                                End date should be after start date!
+                            </span>
+                            <span id="nameError4" style="display:none" class="alert alert-danger" role="alert">
+                                You should enter both start and end dates!
+                            </span>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary" id="submit-added-leave">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+        </div>
+    </body>
+</html>
+

@@ -1,1 +1,294 @@
-﻿
+﻿<div class="row" id="container-company">
+    <div class="col-12">
+
+        <br>
+        <button type="button" class="btn btn-primary" id="create-button">
+            Create
+        </button>
+
+        <!-- Create Modal -->
+        <div class="modal fade" id="create-data-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Create new company</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="create-form">
+                            <div class="form-group">
+                                <label for="company-input">Company Name</label>
+                                <input type="text" class="form-control" id="company-input">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="submit-button" form="create-form">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Loading Modal-->
+        <div class="modal fade" id="loading-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p class="text-lg-center">Loading</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Edit Modal-->
+        <div class="modal fade" id="edit-data-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Edit Company</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-form">
+                            <div class="form-group">
+                                <label for="company-input-edit">Company Name</label>
+                                <input type="text" class="form-control" id="company-input-edit">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="submit-button-edit" form="edit-form">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Delete Modal-->
+        <div class="modal fade" id="delete-data-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Delete company</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
+                        <a class="btn btn-danger btn-ok" id="submit-button-delete">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Modal-->
+        <div class="modal fade" id="error-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-danger" id="staticBackdropLabel">Error!</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="error-message">An error has ocurred!</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ok</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--The table-->
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="table-company" class="table w-100">
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #delete-button {
+        float: right;
+        margin-left: 5%;
+        margin-right: 2%;
+    }
+    #edit-button {
+        float: right;
+    }
+</style>
+
+<script>
+    constructTable();
+    var createform = document.getElementById("create-form");
+    createform.addEventListener('submit', (e) => {
+        e.preventDefault();
+        var companyName = $('#company-input').val();
+        var values = {
+            companyName: companyName
+        };
+        $('#create-data-modal').modal('hide');
+        loadingFunction(() => {
+            sendData(values);
+        }, 2000);
+    });
+
+    $("#create-button").click(() => {
+        $('#create-data-modal').modal('show');
+    });
+
+    var seletected_company_id;
+    $('#table-company').on('click', '#edit-button', function () {
+        var datatable = $('#table-company').DataTable();
+        var data = datatable.row($(this).parents('tr')).data();
+        seletected_company_id = data[0];
+        $('#company-input-edit').val(data[1]);
+        $("#edit-data-modal").modal('show');
+    });
+
+    var form = document.getElementById("edit-form");
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        var companyName = $('#company-input-edit').val();
+        var values = {
+            companyId: seletected_company_id,
+            companyName: companyName
+        };
+        updateValue(values);
+        $('#edit-data-modal').modal('hide');
+    });
+
+    var selected_company_name;
+    $('#table-company').on('click', '#delete-button', function () {
+        var datatable = $('#table-company').DataTable();
+        var data = datatable.row($(this).parents('tr')).data();
+        seletected_company_id = data[0];
+        selected_company_name = data[1];
+        $("#delete-data-modal").modal('show');
+    });
+
+    $('#submit-button-delete').click(() => {
+        var values = {
+            companyId: seletected_company_id,
+            companyName: selected_company_name
+        };
+        deleteValue(values);
+        $('#delete-data-modal').modal('hide');
+    })
+
+    function constructTable() {
+        $.ajax({
+            url: "http://localhost:5000/api/company",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            }
+        }).done((response) => {
+            if (response.hasError) {
+                $('#error-message').val(response.errorMessage);
+                $('#error-modal').modal('show');
+            }
+            var dataset = JsonTo2DArray(response);
+            $('#table-company').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/English.json'
+                },
+                data: dataset,
+                columns: [
+                    { title: "Serial Number" },
+                    { title: "Company Name" }
+                ],
+                "columnDefs": [{
+                    "targets": -1,
+                    "data": null,
+                    "render": function (data, type, row, meta) {
+                        return data[1] + `<button class='btn btn-danger' id='delete-button'>Delete</button>` +
+                                `<button class='btn btn-primary' id='edit-button'>Edit</button>`;
+                    }
+                }]
+            });
+            return dataset;
+        });
+    }
+
+    function deleteValue(values) {
+        var settings = {
+            "url": "http://localhost:5000/api/company",
+            "method": "DELETE",
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
+            "data": JSON.stringify(values),
+        };
+        $.ajax(settings).done((response) => {
+            processResponse(response);
+        });
+    }
+
+    function updateValue(values) {
+        var settings = {
+            "url": "http://localhost:5000/api/company",
+            "method": "PUT",
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
+            "data": JSON.stringify(values),
+        };
+        $.ajax(settings).done((response) => {
+            processResponse(response);
+        });
+    }
+
+    function sendData(values) {
+        var settings = {
+            "url": "http://localhost:5000/api/company",
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
+            "data": JSON.stringify(values),
+        };
+        $.ajax(settings).done((response) => {
+            processResponse(response);
+        });
+    }
+
+    function JsonTo2DArray(json) {
+        var dataset = [[]];
+        for (var i = 0; i < json.data.length; i++) {
+            var obj = json.data[i];
+            let j = 0;
+            dataset[i] = [];
+            for (var m in obj) {
+                dataset[i][j] = obj[m];
+                j++;
+            }
+        }
+        return dataset;
+    }
+
+    function loadingFunction(func, ms) {
+        $('#loading-modal').modal('show');
+        setTimeout(() => {
+            func();
+            $('#loading-modal').modal('hide');
+        }, ms);
+    }
+
+    function processResponse(response) {
+        if (response.hasError) {
+            $('#error-message').text(response.errorMessage);
+            $('#error-modal').modal('show');
+        }
+        var newData = JsonTo2DArray(response);
+        var datatable = $('#table-company').DataTable();
+        datatable.clear().rows.add(newData).draw();
+    }
+</script>
