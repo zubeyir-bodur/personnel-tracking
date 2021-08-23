@@ -13,7 +13,7 @@ namespace personnel_tracking_webapi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[TokenCheck]
+    [TokenCheck]
     public class AreaController : ControllerBase
     {
         private readonly PersonnelTrackingDBContext dbContext;
@@ -37,7 +37,7 @@ namespace personnel_tracking_webapi.Controllers
                     u.AreaName,
                     u.Latitude,
                     u.Longitude,
-                    string.Empty//u.QrCode
+                    u.QrCode
                 });
 
                 response.Data = areaDTOList;
