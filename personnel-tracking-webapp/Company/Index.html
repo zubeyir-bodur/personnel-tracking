@@ -15,10 +15,10 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="create-form">
+                        <form id="create-form" class="needs-validation" novalidate>
                             <div class="form-group">
                                 <label for="company-input">Company Name</label>
-                                <input type="text" class="form-control" id="company-input">
+                                <input type="text" class="form-control validate-me" id="company-input" required>
                             </div>
                         </form>
                     </div>
@@ -50,10 +50,10 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="edit-form">
+                        <form id="edit-form" class="needs-validation" novalidate>
                             <div class="form-group">
                                 <label for="company-input-edit">Company Name</label>
-                                <input type="text" class="form-control" id="company-input-edit">
+                                <input type="text" class="form-control validate-me" id="company-input-edit" required>
                             </div>
                         </form>
                     </div>
