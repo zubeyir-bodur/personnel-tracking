@@ -237,11 +237,12 @@
         configureAreaListEdit(data.areaName);
 
         // copy the pre values of the info that can be changed to the modal
-        $("#edit-entrance-date").attr("value", data.entranceDate);
-        $("#edit-exit-date").attr("value", data.exitDate);
-        $("#edit-auto-exit").attr("checked", data.autoExit);
-       // $('#editPersonnelID').attr("value", data.personnelName + " " + data.personnelSurname);
-       // $('#editAreaID').val("");
+        $('#edit-entrance-date').val(data.entranceDate);
+        $('#edit-exit-date').val(data.exitDate);
+        $('#edit-auto-exit').prop('checked', data.autoExit);
+       // $("#edit-entrance-date").attr("value", data.entranceDate);
+       // $("#edit-exit-date").attr("value", data.exitDate);
+       // $("#edit-auto-exit").attr("checked", data.autoExit);
 
         // show edit modal
         $("#edit-data-modal").modal('show');
@@ -255,7 +256,9 @@
         $('#edit-data-modal').modal('hide');
         $("#editPersonnelID").empty();
         $("#editAreaID").empty();
-
+      //  $('#edit-entrance-date').val("");
+      //  $('#edit-exit-date').val("");
+      //  $('#edit-auto-exit').prop('checked', false);
 
     });
 
@@ -322,7 +325,11 @@
 
         $("#editPersonnelID").empty();
         $("#editAreaID").empty();
+       // $('#edit-entrance-date').val("");
+       // $('#edit-exit-date').val("");
+       // $('#edit-auto-exit').prop('checked', false);
         $('#edit-data-modal').modal('hide');
+      
 
     });
 
