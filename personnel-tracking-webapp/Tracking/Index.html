@@ -36,6 +36,12 @@
                         <label style="margin-top: 10px; margin-right: 45px;">Auto Exit       </label>
                         <input type="checkbox" id="edit-auto-exit" style="margin-top: 10px;">
                     </div>
+                    <span style="display: none;" id="dateErrorEdit" class="alert alert-danger" role="alert">
+                        Exit date should be after entrance date!
+                    </span>
+                    <span style="display: none;" id="entryErrorEdit" class="alert alert-danger" role="alert">
+                        You should enter entrance date!
+                    </span>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancel-button-edit">Cancel</button>
                         <button type="button" class="btn btn-primary" id="submit-button-edit">Edit</button>
@@ -61,8 +67,20 @@
                         <label style="margin-top: 10px; margin-right: 45px;">Exit Date  </label>
                         <input type="datetime-local" id="createExitDate" style="margin-top: 10px;"><br>
                         <label style="margin-top: 10px; margin-right: 45px;">Auto Exit </label>
-                        <input type="checkbox" id="createAutoExit" style="margin-top: 10px;">
+                        <input type="checkbox" id="createAutoExit" style="margin-top: 10px;"><br>
                     </div>
+                    <span style="display: none;" id="dateError" class="alert alert-danger" role="alert">
+                        Exit date should be after entrance date!
+                    </span>
+                    <span style="display: none;" id="entryError" class="alert alert-danger" role="alert">
+                        You should enter entrance date!
+                    </span>
+                    <span style="display: none;" id="entryError2" class="alert alert-danger" role="alert">
+                        You should enter a personnel!
+                    </span>
+                    <span style="display: none;" id="entryError3" class="alert alert-danger" role="alert">
+                        You should enter an area!
+                    </span>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancel-button-create">Cancel</button>
                         <button type="button" class="btn btn-success" id="submit-button-create">Create</button>
@@ -83,6 +101,7 @@
                             <th>Exit Date</th>
                             <th>Auto Exit</th>
                             <th></th>
+                            <th></th>
                         </tr>
                     </thead>
                 </table>
@@ -91,7 +110,6 @@
         <button input="button" class="btn btn-success" id="createNewTracking">Create</button>
     </div>
 </div>
-
 
 <script>
 
@@ -124,8 +142,14 @@
                         {
                             data: null,
                             className: "center",
-                            defaultContent: '<button class="btn btn-primary" id="edit-tracking">Edit</button>  <button class="btn btn-danger" id="remove-tracking">Delete</button>'
-                       }
+                            defaultContent: '<button class="btn btn-primary" id="edit-tracking">Edit</button>'
+                        },
+                        {
+                            data: null,
+                            className: "center",
+                            defaultContent: '<button class="btn btn-danger" id="remove-tracking">Delete</button>'
+
+                        }
 
                     ]
                 });
@@ -209,22 +233,29 @@
         var data = datatable.row($(this).parents('tr')).data();
         selectedTrackingId = data.trackingId;
 
+        configurePersonnelListEdit(data.personnelName, data.personnelSurname);
+        configureAreaListEdit(data.areaName);
+
         // copy the pre values of the info that can be changed to the modal
-        $("#editPersonnelID").attr("value", data.personnelName + " " + data.personnelSurname);
-        $("#editAreaID").attr("value", data.areaName);
         $("#edit-entrance-date").attr("value", data.entranceDate);
         $("#edit-exit-date").attr("value", data.exitDate);
         $("#edit-auto-exit").attr("checked", data.autoExit);
+       // $('#editPersonnelID').attr("value", data.personnelName + " " + data.personnelSurname);
+       // $('#editAreaID').val("");
 
         // show edit modal
         $("#edit-data-modal").modal('show');
-
+        $('#entryErrorEdit').hide();
+        $('#dateErrorEdit').hide();
     });
 
     // cancel button functionality of the edit modal
     $('#cancel-button-edit').click(() => {
 
         $('#edit-data-modal').modal('hide');
+        $("#editPersonnelID").empty();
+        $("#editAreaID").empty();
+
 
     });
 
@@ -239,8 +270,19 @@
         objectTracking.ExitDate = $('#edit-exit-date').val();
         objectTracking.AutoExit = $('#edit-auto-exit').is(':checked');
 
+
+
         if (!document.getElementById('edit-entrance-date').value.trim().length) {
-            alert("Please fill the entrance date information");
+            $('#entryErrorEdit').show();
+            $('#dateErrorEdit').hide();
+            return;
+        }
+
+        var entranceDate = new Date(objectTracking.EntranceDate);
+        var exitDate = new Date(objectTracking.ExitDate);
+        if (entranceDate.getTime() > exitDate.getTime()) {
+            $('#dateErrorEdit').show();
+            $('#entryErrorEdit').hide();
             return;
         }
 
@@ -278,7 +320,8 @@
 
         }
 
-
+        $("#editPersonnelID").empty();
+        $("#editAreaID").empty();
         $('#edit-data-modal').modal('hide');
 
     });
@@ -287,7 +330,17 @@
     // Create a record
     $(document).on('click', '#createNewTracking', function () {
 
+        $('#entryError').hide();
+        $('#entryError2').hide();
+        $('#entryError3').hide();
+        $('#dateError').hide();
         $("#create-data-modal").modal('show');
+        $('#createEntranceDate').val("");
+        $('#createExitDate').val("");
+        $('#createAutoExit').prop('checked', false);
+        $('#createPersonnelID').val("");
+        $('#createAreaID').val("");
+
 
     });
 
@@ -306,8 +359,41 @@
         objectTracking.ExitDate = $('#createExitDate').val();
         objectTracking.AutoExit = $('#createAutoExit').is(':checked');
 
+        if (objectTracking.PersonnelId == 0) {
+
+            $('#entryError').hide();
+            $('#dateError').hide();
+            $('#entryError2').show();
+            $('#entryError3').hide();
+            return;
+
+        }
+
+        if (objectTracking.AreaId == 0) {
+
+            $('#entryError').hide();
+            $('#dateError').hide();
+            $('#entryError2').hide();
+            $('#entryError3').show();
+            return;
+
+        }
+
         if (!document.getElementById('createEntranceDate').value.trim().length) {
-            alert("Please fill the entrance date information");
+            $('#entryError').show();
+            $('#dateError').hide();
+            $('#entryError2').hide();
+            $('#entryError3').hide();
+            return;
+        }
+
+        var entranceDate = new Date(objectTracking.EntranceDate);
+        var exitDate = new Date(objectTracking.ExitDate);
+        if (entranceDate.getTime() > exitDate.getTime()) {
+            $('#dateError').show();
+            $('#entryError').hide();
+            $('#entryError2').hide();
+            $('#entryError3').hide();
             return;
         }
 
@@ -343,7 +429,6 @@
         }
 
         $('#create-data-modal').modal('hide');
-
     });
 
 
@@ -358,6 +443,32 @@
             "success": function (response) {
                 for (var i = 0; i < response.data.length; i++) {
                     $("#createAreaID").append($('<option>').val(response.data[i].areaId).text(response.data[i].areaName));
+                }
+
+                $("#createAreaID").append($('<option value="" selected disabled hidden>').text("Choose an Area"));
+            }
+        });
+
+    }
+
+    function configureAreaListEdit(areaName) {
+        $.ajax({
+            url: "http://localhost:5000/api/area",
+            "type": "GET",
+            "datatype": 'json',
+            headers: {
+                "Authorization": "Bearer token"
+            },
+            "success": function (response) {
+                for (var i = 0; i < response.data.length; i++) {
+
+                    if (response.data[i].areaName == areaName) {
+
+                        $("#editAreaID").append($('<option selected>').val(response.data[i].areaId).text(response.data[i].areaName));
+                        continue;
+
+                    }
+
                     $("#editAreaID").append($('<option>').val(response.data[i].areaId).text(response.data[i].areaName));
                 }
             }
@@ -376,11 +487,37 @@
             "success": function (response) {
             for (var i = 0; i < response.data.length; i++) {
                 $("#createPersonnelID").append($('<option>').val(response.data[i].personnelId).text(response.data[i].personnelName + " " + response.data[i].personnelSurname));
-                $("#editPersonnelID").append($('<option>').val(response.data[i].personnelId).text(response.data[i].personnelName + " " + response.data[i].personnelSurname));
+                }
+
+                $("#createPersonnelID").append($('<option value="" selected disabled hidden>').text("Choose a Personnel"));
+            }
+        });
+
+    }
+
+    function configurePersonnelListEdit(personnelName, personnelSurname) {
+        $.ajax({
+            url: "http://localhost:5000/api/personnel",
+            "type": "GET",
+            "datatype": 'json',
+            headers: {
+                "Authorization": "Bearer token"
+            },
+            "success": function (response) {
+                for (var i = 0; i < response.data.length; i++) {
+                    if (response.data[i].personnelName == personnelName && response.data[i].personnelSurname == personnelSurname) {
+
+                        $("#editPersonnelID").append($('<option selected>').val(response.data[i].personnelId).text(response.data[i].personnelName + " " + response.data[i].personnelSurname));
+                        continue;
+
+                    }
+
+                    $("#editPersonnelID").append($('<option>').val(response.data[i].personnelId).text(response.data[i].personnelName + " " + response.data[i].personnelSurname));
                 }
             }
         });
 
     }
+
 
 </script>
