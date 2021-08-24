@@ -50,7 +50,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="edit-form" class="needs-validation" novalidate>
+                        <form id="edit-form" class="needs-validation edit" novalidate>
                             <div class="form-group">
                                 <label for="company-input-edit">Company Name</label>
                                 <input type="text" class="form-control validate-me" id="company-input-edit" required>
@@ -124,99 +124,155 @@
 </style>
 
 <script>
-    constructTable();
-    var createform = document.getElementById("create-form");
-    createform.addEventListener('submit', (e) => {
-        e.preventDefault();
+    var selected_company_id;
+    $(document).ready(() => {
+        loadingFunction(() => {
+            constructTable();
+        }, 500);
+
+        var forms = document.querySelectorAll('.needs-validation');
+
+        // Check if any field is empty
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', (event) => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        form.classList.add('was-validated');
+                    }
+                    else {
+                        form.classList.remove('was-validated');
+                        var validate_me = document.querySelectorAll('.validate-me');
+                        for (var i = 0; i < validate_me.length; i++) {
+                            validate_me[i].classList.add('is-valid');
+                        }
+                        if ($(form).hasClass("edit")) {
+                            updateEvent(event);
+                        }
+                        else {
+                            createEvent(event);
+                        }
+
+                    }
+                }, false)
+            });
+
+        // event listener for create
+        $("#create-button").click(() => {
+            $('#create-data-modal').modal('show');
+        });   
+
+        // event listener edit
+        $('#table-company').on('click', '#edit-button', function () {
+            var datatable = $('#table-company').DataTable();
+            var data = datatable.row($(this).parents('tr')).data();
+            selected_company_id = data.companyId;
+            $('#company-input-edit').val(data.companyName);
+            $("#edit-data-modal").modal('show');
+        });
+
+        // event listener delete
+        var selected_company_name;
+        $('#table-company').on('click', '#delete-button', function () {
+            var datatable = $('#table-company').DataTable();
+            var data = datatable.row($(this).parents('tr')).data();
+            selected_company_id = data.companyId;
+            selected_company_name = data.companyName;
+            $("#delete-data-modal").modal('show');
+        });
+
+        // event listener delete-submit
+        $('#submit-button-delete').click(() => {
+            var values = {
+                companyId: selected_company_id,
+                companyName: selected_company_name
+            };
+            loadingFunction(() => {
+                deleteValue(values);
+            }, 500);
+            $('#delete-data-modal').modal('hide');
+        });
+    });
+
+    function updateEvent(event) {
+        event.preventDefault();
+        var companyName = $('#company-input-edit').val();
+        var values = {
+            companyId: selected_company_id,
+            companyName: companyName
+        };
+        var validate_me = document.querySelectorAll('.validate-me');
+        for (var i = 0; i < validate_me.length; i++) {
+            validate_me[i].classList.remove('is-valid');
+            validate_me[i].classList.remove('is-invalid');
+        }
+        $('#edit-data-modal').modal('hide');
+        loadingFunction(() => {
+            updateValue(values);
+        }, 500);
+        $('#edit-data-modal').modal('hide');
+    }
+
+    function createEvent(event) {
+        event.preventDefault();
         var companyName = $('#company-input').val();
         var values = {
             companyName: companyName
         };
+        var validate_me = document.querySelectorAll('.validate-me');
+        for (var i = 0; i < validate_me.length; i++) {
+            validate_me[i].classList.remove('is-valid');
+            validate_me[i].classList.remove('is-invalid');
+        }
         $('#create-data-modal').modal('hide');
         loadingFunction(() => {
             sendData(values);
-        }, 2000);
-    });
-
-    $("#create-button").click(() => {
-        $('#create-data-modal').modal('show');
-    });
-
-    var seletected_company_id;
-    $('#table-company').on('click', '#edit-button', function () {
-        var datatable = $('#table-company').DataTable();
-        var data = datatable.row($(this).parents('tr')).data();
-        seletected_company_id = data[0];
-        $('#company-input-edit').val(data[1]);
-        $("#edit-data-modal").modal('show');
-    });
-
-    var form = document.getElementById("edit-form");
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        var companyName = $('#company-input-edit').val();
-        var values = {
-            companyId: seletected_company_id,
-            companyName: companyName
-        };
-        updateValue(values);
-        $('#edit-data-modal').modal('hide');
-    });
-
-    var selected_company_name;
-    $('#table-company').on('click', '#delete-button', function () {
-        var datatable = $('#table-company').DataTable();
-        var data = datatable.row($(this).parents('tr')).data();
-        seletected_company_id = data[0];
-        selected_company_name = data[1];
-        $("#delete-data-modal").modal('show');
-    });
-
-    $('#submit-button-delete').click(() => {
-        var values = {
-            companyId: seletected_company_id,
-            companyName: selected_company_name
-        };
-        deleteValue(values);
-        $('#delete-data-modal').modal('hide');
-    })
+        }, 500);
+    }
 
     function constructTable() {
         $.ajax({
             url: "http://localhost:5000/api/company",
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("token")
-            }
-        }).done((response) => {
-            if (response.hasError) {
-                $('#error-message').val(response.errorMessage);
-                $('#error-modal').modal('show');
-            }
-            var dataset = JsonTo2DArray(response);
-            $('#table-company').DataTable({
-                language: {
-                    url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/English.json'
-                },
-                data: dataset,
-                columns: [
-                    { title: "Serial Number" },
-                    { title: "Company Name" }
-                ],
-                "columnDefs": [{
-                    "targets": -1,
-                    "data": null,
-                    "render": function (data, type, row, meta) {
-                        return data[1] + `<button class='btn btn-danger' id='delete-button'>Delete</button>` +
+            },
+            dataType: "json",
+            success: (response) => {
+                if (response.hasError) {
+                    $('#error-message').val(response.errorMessage);
+                    $('#error-modal').modal('show');
+                }
+                $('#table-company').DataTable({
+                    data: response.data,
+                    columns: [
+                        {
+                            title: "Serial Number",
+                            data: "companyId"
+                        },
+                        {
+                            title: "Company Name",
+                            data: "companyName"
+                        },
+                        {
+                            title: "Actions"
+                        }
+                    ],
+                    "columnDefs": [{
+                        "targets": -1,
+                        "data": null,
+                        "render": function (data, type, row, meta) {
+                            return `<button class='btn btn-danger' id='delete-button'>Delete</button>` +
                                 `<button class='btn btn-primary' id='edit-button'>Edit</button>`;
-                    }
-                }]
-            });
-            return dataset;
+                        }
+                    }]
+                });
+            }
         });
     }
 
     function deleteValue(values) {
-        var settings = {
+        $.ajax({
             "url": "http://localhost:5000/api/company",
             "method": "DELETE",
             "headers": {
@@ -224,14 +280,13 @@
                 "Authorization": "Bearer " + localStorage.getItem("token")
             },
             "data": JSON.stringify(values),
-        };
-        $.ajax(settings).done((response) => {
-            processResponse(response);
+            "dataType": "json",
+            "success": (response) => processResponse(response)
         });
     }
 
     function updateValue(values) {
-        var settings = {
+        $.ajax({
             "url": "http://localhost:5000/api/company",
             "method": "PUT",
             "headers": {
@@ -239,14 +294,13 @@
                 "Authorization": "Bearer " + localStorage.getItem("token")
             },
             "data": JSON.stringify(values),
-        };
-        $.ajax(settings).done((response) => {
-            processResponse(response);
+            "dataType": "json",
+            "success": (response) => processResponse(response)
         });
     }
 
     function sendData(values) {
-        var settings = {
+        $.ajax({
             "url": "http://localhost:5000/api/company",
             "method": "POST",
             "headers": {
@@ -254,24 +308,9 @@
                 "Authorization": "Bearer " + localStorage.getItem("token")
             },
             "data": JSON.stringify(values),
-        };
-        $.ajax(settings).done((response) => {
-            processResponse(response);
+            "dataType": "json",
+            "success": (response) => processResponse(response)
         });
-    }
-
-    function JsonTo2DArray(json) {
-        var dataset = [[]];
-        for (var i = 0; i < json.data.length; i++) {
-            var obj = json.data[i];
-            let j = 0;
-            dataset[i] = [];
-            for (var m in obj) {
-                dataset[i][j] = obj[m];
-                j++;
-            }
-        }
-        return dataset;
     }
 
     function loadingFunction(func, ms) {
@@ -287,8 +326,7 @@
             $('#error-message').text(response.errorMessage);
             $('#error-modal').modal('show');
         }
-        var newData = JsonTo2DArray(response);
         var datatable = $('#table-company').DataTable();
-        datatable.clear().rows.add(newData).draw();
+        datatable.clear().rows.add(response.data).draw();
     }
 </script>
