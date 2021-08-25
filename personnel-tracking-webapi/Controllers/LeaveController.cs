@@ -62,11 +62,32 @@ namespace personnel_tracking_webapi.Controllers
         public IActionResult Post(Leave leave)
         {
             ResponseModel response = new ResponseModel();
+            bool x = false;
 
             try
             {
-                dbContext.Leaves.Add(leave);
-                dbContext.SaveChanges();
+                var leaveListC = dbContext.Set<Leave>().ToList();
+
+                for (int i = 0; i < leaveListC.Count; i++)
+                {
+                    if ( leaveListC[i].PersonnelId == leave.PersonnelId && leaveListC[i].LeaveStart == leave.LeaveStart && leaveListC[i].LeaveEnd == leave.LeaveEnd)
+                    {
+                        x = true;
+                    }
+                }
+
+                if (!x)
+                {
+                    dbContext.Leaves.Add(leave);
+                    dbContext.SaveChanges();
+                }
+                else
+                {
+                    response.HasError = true;
+                    response.ErrorMessage = "Dublicate Value";
+                }
+
+            
             }
             catch (Exception ex)
             {
