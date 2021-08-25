@@ -5,6 +5,9 @@
     <title></title>
     <script src="lib/jquery/dist/jquery.min.js"></script>
     <script src="lib/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <script th:src="@{//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js}"></script>
+    <script th:src="@{//cdn.datatables.net/plug-ins/1.10.11/sorting/datetime-moment.js}"></script>
     <script src="lib/datatables/datatables.min.js"></script>
     <script src="lib/datatables/DataTables-1.10.25/js/dataTables.bootstrap5.min.js"></script>
 </head>
@@ -20,6 +23,7 @@
                 },
                 "type": "GET",
                 "datatype": 'json',
+                "dateFormat": "yy-mm-dd",
                 "success": function (response) {
                     $('#table-leave').DataTable({
                         responsive: true,
@@ -28,8 +32,8 @@
                             { 'data': 'leaveId' },
                             { 'data': 'personnelName' },
                             { 'data': 'personnelSurname' },
-                            { 'data': 'leaveStart' },
-                            { 'data': 'leaveEnd' },
+                            {'data': 'leaveStart'},
+                            {'data': 'leaveEnd'},
                             {
                                 "render": function (data, type, full) {
 
@@ -37,7 +41,23 @@
                                 }
                             }
 
+                        ],
+                        "columnDefs": [
+                            {
+                                "targets": [3, 4],
+                                "type": "date",
+                                "render": function (data) {
+                                    if (data !== null) {
+                                        var javascriptDate = new Date(data);
+                                        javascriptDate = javascriptDate.getMonth() + 1 + "/" + javascriptDate.getDate() + "/" + javascriptDate.getFullYear();
+                                        return javascriptDate;
+                                    } else {
+                                        return "";
+                                    }
+                                }
+                            }
                         ]
+
                     });
 
                 }
@@ -54,6 +74,7 @@
             leave.PersonnelId = Number($('#personnel-input').val());
             leave.leaveStart = $('#leave-add-start').val();
             leave.leaveEnd = $('#leave-add-end').val();
+
             if (leave.leaveEnd == "" || leave.leaveStart == "") {
                 $('#nameError4').show();
             }
@@ -76,19 +97,31 @@
                             "Authorization": "Bearer token"
                         },
                         success: function (response) {
+                            if (response.hasError) {
+                                $('#nameError5').show();
+                                $('#add-leave-form')[0].reset();
+                            }
+                            else {
+                                console.log(response);
+                                var newData = response.data;
+                                console.log(newData);
+                                var datatable = $('#table-leave').DataTable();
+                                datatable.clear().rows.add(newData).draw();
+                                $('#add-leave-form')[0].reset();
+                                $('#nameError2').hide();
+                                $('#nameError4').hide();
+                                $('#nameError5').hide();
+                                $('#myAddModal').modal('hide');
+                            }
 
-                            console.log(response);
-                            var newData = response.data;
-                            console.log(newData);
-                            var datatable = $('#table-leave').DataTable();
-                            datatable.clear().rows.add(newData).draw();
+
                         },
                         error: function (msg) {
-
-                            console.log(msg);
+                            $('#nameError2').show();
+                            
                         }
                     });
-                    $('#myAddModal').modal('hide');
+
                 }
             }
 
@@ -128,6 +161,12 @@
         })
         $('.cancel').click(() => {
             $('.modal').modal('hide');
+            $('#nameError3').hide();
+            $('#nameError2').hide();
+            $('#nameError4').hide();
+            $('#nameError').hide();
+            $('#add-leave-form')[0].reset();
+            $('#edit-leave-form')[0].reset();
         })
 
         function deleteValue(values) {
@@ -149,12 +188,30 @@
         }
 
         //My Edit  Model
+        function convertDate(data) {
+            if (data !== null) {
+                var javascriptDate = new Date(data);
+                javascriptDate = javascriptDate.getFullYear() + "-" + ("0" + javascriptDate.getMonth()).slice(-2) + "-" + ("0" + javascriptDate.getDate()).slice(-2)  ;
+                return javascriptDate;
+            } else {
+                return "";
+            }
 
+        }
         var selecetedLeaveId;
         $("#table-leave").on("click", "#editModelB", function () {
             $("#myEditModal").modal('show');
             var datatable = $('#table-leave').DataTable();
             selecetedLeaveId = datatable.row($(this).parents('tr')).data().leaveId;
+            var ename = datatable.row($(this).parents('tr')).data().personnelName +" " +datatable.row($(this).parents('tr')).data().personnelSurname;
+            var previousEndDate = new Date();
+            previousEndDate = convertDate(datatable.row($(this).parents('tr')).data().leaveEnd);
+            var previousStartDate = new Date();
+            previousStartDate =convertDate(datatable.row($(this).parents('tr')).data().leaveStart);
+            $("#leave-edit-end").attr("value", previousEndDate);
+            $("#leave-edit-start").attr("value", previousStartDate);
+            $("#editted-personnel-name").attr("value", ename);
+
         });
 
         $("#myEditModal").on("click", '#submit-editted-leave', (e) => {
@@ -179,8 +236,10 @@
                         leaveEnd: end,
                     }
                     updateValue(values);
-
+                    $('#edit-leave-form')[0].reset();
                     $('#myEditModal').modal('hide');
+                    $('#nameError3').hide();
+                    $('#nameError').hide();
                 }
             }
 
@@ -204,6 +263,14 @@
                 datatable.clear().rows.add(newData).draw();
             });
         }
+        $('#myEditModal').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+        $('#myAddModal').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
 
     </script>
     <div class="row" id="container-leave">
@@ -247,7 +314,7 @@
                 </div>
             </div>
 
-            <div id="myEditModal" class="modal fade" tabindex="-1">
+            <div id="myEditModal" class="modal fade" tabindex="-1" >
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -256,13 +323,17 @@
                         </div>
                         <div class="modal-body">
                             <form id="edit-leave-form">
-                                <div class=”form-group”>
+                                <div class="form-group">
+                                    <label for="leave-edit-start">Personnel Name and Surname</label>
+                                    <input type="text" class="form-control" id="editted-personnel-name"  disabled>
+                                </div>
+                                <div class="form-group">
                                     <label for="leave-edit-start">Enter leave start date</label>
-                                    <input type="date" id="leave-edit-start" class="form-control" placeholder="Start">
+                                    <input type="date" id="leave-edit-start" class="form-control"placeholder="Date">
                                 </div>
                                 <div class=”form-group”>
                                     <label for="leave-edit-end">Enter leave end date</label>
-                                    <input type="date" id="leave-edit-end" class="form-control" placeholder="End">
+                                    <input type="date" id="leave-edit-end" class="form-control" placeholder="Date">
                                 </div>
                             </form>
                         </div>
@@ -308,6 +379,9 @@
                             </span>
                             <span id="nameError4" style="display:none" class="alert alert-danger" role="alert">
                                 You should enter both start and end dates!
+                            </span>
+                            <span id="nameError5" style="display:none" class="alert alert-danger" role="alert">
+                                You  enter dublicate leave !
                             </span>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">Cancel</button>
