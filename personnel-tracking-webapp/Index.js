@@ -7,6 +7,7 @@
         });
         $("#PersonnelTypePage").click(() => {
             $.get('PersonnelType/Index.html', (obj) => {
+                alert("here");
                 $('#container-main').empty().append(obj);
             });
         });
