@@ -16,7 +16,7 @@ namespace personnel_tracking_entity
         public int PersonnelId { get; set; }
         public int CompanyId { get; set; }
         public int PersonnelTypeId { get; set; }
-        public int IdentityNumber { get; set; }
+        public long IdentityNumber { get; set; }
         public string PersonnelName { get; set; }
         public string PersonnelSurname { get; set; }
         public string UserName { get; set; }
