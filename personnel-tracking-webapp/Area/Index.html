@@ -263,10 +263,10 @@
 
     function createEvent(event) {
         event.preventDefault();
-        var company = $('#company-input-edit').val();
-        var area = $("#area-input-edit").val();
-        var latitude = $("#latitude-input-edit").val();
-        var longitude = $("#longitude-input-edit").val();
+        var company = $('#company-input').val();
+        var area = $("#area-input").val();
+        var latitude = $("#latitude-input").val();
+        var longitude = $("#longitude-input").val();
         var values = {
             company: company,
             area: area,
@@ -307,7 +307,8 @@
                 latitude: values.latitude,
                 longitude: values.longitude,
                 qr_code: dataUrl
-            }
+            };
+            console.log(newVal);
             sendData(newVal);
         }, 2000);
 
@@ -329,7 +330,8 @@
                 latitude: values.latitude,
                 longitude: values.longitude,
                 qr_code: dataUrl
-            }
+            };
+            console.log(newVal);
             updateValue(newVal);
         }, 2000);
 
@@ -429,20 +431,6 @@
             "dataType": "json",
             "success": (response) => processResponse(response)
         });
-    }
-
-    function JsonTo2DArray(json) {
-        var dataset = [];
-        for (var i = 0; i < json.data.length; i++) {
-            var obj = json.data[i];
-            let j = 0;
-            dataset[i] = [];
-            for (var m in obj) {
-                dataset[i][j] = obj[m];
-                j++;
-            }
-        }
-        return dataset;
     }
 
     function ConfigurateCompanyList() {
