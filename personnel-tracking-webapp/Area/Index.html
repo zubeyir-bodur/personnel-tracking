@@ -13,27 +13,25 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="create-form">
+                        <form id="create-form" class="needs-validation" novalidate>
                             <div class="form-group">
                                 <label for="company-input">Companies</label>
-                                <select class="form-control" id="company-input">
-                                </select>
+                                <select class="form-control validate-me" id="company-input" required></select>
                             </div>
-
                             <div class="form-group">
                                 <label for="area-input">Area Name</label>
-                                <input type="text" class="form-control" id="area-input">
+                                <input type="text" class="form-control validate-me" id="area-input" required>
                             </div>
                             <div class="form-group">
                                 <label for="latitude-input">Latitude</label>
-                                <input type="number" class="form-control" id="latitude-input" step=".000000000001">
+                                <input type="number" class="form-control validate-me" id="latitude-input" step=".000000000001" required>
                             </div>
                             <div class="form-group">
                                 <label for="longitude-input">Longitude</label>
-                                <input type="number" class="form-control" id="longitude-input" step=".000000000001">
+                                <input type="number" class="form-control validate-me" id="longitude-input" step=".000000000001" required>
                             </div>
                             <div class="form-group">
-                                <br />
+                                <br/>
                                 <p> QR Code will be created after you submitted.</p>
                             </div>
 
@@ -70,7 +68,7 @@
             <div class="modal-dialog modal-dialog-centered modal-sm">
                 <div class="modal-content">
                     <div class="modal-body">
-                        <p  class="text-lg-center">Loading</p>
+                        <p class="text-lg-center">Loading</p>
                     </div>
                 </div>
             </div>
@@ -85,24 +83,26 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="edit-form">
+                        <form id="edit-form" class="needs-validation edit" novalidate>
                             <div class="form-group">
                                 <label for="company-input">Companies</label>
-                                <select class="form-control" id="company-input-edit">
-                                </select>
+                                <select class="form-control validate-me" id="company-input-edit" required></select>
                             </div>
-
                             <div class="form-group">
                                 <label for="area-input-edit">Area Name</label>
-                                <input type="text" class="form-control" id="area-input-edit">
+                                <input type="text" class="form-control validate-me" id="area-input-edit" required>
                             </div>
                             <div class="form-group">
                                 <label for="latitude-input-edit">Latitude</label>
-                                <input type="number" class="form-control" id="latitude-input-edit" step=".000000000001">
+                                <input type="number" class="form-control validate-me" id="latitude-input-edit" step=".000000000001" required>
                             </div>
                             <div class="form-group">
                                 <label for="longitude-input-edit">Longitude</label>
-                                <input type="number" class="form-control" id="longitude-input-edit" step=".000000000001">
+                                <input type="number" class="form-control validate-me" id="longitude-input-edit" step=".000000000001" required>
+                            </div>
+                            <div class="form-group">
+                                <br>
+                                <p> QR Code will be created after you submitted.</p>
                             </div>
                         </form>
                     </div>
@@ -132,6 +132,24 @@
             </div>
         </div>
 
+        <!-- Error Modal-->
+        <div class="modal fade" id="error-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-danger" id="staticBackdropLabel">Error!</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="error-message">An error has ocurred!</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ok</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card-body">
             <div class="table-responsive">
                 <table id="table-area" class="table w-100">
@@ -143,34 +161,42 @@
 </div>
 
 <script>
+    var selected_area_id;
     var companyList;
     $(document).ready(() => {
         initialize();
-        var form = document.getElementById("create-form");
-        form.addEventListener('submit', (e) => {
+        
+        var forms = document.querySelectorAll('.needs-validation');
+        // Check if any field is empty
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', (event) => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        form.classList.add('was-validated');
+                    }
+                    else {
+                        form.classList.remove('was-validated');
+                        var validate_me = document.querySelectorAll('.validate-me');
+                        for (var i = 0; i < validate_me.length; i++) {
+                            validate_me[i].classList.add('is-valid');
+                        }
+                        if ($(form).hasClass("edit")) {
+                            updateEvent(event);
+                        }
+                        else {
+                            createEvent(event);
+                        }
 
-            e.preventDefault();
-            var company = $('#company-input').val();
-            var area = $("#area-input").val();
-            var latitude = $("#latitude-input").val();
-            var longitude = $("#longitude-input").val();
-            var values = {
-                company: company,
-                area: area,
-                latitude: parseFloat(latitude),
-                longitude: parseFloat(longitude),
-            }
-            $('#create-data-modal').modal('hide');
-            $('#loading-modal').modal('show');
-            openCodeModal(values);
-        });
-
+                    }
+                }, false)
+            });
 
         $("#create-button").click(() => {
             $('#create-data-modal').modal('show');
         });
 
-        var selected_area_id;
         $('#table-area').on('click', '#edit-button', function () {
             var datatable = $('#table-area').DataTable();
             var data = datatable.row($(this).parents('tr')).data();
@@ -182,28 +208,6 @@
             $("#edit-data-modal").modal('show');
         });
 
-
-        var form = document.getElementById("edit-form");
-        form.addEventListener('submit', (e) => {
-
-            e.preventDefault();
-
-            var company = $('#company-input-edit').val();
-            var area = $("#area-input-edit").val();
-            var latitude = $("#latitude-input-edit").val();
-            var longitude = $("#longitude-input-edit").val();
-            var values = {
-                areaId: selected_area_id,
-                company: company,
-                area: area,
-                latitude: parseFloat(latitude),
-                longitude: parseFloat(longitude)
-            };
-            $('#create-data-modal').modal('hide');
-            $('#loading-modal').modal('show');
-            openCodeModalEdit(values);         
-            $('#edit-data-modal').modal('hide');
-        });
 
         $('#table-area').on('click', '#row-img', function () {
             var datatable = $('#table-area').DataTable();
@@ -233,6 +237,51 @@
 
         })
     });
+
+    function updateEvent(event) {
+        event.preventDefault();
+        var company = $('#company-input-edit').val();
+        var area = $("#area-input-edit").val();
+        var latitude = $("#latitude-input-edit").val();
+        var longitude = $("#longitude-input-edit").val();
+        var values = {
+            areaId: selected_area_id,
+            company: company,
+            area: area,
+            latitude: parseFloat(latitude),
+            longitude: parseFloat(longitude)
+        };
+        var validate_me = document.querySelectorAll('.validate-me');
+        for (var i = 0; i < validate_me.length; i++) {
+            validate_me[i].classList.remove('is-valid');
+            validate_me[i].classList.remove('is-invalid');
+        }
+        $('#loading-modal').modal('show');
+        openCodeModalEdit(values);
+        $('#edit-data-modal').modal('hide');
+    }
+
+    function createEvent(event) {
+        event.preventDefault();
+        var company = $('#company-input-edit').val();
+        var area = $("#area-input-edit").val();
+        var latitude = $("#latitude-input-edit").val();
+        var longitude = $("#longitude-input-edit").val();
+        var values = {
+            company: company,
+            area: area,
+            latitude: parseFloat(latitude),
+            longitude: parseFloat(longitude)
+        };
+        var validate_me = document.querySelectorAll('.validate-me');
+        for (var i = 0; i < validate_me.length; i++) {
+            validate_me[i].classList.remove('is-valid');
+            validate_me[i].classList.remove('is-invalid');
+        }
+        $('#loading-modal').modal('show');
+        openCodeModal(values);
+        $('#create-data-modal').modal('hide');
+    }
 
     function initialize() {
         constructTable();
@@ -295,8 +344,8 @@
             dataType: "json",
             success: (response) => {
                 if (response.hasError) {
-                    //$('#error-message').val(response.errorMessage);
-                    //$('#error-modal').modal('show');
+                    $('#error-message').val(response.errorMessage);
+                    $('#error-modal').modal('show');
                 }
                 $('#table-area').DataTable({
                     language: {
@@ -419,8 +468,8 @@
 
     function processResponse(response) {
         if (response.hasError) {
-            //$('#error-message').text(response.errorMessage);
-            //$('#error-modal').modal('show');
+            $('#error-message').text(response.errorMessage);
+            $('#error-modal').modal('show');
         }
         var datatable = $('#table-area').DataTable();
         datatable.clear().rows.add(response.data).draw();
