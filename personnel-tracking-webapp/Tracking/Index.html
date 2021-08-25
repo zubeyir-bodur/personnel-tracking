@@ -16,6 +16,21 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="info-data-modal" role="dialog" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Tracking Already In System</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>The tracking you want to add is already in the system. Try Again.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="close-button-info">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="modal fade" id="edit-data-modal" role="dialog" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="dialog">
                 <div class="modal-content">
@@ -353,7 +368,7 @@
 
     $('#cancel-button-create').click(() => {
 
-        $('#delete-data-modal').modal('hide');
+        $('#create-data-modal').modal('hide');
 
     });
 
@@ -408,9 +423,12 @@
             objectTracking.ExitDate = null;
         }
 
-        console.log(objectTracking);
+       // console.log(objectTracking);
 
         if (objectTracking) {
+
+            var alreadyIn;
+
             $.ajax({
 
                 "url": "http://localhost:5000/api/tracking",
@@ -424,8 +442,20 @@
                 success: function (result) {
 
                     var newData = result.data;
-                    var dataTable = $('#table-tracking').DataTable();
-                    dataTable.clear().rows.add(newData).draw();
+                    console.log(newData);
+
+                    if (newData == false) {
+
+                        console.log("girdi");
+                        alreadyIn = true;
+                        $('#info-data-modal').modal('show');
+
+                    }
+
+                    else {
+                        var dataTable = $('#table-tracking').DataTable();
+                        dataTable.clear().rows.add(newData).draw();
+                    }
              
                 },
                 error: function (msg) {
@@ -435,7 +465,16 @@
             });
         }
 
+
         $('#create-data-modal').modal('hide');
+
+    });
+
+    // info modal cancel button
+    $('#close-button-info').click(() => {
+
+        $('#info-data-modal').modal('hide');
+
     });
 
 
