@@ -108,7 +108,7 @@ namespace personnel_tracking_webapi.Controllers
             }).ToList();
             return Ok(response);
         }
-
+        
         [HttpDelete]
         public IActionResult Delete(AreaDTO areaDto)
         {

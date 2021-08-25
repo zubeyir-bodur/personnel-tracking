@@ -25,6 +25,7 @@ namespace personnel_tracking_webapi
 
         public void ConfigureServices(IServiceCollection services)
         {
+           services.AddDbContext<PersonnelTrackingDBContext>();
             services.AddControllers();
             services.AddCors(policy => policy.AddDefaultPolicy(options => {
                 options.AllowCredentials().AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowed(origin => true);

@@ -27,8 +27,22 @@
                 $('#container-main').html(e);
             }); return false;
         });
+        $("#TrackingPage").click(() => {
+            $.get('Tracking/Index.html', (obj) => {
+                $('#container-main').empty().append(obj);
+            });
+        });
     });
 });
 
+/*function showTrackingContent() {
 
+    $('#area-table-container').hide();
 
+    $(document).ready(() => {
+        $.get('Tracking/Index.html', (e) => {
+            $('#tracking-table-container').append(e);
+        });
+    });
+
+}*/
