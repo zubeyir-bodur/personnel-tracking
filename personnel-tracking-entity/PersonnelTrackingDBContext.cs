@@ -113,7 +113,9 @@ namespace personnel_tracking_entity
 
                 entity.Property(e => e.CompanyId).HasColumnName("company_id");
 
-                entity.Property(e => e.IdentityNumber).HasColumnName("identity_number");
+                entity.Property(e => e.IdentityNumber)
+                    .HasColumnName("identity_number")
+                    .HasColumnType("bigint");
 
                 entity.Property(e => e.Password)
                     .IsRequired()
@@ -183,9 +185,7 @@ namespace personnel_tracking_entity
                     .HasColumnType("smalldatetime")
                     .HasColumnName("exit_date");
 
-                entity.Property(e => e.PersonnelId)
-                    .HasColumnName("personnel_id")
-                    .HasColumnType("bigint");
+                entity.Property(e => e.PersonnelId).HasColumnName("personnel_id");
 
                 entity.HasOne(d => d.Area)
                     .WithMany(p => p.Trackings)
