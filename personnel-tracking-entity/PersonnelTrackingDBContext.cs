@@ -114,7 +114,7 @@ namespace personnel_tracking_entity
 
                 entity.Property(e => e.CompanyId).HasColumnName("company_id");
 
-                entity.Property(e => e.IdentityNumber).HasColumnName("identity_number");
+                entity.Property(e => e.IdentityNumber).HasColumnName("identity_number").HasColumnType("bigint");
 
                 entity.Property(e => e.Password)
                     .IsRequired()
