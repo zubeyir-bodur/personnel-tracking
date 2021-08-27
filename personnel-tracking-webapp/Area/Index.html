@@ -297,10 +297,7 @@
         let dataUrl;        
         setTimeout(() => {
             $('#loading-modal').modal('hide');
-            $("#qr-code-modal").modal('show');
             dataUrl = code._oDrawing._elImage.src;
-            console.log(dataUrl);
-            $("#qr-code-img").attr('src', dataUrl);
             var newVal = {
                 company: values.company,
                 area: values.area,
@@ -309,7 +306,12 @@
                 qr_code: dataUrl
             };
             console.log(newVal);
-            sendData(newVal);
+            var hasNoError = sendData(newVal);
+            if (hasNoError) {
+                $("#qr-code-modal").modal('show');
+                console.log(dataUrl);
+                $("#qr-code-img").attr('src', dataUrl);
+            }
         }, 2000);
 
     }
@@ -319,10 +321,8 @@
         let dataUrl;
         setTimeout(() => {
             $('#loading-modal').modal('hide');
-            $("#qr-code-modal").modal('show');
             dataUrl = code._oDrawing._elImage.src;
             console.log(dataUrl);
-            $("#qr-code-img").attr('src', dataUrl);
             var newVal = {
                 areaId: values.areaId,
                 company: values.company,
@@ -332,12 +332,18 @@
                 qr_code: dataUrl
             };
             console.log(newVal);
-            updateValue(newVal);
+            var hasNoError = updateValue(newVal);
+            if (hasNoError) {
+                $("#qr-code-modal").modal('show');
+                console.log(dataUrl);
+                $("#qr-code-img").attr('src', dataUrl);
+            }
         }, 2000);
 
     }
 
     function constructTable() {
+        var hasNoError;
         $.ajax({
             url: "http://localhost:5000/api/area",
             headers: {
@@ -348,7 +354,9 @@
                 if (response.hasError) {
                     $('#error-message').val(response.errorMessage);
                     $('#error-modal').modal('show');
+                    hasNoError = false;
                 }
+                hasNoError = true;
                 $('#table-area').DataTable({
                     language: {
                         url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Turkish.json'
@@ -389,9 +397,11 @@
                 });
             }
         });
+        return hasNoError;
     }
     
     function deleteValue(values) {
+        var hasNoError;
         $.ajax({
             "url": "http://localhost:5000/api/area",
             "method": "DELETE",
@@ -401,11 +411,15 @@
             },
             "data": JSON.stringify(values),
             "dataType": "json",
-            "success": (response) => processResponse(response)
+            "success": (response) => {
+                hasNoError = processResponse(response);
+            }
         });
+        return hasNoError;
     }
 
     function updateValue(values) {
+        var hasNoError;
         $.ajax({
             "url": "http://localhost:5000/api/area",
             "method": "PUT",
@@ -415,11 +429,15 @@
             },
             "data": JSON.stringify(values),
             "dataType": "json",
-            "success": (response) => processResponse(response)
+            "success": (response) => {
+                hasNoError = processResponse(response);
+            }
         });
+        return hasNoError;
     }
 
     function sendData(values) {
+        var hasNoError;
         $.ajax({
             "url": "http://localhost:5000/api/area",
             "method": "POST",
@@ -429,8 +447,11 @@
             },
             "data": JSON.stringify(values),
             "dataType": "json",
-            "success": (response) => processResponse(response)
+            "success": (response) => {
+                hasNoError = processResponse(response);
+            }
         });
+        return hasNoError;
     }
 
     function ConfigurateCompanyList() {
@@ -458,9 +479,13 @@
         if (response.hasError) {
             $('#error-message').text(response.errorMessage);
             $('#error-modal').modal('show');
+            var datatable = $('#table-area').DataTable();
+            datatable.clear().rows.add(response.data).draw();
+            return false;
         }
         var datatable = $('#table-area').DataTable();
         datatable.clear().rows.add(response.data).draw();
+        return true;
     }
 
 </script>

@@ -154,6 +154,17 @@ namespace personnel_tracking_webapi.Controllers
                     CompanyId = companyDto.CompanyId,
                     CompanyName = companyDto.CompanyName
                 };
+
+                bool isRelationalArea, isRelationalPersonnel;
+                isRelationalArea = dbContext.Areas.AsNoTracking().FirstOrDefault(a => a.CompanyId == companyDto.CompanyId) != null;
+                isRelationalPersonnel = dbContext.Personnel.AsNoTracking().FirstOrDefault(a => a.CompanyId == companyDto.CompanyId) != null;
+                if (isRelationalArea && !isRelationalPersonnel)
+                    throw new Exception("The company being deleted has areas related to it, please delete areas first.");
+                if (isRelationalPersonnel&& !isRelationalArea)
+                    throw new Exception("The company being deleted has personnel related to it, please delete those personnel first.");
+                if (isRelationalPersonnel && isRelationalArea)
+                    throw new Exception("The company being deleted has personnel and areas related to it, please delete those first.");
+
                 dbContext.Companies.Remove(delCompany).State = EntityState.Deleted;
                 Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
             }

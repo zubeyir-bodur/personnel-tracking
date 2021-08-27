@@ -130,23 +130,29 @@ namespace personnel_tracking_webapi.Controllers
                     Longitude = Convert.ToDecimal(areaDto.longitude),
                     QrCode = Convert.FromBase64String(areaDto.qr_code.Substring(22))
                 };
-                // 1- Coordinates must be unique
+                // 1- Coordinates must be unique, but may be equal to old one
+                decimal oldLat, oldLong;
+                var oldArea = dbContext.Areas.AsNoTracking().FirstOrDefault(a => a.AreaId == areaDto.areaId);
+                oldLat = oldArea.Latitude;
+                oldLong = oldArea.Longitude;
+                bool isOldCoordinate = newArea.Latitude == oldLat && newArea.Longitude == oldLong;
                 bool existsCoordinates = dbContext.Areas.AsNoTracking().
                     FirstOrDefault(a =>
-                    a.Latitude == newArea.Latitude
-                    && a.Longitude == newArea.Longitude
+                    (a.Latitude == newArea.Latitude
+                    && a.Longitude == newArea.Longitude)
                     ) != null;
 
-                // 2- A company can't have two areas with same names
+                // 2- A company can't have two areas with same names, but may be equal to old one
                 var companyAreas = dbContext.Areas.AsNoTracking().Where(a => a.CompanyId == newArea.CompanyId).ToList();
+                var isOldName = oldArea.AreaName.Equals(newArea.AreaName);
                 bool existsName = companyAreas.
                     FirstOrDefault(a =>
                     a.AreaName.Equals(newArea.AreaName)
-                    ) != null; ;
-                if (existsCoordinates)
-                    throw new Exception("An area with same coordinates already exist!");
-                else if (existsName)
+                    ) != null;
+                if (existsName && !isOldName)
                     throw new Exception("A company can't have two areas with same names!");
+                else if (existsCoordinates && !isOldCoordinate)
+                    throw new Exception("An area with same coordinates already exist!");
                 else
                 {
                     dbContext.Update<Area>(newArea).State = EntityState.Modified;

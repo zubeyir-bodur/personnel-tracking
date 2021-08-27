@@ -155,8 +155,15 @@ namespace personnel_tracking_webapi.Controllers
                     PersonnelTypeId = personnelTypeDto.PersonnelTypeId,
                     PersonnelTypeName = personnelTypeDto.PersonnelTypeName
                 };
+
+                bool isRelationalPersonnel = dbContext.Personnel
+                    .AsNoTracking()
+                    .FirstOrDefault(a => a.PersonnelTypeId == personnelTypeDto.PersonnelTypeId) != null;
+                if (isRelationalPersonnel)
+                    throw new Exception("The role being deleted has personnel related to it, please delete those personnel first.");
+
                 dbContext.PersonnelTypes.Remove(delPersonnelType).State = EntityState.Deleted;
-                Console.WriteLine(dbContext.SaveChanges() + " rows affected.");
+                dbContext.SaveChanges();
             }
             catch (Exception e)
             {
