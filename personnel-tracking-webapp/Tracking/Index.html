@@ -488,7 +488,7 @@
             },
             "success": function (response) {
                 for (var i = 0; i < response.data.length; i++) {
-                    $("#createAreaID").append($('<option>').val(response.data[i].areaId).text(response.data[i].areaName));
+                    $("#createAreaID").append($('<option>').val(response.data[i].areaId).text(response.data[i].area));
                 }
 
                 $("#createAreaID").append($('<option value="" selected disabled hidden>').text("Choose an Area"));
@@ -510,12 +510,12 @@
 
                     if (response.data[i].areaName == areaName) {
 
-                        $("#editAreaID").append($('<option selected>').val(response.data[i].areaId).text(response.data[i].areaName));
+                        $("#editAreaID").append($('<option selected>').val(response.data[i].areaId).text(response.data[i].area));
                         continue;
 
                     }
 
-                    $("#editAreaID").append($('<option>').val(response.data[i].areaId).text(response.data[i].areaName));
+                    $("#editAreaID").append($('<option>').val(response.data[i].areaId).text(response.data[i].area));
                 }
             }
         });

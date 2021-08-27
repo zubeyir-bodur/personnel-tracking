@@ -213,7 +213,7 @@ namespace personnel_tracking_webapi.Controllers
         public int personnelId { get; set; }
         public string company { get; set; }
         public string personnelType { get; set; }
-        public int identityNumber { get; set; }
+        public long identityNumber { get; set; }
         public string personnelName { get; set; }
         public string personnelSurname { get; set; }
         public string username { get; set; }
