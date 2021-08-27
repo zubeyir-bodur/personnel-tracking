@@ -1,7 +1,7 @@
 ﻿<div class="row" id="container-area">
     <div class="col-12">
         <br />
-        <button type="button" class="btn btn-primary" id="create-button">
+        <button type="button" class="btn btn-success" id="create-button">
             Create
         </button>
 
@@ -25,10 +25,12 @@
                             <div class="form-group">
                                 <label for="latitude-input">Latitude</label>
                                 <input type="number" class="form-control validate-me" id="latitude-input" step=".000000000001" required>
+                                <div class="error-latitude" style="display: none">Latitude can range between -90 and 90</div>
                             </div>
                             <div class="form-group">
                                 <label for="longitude-input">Longitude</label>
                                 <input type="number" class="form-control validate-me" id="longitude-input" step=".000000000001" required>
+                                <div class="error-longitude" style="display: none">Longitude can range between -180 and 180</div>
                             </div>
                             <div class="form-group">
                                 <br/>
@@ -95,10 +97,12 @@
                             <div class="form-group">
                                 <label for="latitude-input-edit">Latitude</label>
                                 <input type="number" class="form-control validate-me" id="latitude-input-edit" step=".000000000001" required>
+                                <div class="error-latitude-edit" style="display: none">Latitude can range between -90 and 90</div>
                             </div>
                             <div class="form-group">
                                 <label for="longitude-input-edit">Longitude</label>
                                 <input type="number" class="form-control validate-me" id="longitude-input-edit" step=".000000000001" required>
+                                <div class="error-longitude-edit" style="display: none">Longitude can range between -180 and 180</div>
                             </div>
                             <div class="form-group">
                                 <br>
@@ -188,7 +192,6 @@
                         else {
                             createEvent(event);
                         }
-
                     }
                 }, false)
             });
@@ -238,7 +241,7 @@
         })
     });
 
-    function updateEvent(event) {
+    async function updateEvent(event) {
         event.preventDefault();
         var company = $('#company-input-edit').val();
         var area = $("#area-input-edit").val();
@@ -251,6 +254,22 @@
             latitude: parseFloat(latitude),
             longitude: parseFloat(longitude)
         };
+        var rangesResponse = await checkCoordinates(parseFloat(latitude), parseFloat(longitude));
+        if (!rangesResponse.success) {
+            if (!rangesResponse.successArray[0]) {
+                $("#latitude-input-edit").removeClass('is-valid');
+                $("#latitude-input-edit").addClass('is-invalid');
+                $(".error-latitude-edit").css('color', 'red');
+                $(".error-latitude-edit").css('display', 'block');
+            }
+            if (!rangesResponse.successArray[1]) {
+                $("#longitude-input-edit").removeClass('is-valid');
+                $("#longitude-input-edit").addClass('is-invalid');
+                $(".error-longitude-edit").css('color', 'red');
+                $(".error-longitude-edit").css('display', 'block');
+            }
+            return;
+        }
         var validate_me = document.querySelectorAll('.validate-me');
         for (var i = 0; i < validate_me.length; i++) {
             validate_me[i].classList.remove('is-valid');
@@ -261,7 +280,7 @@
         $('#edit-data-modal').modal('hide');
     }
 
-    function createEvent(event) {
+    async function createEvent(event) {
         event.preventDefault();
         var company = $('#company-input').val();
         var area = $("#area-input").val();
@@ -273,6 +292,22 @@
             latitude: parseFloat(latitude),
             longitude: parseFloat(longitude)
         };
+        var rangesResponse = await checkCoordinates(parseFloat(latitude), parseFloat(longitude));
+        if (!rangesResponse.success) {
+            if (!rangesResponse.successArray[0]) {
+                $("#latitude-input").removeClass('is-valid');
+                $("#latitude-input").addClass('is-invalid');
+                $(".error-latitude").css('color', 'red');
+                $(".error-latitude").css('display', 'block');
+            }
+            if (!rangesResponse.successArray[1]) {
+                $("#longitude-input").removeClass('is-valid');
+                $("#longitude-input").addClass('is-invalid');
+                $(".error-longitude").css('color', 'red');
+                $(".error-longitude").css('display', 'block');
+            }
+            return;
+        }
         var validate_me = document.querySelectorAll('.validate-me');
         for (var i = 0; i < validate_me.length; i++) {
             validate_me[i].classList.remove('is-valid');
@@ -305,11 +340,9 @@
                 longitude: values.longitude,
                 qr_code: dataUrl
             };
-            console.log(newVal);
             var hasNoError = sendData(newVal);
             if (hasNoError) {
                 $("#qr-code-modal").modal('show');
-                console.log(dataUrl);
                 $("#qr-code-img").attr('src', dataUrl);
             }
         }, 2000);
@@ -322,7 +355,6 @@
         setTimeout(() => {
             $('#loading-modal').modal('hide');
             dataUrl = code._oDrawing._elImage.src;
-            console.log(dataUrl);
             var newVal = {
                 areaId: values.areaId,
                 company: values.company,
@@ -331,15 +363,12 @@
                 longitude: values.longitude,
                 qr_code: dataUrl
             };
-            console.log(newVal);
             var hasNoError = updateValue(newVal);
             if (hasNoError) {
                 $("#qr-code-modal").modal('show');
-                console.log(dataUrl);
                 $("#qr-code-img").attr('src', dataUrl);
             }
         }, 2000);
-
     }
 
     function constructTable() {
@@ -358,40 +387,37 @@
                 }
                 hasNoError = true;
                 $('#table-area').DataTable({
-                    language: {
-                        url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Turkish.json'
-                    },
                     data: response.data,
                     columns: [
                         {
-                            title: "Sıra No",
+                            title: "#",
                             data: "areaId"
                         },
                         {
-                            title: "Firma Adı",
+                            title: "Company",
                             data: "company"
                         },
                         {
-                            title: "Bölge Adı",
+                            title: "Area",
                             data: "area"
                         },
                         {
-                            title: "Enlem",
+                            title: "Latitude",
                             data: "latitude"
                         },
                         {
-                            title: "Boylam",
+                            title: "Longitude",
                             data: "longitude"
                         },
                         {
-                            title: "QR Kod"
+                            title: "QR Code"
                         }
                     ],
                     "columnDefs": [{
                         "targets": -1,
                         "data": null,
                         "render": function (data, type, row, meta) {
-                            return `<img id='row-img' src='${data.qr_code}' width='50px'> <button style='margin-left:50px' class='btn btn-primary' id='edit-button'>Edit</button> <button style='margin-right:-120px' class='btn btn-secondary' id='delete-button'>Delete</button>`;
+                            return `<img id='row-img' src='${data.qr_code}' width='50px'> <button style='margin-left:50px' class='btn btn-primary' id='edit-button'>Edit</button> <button style='margin-right:-120px' class='btn btn-danger' id='delete-button'>Delete</button>`;
                         }
                     }]
                 });
@@ -468,6 +494,30 @@
                 }
             }
         });
+    }
+
+    async function checkCoordinates(latitude, longitude) {
+        var returnVal = {
+            success: true,
+            successArray: []
+        };
+        await $.ajax({
+            "url": "http://localhost:5000/api/area/range",
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer" + localStorage.getItem("token")
+            },
+            "data": JSON.stringify({
+                latitude: latitude,
+                longitude: longitude
+            }),
+            "success": (response) => {
+                returnVal.success = !response.hasError;
+                returnVal.successArray = response.data;
+            }
+        });
+        return returnVal;
     }
 
     function showQRCode(dataUrl) {

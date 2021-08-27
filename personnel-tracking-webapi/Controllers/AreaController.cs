@@ -220,6 +220,44 @@ namespace personnel_tracking_webapi.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Verify the range of coordinates
+        /// </summary>
+        /// <param name="latitude"></param>
+        /// <param name="longitude"></param>
+        /// <returns></returns>
+        [HttpPost("range")]
+        public IActionResult InRange([FromBody] Coordinate coordinate) {
+            decimal latitude = coordinate.latitude;
+            decimal longitude = coordinate.longitude;
+            bool[] success = {false, false};
+            ResponseModel response = new ResponseModel();
+            bool latInRange = !(latitude > 90 || latitude < -90);
+            bool longInRange = !(longitude > 180 || longitude < -180);
+            if (latInRange && !longInRange) {
+                response.HasError = true;
+                success[0] = true;
+                response.Data = success;
+            }
+            else if (!latInRange && longInRange) {
+                response.HasError = true;
+                success[1] = true;
+                response.Data = success;
+            }
+            else if (!latInRange && !longInRange) {
+                response.HasError = true;
+                response.Data = success;
+            }
+            else
+            {
+                response.HasError = false;
+                success[0] = true;
+                success[1] = true;
+                response.Data = success;
+            }
+            return Ok(response);
+        }
+
         public IActionResult SaveChanges()
         {
             ResponseModel response = new ResponseModel();
@@ -244,5 +282,10 @@ namespace personnel_tracking_webapi.Controllers
         public double latitude { get; set; }
         public double longitude { get; set; }
         public string qr_code { get; set; }
+    }
+
+    public class Coordinate {
+        public decimal latitude { get; set; }
+        public decimal longitude { get; set; }
     }
 }
