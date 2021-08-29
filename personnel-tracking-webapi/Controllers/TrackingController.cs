@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using personnel_tracking_entity;
+using personnel_tracking_dto;
 using personnel_tracking_webapi.Filters;
 using personnel_tracking_webapi.Models;
 using System;
@@ -65,16 +66,37 @@ namespace personnel_tracking_webapi.Controllers
         public IActionResult Post(Tracking t)
         {
             ResponseModel response = new ResponseModel();
+            bool alreadyExists = false;
 
             try
             {
-                dbContext.Trackings.Add(t);
-                dbContext.SaveChanges();
+                var tList = dbContext.Set<Tracking>().ToList();
+
+                for (int i = 0; i < tList.Count; i++)
+                {
+                    if (tList[i].PersonnelId == t.PersonnelId && tList[i].AreaId == t.AreaId && tList[i].EntranceDate == t.EntranceDate && tList[i].ExitDate == t.ExitDate && tList[i].AutoExit == t.AutoExit)
+                    {
+                        alreadyExists = true;
+                    }
+                }
+
+                if (!alreadyExists)
+                {
+                    dbContext.Trackings.Add(t);
+                    dbContext.SaveChanges();
+                }
+                
             }
             catch (Exception ex)
             {
                 response.HasError = true;
                 response.ErrorMessage = ex.Message;
+            }
+
+            if (alreadyExists)
+            {
+                response.Data = false;
+                return Ok(response);
             }
 
             var trackingList = dbContext.Set<Tracking>().ToList();
@@ -93,7 +115,7 @@ namespace personnel_tracking_webapi.Controllers
                 });
             }
 
-            response.Data = trackingDTOList;
+           response.Data = trackingDTOList;
            return Ok(response);
         }
 
@@ -181,17 +203,6 @@ namespace personnel_tracking_webapi.Controllers
             return Ok(response);
         }
 
-    }
 
-
-    public class TrackingDTO
-    {
-        public int trackingId { get; set; }
-        public string personnelName { get; set; }
-        public string personnelSurname { get; set; }
-        public string areaName { get; set; }
-        public DateTime entranceDate { get; set; }
-        public DateTime? exitDate { get; set; }
-        public bool autoExit { get; set; }
     }
 }

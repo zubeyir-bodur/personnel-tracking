@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\personnel-tracking-dto\personnel-tracking-dto.csproj" />
     <ProjectReference Include="..\personnel-tracking-entity\personnel-tracking-entity.csproj" />
   </ItemGroup>
 

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using personnel_tracking_entity;
+using personnel_tracking_dto;
 using personnel_tracking_webapi.Filters;
 using personnel_tracking_webapi.Models;
 using System;
@@ -206,22 +207,4 @@ namespace personnel_tracking_webapi.Controllers
             return Ok(response);
         }
     }
-
-
-    public class PersonnelDTO
-    {
-        public int personnelId { get; set; }
-        public string company { get; set; }
-        public string personnelType { get; set; }
-        public int identityNumber { get; set; }
-        public string personnelName { get; set; }
-        public string personnelSurname { get; set; }
-        public string username { get; set; }
-        public string password { get; set; }
-
-
-        //maybe add virtual ones too?
-    }
-
-
 }

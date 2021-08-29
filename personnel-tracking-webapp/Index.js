@@ -1,5 +1,8 @@
 ﻿$(() => {
     $(document).ready(() => {
+        $.get('Area/Index.html', (e) => {
+            $('#container-main').append(e);
+        });
         $("#CompanyPage").click(() => {
             $.get('Company/Index.html', (obj) => {
                 $('#container-main').empty().append(obj);

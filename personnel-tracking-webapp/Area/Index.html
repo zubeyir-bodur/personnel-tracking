@@ -1,7 +1,7 @@
 ﻿<div class="row" id="container-area">
     <div class="col-12">
         <br />
-        <button type="button" class="btn btn-primary" id="create-button">
+        <button type="button" class="btn btn-success" id="create-button">
             Create
         </button>
 
@@ -13,27 +13,27 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="create-form">
+                        <form id="create-form" class="needs-validation" novalidate>
                             <div class="form-group">
                                 <label for="company-input">Companies</label>
-                                <select class="form-control" id="company-input">
-                                </select>
+                                <select class="form-control validate-me" id="company-input" required></select>
                             </div>
-
                             <div class="form-group">
                                 <label for="area-input">Area Name</label>
-                                <input type="text" class="form-control" id="area-input">
+                                <input type="text" class="form-control validate-me" id="area-input" required>
                             </div>
                             <div class="form-group">
                                 <label for="latitude-input">Latitude</label>
-                                <input type="number" class="form-control" id="latitude-input" step=".000000000001">
+                                <input type="number" class="form-control validate-me" id="latitude-input" step=".000000000001" required>
+                                <div class="error-latitude" style="display: none">Latitude can range between -90 and 90</div>
                             </div>
                             <div class="form-group">
                                 <label for="longitude-input">Longitude</label>
-                                <input type="number" class="form-control" id="longitude-input" step=".000000000001">
+                                <input type="number" class="form-control validate-me" id="longitude-input" step=".000000000001" required>
+                                <div class="error-longitude" style="display: none">Longitude can range between -180 and 180</div>
                             </div>
                             <div class="form-group">
-                                <br />
+                                <br/>
                                 <p> QR Code will be created after you submitted.</p>
                             </div>
 
@@ -70,7 +70,7 @@
             <div class="modal-dialog modal-dialog-centered modal-sm">
                 <div class="modal-content">
                     <div class="modal-body">
-                        <p  class="text-lg-center">Loading</p>
+                        <p class="text-lg-center">Loading</p>
                     </div>
                 </div>
             </div>
@@ -81,29 +81,32 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="staticBackdropLabel">
-                            Edit area:<h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title" id="staticBackdropLabel">Edit area:</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="edit-form">
+                        <form id="edit-form" class="needs-validation edit" novalidate>
                             <div class="form-group">
                                 <label for="company-input">Companies</label>
-                                <select class="form-control" id="company-input-edit">
-                                </select>
+                                <select class="form-control validate-me" id="company-input-edit" required></select>
                             </div>
-
                             <div class="form-group">
                                 <label for="area-input-edit">Area Name</label>
-                                <input type="text" class="form-control" id="area-input-edit">
+                                <input type="text" class="form-control validate-me" id="area-input-edit" required>
                             </div>
                             <div class="form-group">
                                 <label for="latitude-input-edit">Latitude</label>
-                                <input type="number" class="form-control" id="latitude-input-edit" step=".000000000001">
+                                <input type="number" class="form-control validate-me" id="latitude-input-edit" step=".000000000001" required>
+                                <div class="error-latitude-edit" style="display: none">Latitude can range between -90 and 90</div>
                             </div>
                             <div class="form-group">
                                 <label for="longitude-input-edit">Longitude</label>
-                                <input type="number" class="form-control" id="longitude-input-edit" step=".000000000001">
+                                <input type="number" class="form-control validate-me" id="longitude-input-edit" step=".000000000001" required>
+                                <div class="error-longitude-edit" style="display: none">Longitude can range between -180 and 180</div>
+                            </div>
+                            <div class="form-group">
+                                <br>
+                                <p> QR Code will be created after you submitted.</p>
                             </div>
                         </form>
                     </div>
@@ -133,6 +136,24 @@
             </div>
         </div>
 
+        <!-- Error Modal-->
+        <div class="modal fade" id="error-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-danger" id="staticBackdropLabel">Error!</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="error-message">An error has ocurred!</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ok</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card-body">
             <div class="table-responsive">
                 <table id="table-area" class="table w-100">
@@ -144,31 +165,143 @@
 </div>
 
 <script>
-    // TODO: Companies list at create table
-    // QR Code configuration
-
+    var selected_area_id;
     var companyList;
+    $(document).ready(() => {
+        initialize();
+        
+        var forms = document.querySelectorAll('.needs-validation');
+        // Check if any field is empty
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', (event) => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        form.classList.add('was-validated');
+                    }
+                    else {
+                        form.classList.remove('was-validated');
+                        var validate_me = document.querySelectorAll('.validate-me');
+                        for (var i = 0; i < validate_me.length; i++) {
+                            validate_me[i].classList.add('is-valid');
+                        }
+                        if ($(form).hasClass("edit")) {
+                            updateEvent(event);
+                        }
+                        else {
+                            createEvent(event);
+                        }
+                    }
+                }, false)
+            });
 
-    initialize();
+        // Clear the fields if there is still data
+        $("#create-button").click(() => {
+            $('#area-input').val("");
+            $('#latitude-input').val("");
+            $('#longitude-input').val("");
+            $("#create-form").removeClass("was-walidated");
+            var validate_me = document.querySelectorAll('.validate-me');
+            for (var i = 0; i < validate_me.length; i++) {
+                validate_me[i].classList.remove('is-valid');
+                validate_me[i].classList.remove('is-invalid');
+            }
+            $(".error-latitude").css('display', 'none');
+            $(".error-longitude").css('display', 'none');
+            $('#create-data-modal').modal('show');
+        });
 
-    function initialize() {
-        constructTable();
-        ConfigurateCompanyList();
+        $('#table-area').on('click', '#edit-button', function () {
+            var datatable = $('#table-area').DataTable();
+            var data = datatable.row($(this).parents('tr')).data();
+            selected_area_id = data.areaId;
+            $('#company-input-edit').val(data.company);
+            $('#area-input-edit').val(data.area);
+            $('#latitude-input-edit').val(data.latitude);
+            $('#longitude-input-edit').val(data.longitude);
+            $("#edit-form").removeClass("was-walidated");
+            var validate_me = document.querySelectorAll('.validate-me');
+            for (var i = 0; i < validate_me.length; i++) {
+                validate_me[i].classList.remove('is-valid');
+                validate_me[i].classList.remove('is-invalid');
+            }
+            $(".error-latitude-edit").css('display', 'none');
+            $(".error-longitude-edit").css('display', 'none');
+            $("#edit-data-modal").modal('show');
+        });
+
+
+        $('#table-area').on('click', '#row-img', function () {
+            var datatable = $('#table-area').DataTable();
+            var data = datatable.row($(this).parents('tr')).data();
+            showQRCode(data.qr_code);
+        });
+
+        var delArea;
+        $('#table-area').on('click', '#delete-button', function () {
+            var datatable = $('#table-area').DataTable();
+            delArea = datatable.row($(this).parents('tr')).data();
+            $("#delete-data-modal").modal('show');
+        });
+        
+        $('#submit-button-delete').click(() => {
+            var values = {
+                areaId: delArea.areaId,
+                company: delArea.company,
+                area: delArea.area,
+                latitude: delArea.latitude,
+                longitude: delArea.longitude,
+                qr_code: delArea.qr_code
+            };
+            deleteValue(values);
+
+            $('#delete-data-modal').modal('hide');
+
+        })
+    });
+
+    async function updateEvent(event) {
+        event.preventDefault();
+        var company = $('#company-input-edit').val();
+        var area = $("#area-input-edit").val();
+        var latitude = $("#latitude-input-edit").val();
+        var longitude = $("#longitude-input-edit").val();
+        var values = {
+            areaId: selected_area_id,
+            company: company,
+            area: area,
+            latitude: parseFloat(latitude),
+            longitude: parseFloat(longitude)
+        };
+        var rangesResponse = await checkCoordinates(parseFloat(latitude), parseFloat(longitude));
+        if (!rangesResponse.success) {
+            if (!rangesResponse.successArray[0]) {
+                $("#latitude-input-edit").removeClass('is-valid');
+                $("#latitude-input-edit").addClass('is-invalid');
+                $(".error-latitude-edit").css('color', 'red');
+                $(".error-latitude-edit").css('display', 'block');
+            }
+            if (!rangesResponse.successArray[1]) {
+                $("#longitude-input-edit").removeClass('is-valid');
+                $("#longitude-input-edit").addClass('is-invalid');
+                $(".error-longitude-edit").css('color', 'red');
+                $(".error-longitude-edit").css('display', 'block');
+            }
+            return;
+        }
+        var validate_me = document.querySelectorAll('.validate-me');
+        for (var i = 0; i < validate_me.length; i++) {
+            validate_me[i].classList.remove('is-valid');
+            validate_me[i].classList.remove('is-invalid');
+        }
+        $('#loading-modal').modal('show');
+        openCodeModalEdit(values);
+        $('#edit-data-modal').modal('hide');
     }
 
-
-    function generateQRCode(values) {
-        return code = new QRCode(document.getElementById("qr-code"), JSON.stringify (values));
-    }
-
-    // Print function
-
-
-    
-    var form = document.getElementById("create-form");
-    form.addEventListener('submit', (e) => {
-
-        e.preventDefault();
+    async function createEvent(event) {
+        event.preventDefault();
         var company = $('#company-input').val();
         var area = $("#area-input").val();
         var latitude = $("#latitude-input").val();
@@ -177,200 +310,194 @@
             company: company,
             area: area,
             latitude: parseFloat(latitude),
-            longitude: parseFloat(longitude),
+            longitude: parseFloat(longitude)
+        };
+        var rangesResponse = await checkCoordinates(parseFloat(latitude), parseFloat(longitude));
+        if (!rangesResponse.success) {
+            if (!rangesResponse.successArray[0]) {
+                $("#latitude-input").removeClass('is-valid');
+                $("#latitude-input").addClass('is-invalid');
+                $(".error-latitude").css('color', 'red');
+                $(".error-latitude").css('display', 'block');
+            }
+            if (!rangesResponse.successArray[1]) {
+                $("#longitude-input").removeClass('is-valid');
+                $("#longitude-input").addClass('is-invalid');
+                $(".error-longitude").css('color', 'red');
+                $(".error-longitude").css('display', 'block');
+            }
+            return;
         }
-        $('#create-data-modal').modal('hide');
+        var validate_me = document.querySelectorAll('.validate-me');
+        for (var i = 0; i < validate_me.length; i++) {
+            validate_me[i].classList.remove('is-valid');
+            validate_me[i].classList.remove('is-invalid');
+        }
         $('#loading-modal').modal('show');
         openCodeModal(values);
-    });
+        $('#create-data-modal').modal('hide');
+    }
 
+    function initialize() {
+        constructTable();
+        ConfigurateCompanyList();
+    }
 
-    $("#create-button").click(() => {
-        $('#create-data-modal').modal('show');
-    })
+    function generateQRCode(values) {
+        return code = new QRCode(document.getElementById("qr-code"), JSON.stringify (values));
+    }    
 
     function openCodeModal(values) {
         var code = generateQRCode(values);
         let dataUrl;        
         setTimeout(() => {
             $('#loading-modal').modal('hide');
-            $("#qr-code-modal").modal('show');
             dataUrl = code._oDrawing._elImage.src;
-            $("#qr-code-img").attr('src', dataUrl);
             var newVal = {
                 company: values.company,
                 area: values.area,
                 latitude: values.latitude,
                 longitude: values.longitude,
                 qr_code: dataUrl
+            };
+            var hasNoError = sendData(newVal);
+            if (hasNoError) {
+                $("#qr-code-modal").modal('show');
+                $("#qr-code-img").attr('src', dataUrl);
             }
-            sendData(newVal);
         }, 2000);
 
     }
 
+    function openCodeModalEdit(values) {
+        var code = generateQRCode(values);
+        let dataUrl;
+        setTimeout(() => {
+            $('#loading-modal').modal('hide');
+            dataUrl = code._oDrawing._elImage.src;
+            var newVal = {
+                areaId: values.areaId,
+                company: values.company,
+                area: values.area,
+                latitude: values.latitude,
+                longitude: values.longitude,
+                qr_code: dataUrl
+            };
+            var hasNoError = updateValue(newVal);
+            if (hasNoError) {
+                $("#qr-code-modal").modal('show');
+                $("#qr-code-img").attr('src', dataUrl);
+            }
+        }, 2000);
+    }
 
     function constructTable() {
+        var hasNoError;
         $.ajax({
             url: "http://localhost:5000/api/area",
             headers: {
-                "Authorization": "Bearer token"
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
+            dataType: "json",
+            success: (response) => {
+                if (response.hasError) {
+                    $('#error-message').val(response.errorMessage);
+                    $('#error-modal').modal('show');
+                    hasNoError = false;
+                }
+                hasNoError = true;
+                $('#table-area').DataTable({
+                    data: response.data,
+                    columns: [
+                        {
+                            title: "#",
+                            data: "areaId"
+                        },
+                        {
+                            title: "Company",
+                            data: "company"
+                        },
+                        {
+                            title: "Area",
+                            data: "area"
+                        },
+                        {
+                            title: "Latitude",
+                            data: "latitude"
+                        },
+                        {
+                            title: "Longitude",
+                            data: "longitude"
+                        },
+                        {
+                            title: "QR Code"
+                        }
+                    ],
+                    "columnDefs": [{
+                        "targets": -1,
+                        "data": null,
+                        "render": function (data, type, row, meta) {
+                            return `<img id='row-img' src='${data.qr_code}' width='50px'> <button style='margin-left:50px' class='btn btn-primary' id='edit-button'>Edit</button> <button style='margin-right:-120px' class='btn btn-danger' id='delete-button'>Delete</button>`;
+                        }
+                    }]
+                });
             }
-        }).done((response) => {
-            var dataset = JsonTo2DArray(response);
-            $('#table-area').DataTable({
-                language: {
-                    url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Turkish.json'
-                },
-                data: dataset,
-                columns: [
-                    { title: "Sıra No" },
-                    { title: "Firma Adı" },
-                    { title: "Bölge Adı" },
-                    { title: "Enlem" },
-                    { title: "Boylam" },
-                    { title: "QR Kod" }
-                ],
-                "columnDefs": [{
-                    "targets": -1,
-                    "data": null,
-                    "render": function (data, type, row, meta) {
-                        return `<img id='row-img' src='data:image/png;base64,${data[5]}' width='50px'> <button style='margin-left:50px' class='btn btn-primary' id='edit-button'>Edit</button> <button style='margin-right:-120px' class='btn btn-secondary' id='delete-button'>Delete</button>`;
-                    }
-                }]
-            });
-            return dataset;
         });
+        return hasNoError;
     }
-
-    var seletected_area_id;
-    $('#table-area').on('click', '#edit-button', function () {
-        var datatable = $('#table-area').DataTable();
-        var data = datatable.row($(this).parents('tr')).data();
-        seletected_area_id = data[0];
-        $('#company-input-edit').val(data[1]);
-        $('#area-input-edit').val(data[2]);
-        $('#latitude-input-edit').val(data[3]);
-        $('#longitude-input-edit').val(data[4]);
-        $("#edit-data-modal").modal('show');
-    });
-
-    
-    var form = document.getElementById("edit-form");
-    form.addEventListener('submit', (e) => {
-
-        e.preventDefault();
-
-        var company = $('#company-input-edit').val();
-        var area = $("#area-input-edit").val();
-        var latitude = $("#latitude-input-edit").val();
-        var longitude = $("#longitude-input-edit").val();
-        var values = {
-            areaId: seletected_area_id,
-            company: company,
-            area: area,
-            latitude: parseFloat(latitude),
-            longitude: parseFloat(longitude),
-        }
-        updateValue(values);
-
-        $('#edit-data-modal').modal('hide');
-    });
-   
-
-
-    
-    $('#table-area').on('click', '#row-img', function () {
-        var datatable = $('#table-area').DataTable();
-        var data = datatable.row($(this).parents('tr')).data();
-        showQRCode(data[5]);
-    });
-
-    $('#table-area').on('click', '#delete-button', function () {
-        var datatable = $('#table-area').DataTable();
-        var data = datatable.row($(this).parents('tr')).data();
-        seletected_area_id = data[0];
-        $("#delete-data-modal").modal('show');
-    });
-
-    $('#submit-button-delete').click(() => {
-        var values = {
-            areaId: seletected_area_id
-        };
-        deleteValue(values);
-
-        $('#delete-data-modal').modal('hide');
-
-    })
-
-    
     
     function deleteValue(values) {
-        var settings = {
+        var hasNoError;
+        $.ajax({
             "url": "http://localhost:5000/api/area",
             "method": "DELETE",
             "headers": {
                 "Content-Type": "application/json",
-                "Authorization": "Bearer token"
+                "Authorization": "Bearer " + localStorage.getItem("token")
             },
             "data": JSON.stringify(values),
-        };
-        $.ajax(settings).done((response) => {
-            var newData = JsonTo2DArray(response);
-            var datatable = $('#table-area').DataTable();
-            datatable.clear().rows.add(newData).draw();
+            "dataType": "json",
+            "success": (response) => {
+                hasNoError = processResponse(response);
+            }
         });
+        return hasNoError;
     }
 
     function updateValue(values) {
-        var settings = {
+        var hasNoError;
+        $.ajax({
             "url": "http://localhost:5000/api/area",
             "method": "PUT",
             "headers": {
                 "Content-Type": "application/json",
-                "Authorization": "Bearer token"
+                "Authorization": "Bearer " + localStorage.getItem("token")
             },
             "data": JSON.stringify(values),
-        };
-        $.ajax(settings).done((response) => {
-           
-            var newData = JsonTo2DArray(response);
-            var datatable = $('#table-area').DataTable();
-            datatable.clear().rows.add(newData).draw();
+            "dataType": "json",
+            "success": (response) => {
+                hasNoError = processResponse(response);
+            }
         });
+        return hasNoError;
     }
 
-
     function sendData(values) {
-        var settings = {
+        var hasNoError;
+        $.ajax({
             "url": "http://localhost:5000/api/area",
             "method": "POST",
             "headers": {
                 "Content-Type": "application/json",
-                "Authorization": "Bearer token"
+                "Authorization": "Bearer " + localStorage.getItem("token")
             },
             "data": JSON.stringify(values),
-        };
-
-        $.ajax(settings).done((response) => {
-            var newData = JsonTo2DArray(response);
-            var datatable = $('#table-area').DataTable();
-            datatable.clear().rows.add(newData).draw();
-        });
-    }
-
-    function JsonTo2DArray(json) {
-        var dataset = [];
-        for (var i = 0; i < json.data.length; i++) {
-            var obj = json.data[i];
-            let j = 0;
-            dataset[i] = [];
-            for (var m in obj) {
-                dataset[i][j] = obj[m];
-                j++;
+            "dataType": "json",
+            "success": (response) => {
+                hasNoError = processResponse(response);
             }
-        }
-        return dataset;
+        });
+        return hasNoError;
     }
 
     function ConfigurateCompanyList() {
@@ -378,18 +505,56 @@
             url: "http://localhost:5000/api/company",
             headers: {
                 "Authorization": "Bearer token"
+            },
+            dataType: "json",
+            success: (response) => {
+                for (var i = 0; i < response.data.length; i++) {
+                    $("#company-input").append(`<option>${response.data[i].companyName}</option>`);
+                    $("#company-input-edit").append(`<option>${response.data[i].companyName}</option>`);
+                }
             }
-        }).done((response) => {
-            for (var i = 0; i < response.data.length; i++) {
-                $("#company-input").append(`<option>${response.data[i].companyName}</option>`);
-                $("#company-input-edit").append(`<option>${response.data[i].companyName}</option>`);
-            }   
-        })
+        });
+    }
+
+    async function checkCoordinates(latitude, longitude) {
+        var returnVal = {
+            success: true,
+            successArray: []
+        };
+        await $.ajax({
+            "url": "http://localhost:5000/api/area/range",
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer" + localStorage.getItem("token")
+            },
+            "data": JSON.stringify({
+                latitude: latitude,
+                longitude: longitude
+            }),
+            "success": (response) => {
+                returnVal.success = !response.hasError;
+                returnVal.successArray = response.data;
+            }
+        });
+        return returnVal;
     }
 
     function showQRCode(dataUrl) {
-        $("#qr-code-img").attr('src', "data:image/png;base64," + dataUrl);
+        $("#qr-code-img").attr('src', dataUrl);
         $("#qr-code-modal").modal('show');
     }
 
+    function processResponse(response) {
+        if (response.hasError) {
+            $('#error-message').text(response.errorMessage);
+            $('#error-modal').modal('show');
+            var datatable = $('#table-area').DataTable();
+            datatable.clear().rows.add(response.data).draw();
+            return false;
+        }
+        var datatable = $('#table-area').DataTable();
+        datatable.clear().rows.add(response.data).draw();
+        return true;
+    }
 </script>
