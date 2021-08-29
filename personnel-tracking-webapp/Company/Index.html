@@ -160,6 +160,13 @@
 
         // event listener for create
         $("#create-button").click(() => {
+            $('#company-input').val("");
+            $("#create-form").removeClass("was-walidated");
+            var validate_me = document.querySelectorAll('.validate-me');
+            for (var i = 0; i < validate_me.length; i++) {
+                validate_me[i].classList.remove('is-valid');
+                validate_me[i].classList.remove('is-invalid');
+            }
             $('#create-data-modal').modal('show');
         });   
 
@@ -169,6 +176,12 @@
             var data = datatable.row($(this).parents('tr')).data();
             selected_company_id = data.companyId;
             $('#company-input-edit').val(data.companyName);
+            $("#edit-form").removeClass("was-walidated");
+            var validate_me = document.querySelectorAll('.validate-me');
+            for (var i = 0; i < validate_me.length; i++) {
+                validate_me[i].classList.remove('is-valid');
+                validate_me[i].classList.remove('is-invalid');
+            }
             $("#edit-data-modal").modal('show');
         });
 

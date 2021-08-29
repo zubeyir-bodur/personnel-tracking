@@ -196,7 +196,19 @@
                 }, false)
             });
 
+        // Clear the fields if there is still data
         $("#create-button").click(() => {
+            $('#area-input').val("");
+            $('#latitude-input').val("");
+            $('#longitude-input').val("");
+            $("#create-form").removeClass("was-walidated");
+            var validate_me = document.querySelectorAll('.validate-me');
+            for (var i = 0; i < validate_me.length; i++) {
+                validate_me[i].classList.remove('is-valid');
+                validate_me[i].classList.remove('is-invalid');
+            }
+            $(".error-latitude").css('display', 'none');
+            $(".error-longitude").css('display', 'none');
             $('#create-data-modal').modal('show');
         });
 
@@ -208,6 +220,14 @@
             $('#area-input-edit').val(data.area);
             $('#latitude-input-edit').val(data.latitude);
             $('#longitude-input-edit').val(data.longitude);
+            $("#edit-form").removeClass("was-walidated");
+            var validate_me = document.querySelectorAll('.validate-me');
+            for (var i = 0; i < validate_me.length; i++) {
+                validate_me[i].classList.remove('is-valid');
+                validate_me[i].classList.remove('is-invalid');
+            }
+            $(".error-latitude-edit").css('display', 'none');
+            $(".error-longitude-edit").css('display', 'none');
             $("#edit-data-modal").modal('show');
         });
 
@@ -537,5 +557,4 @@
         datatable.clear().rows.add(response.data).draw();
         return true;
     }
-
 </script>
