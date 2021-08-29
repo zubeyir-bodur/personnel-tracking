@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using personnel_tracking_entity;
+using personnel_tracking_dto;
 using personnel_tracking_webapi.Filters;
 using personnel_tracking_webapi.Models;
 using System;
@@ -203,18 +204,5 @@ namespace personnel_tracking_webapi.Controllers
         }
 
 
-    }
-
-
-
-    public class TrackingDTO
-    {
-        public int trackingId { get; set; }
-        public string personnelName { get; set; }
-        public string personnelSurname { get; set; }
-        public string areaName { get; set; }
-        public DateTime entranceDate { get; set; }
-        public DateTime? exitDate { get; set; }
-        public bool autoExit { get; set; }
     }
 }

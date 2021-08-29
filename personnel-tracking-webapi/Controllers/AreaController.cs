@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using personnel_tracking_entity;
+using personnel_tracking_dto;
 using personnel_tracking_webapi.Filters;
 using personnel_tracking_webapi.Models;
 using System;
@@ -273,15 +274,6 @@ namespace personnel_tracking_webapi.Controllers
 
             return Ok(response);
         }
-    }
-    public class AreaDTO
-    {
-        public int areaId { get; set; }
-        public string company { get; set; }
-        public string area { get; set; }
-        public double latitude { get; set; }
-        public double longitude { get; set; }
-        public string qr_code { get; set; }
     }
 
     public class Coordinate {

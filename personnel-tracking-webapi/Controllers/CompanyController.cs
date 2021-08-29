@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using personnel_tracking_entity;
+using personnel_tracking_dto;
 using personnel_tracking_webapi.Filters;
 using personnel_tracking_webapi.Models;
 using System;
@@ -199,11 +200,5 @@ namespace personnel_tracking_webapi.Controllers
 
             return Ok(response);
         }*/
-    }
-
-    public class CompanyDTO
-    {
-        public int CompanyId { get; set; }
-        public string CompanyName { get; set; }
     }
 }
