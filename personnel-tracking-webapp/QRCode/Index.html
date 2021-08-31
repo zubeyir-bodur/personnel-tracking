@@ -2,9 +2,74 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title></title>
+    <title>Html-Qrcode Scanner</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 <body>
-
+    <div class="modal fade" id="login-succesful-modal" role="dialog" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Login is successful!!</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Please scan your area QR code</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="ok-button-login-succesful">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-5">
+                <div class="card-header bg-transparent mb-0">
+                    <h5 class="text-center"><span class="font-weight-bold text-secondary">Scan QR Code</span></h5>
+                </div>
+                <div class="card-body">
+                    <div id="qr-reader" style="width:500px"></div>
+                    <div id="qr-reader-results"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <link href="../lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../lib/datatables/datatables.css" rel="stylesheet" />
+    <link href="../lib/datatables/DataTables-1.10.25/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="../lib/datatables/buttons.dataTables.min.css" rel="stylesheet" />
+    <script src="../lib/jquery/dist/jquery.min.js"></script>
+    <script src="../lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="../lib/qrcode/html5-qrcode.min.js"></script>
 </body>
 </html>
+<script>
+
+    $(document).ready(function () {
+        $("#login-succesful-modal").modal('show');
+    });
+
+    // ok button of login succesful modal
+    $('#ok-button-login-succesful').click(() => {
+
+        $('#login-succesful-modal').modal('hide');
+
+    });
+
+
+    var resultContainer = document.getElementById('qr-reader-results');
+    var lastResult, countResults = 0;
+
+    function onScanSuccess(decodedText, decodedResult) {
+        if (decodedText !== lastResult) {
+            ++countResults;
+            lastResult = decodedText;
+            // Handle on success condition with the decoded message.
+            alert(`Scan result ${decodedText}`, decodedResult);
+        }
+    }
+
+    var html5QrcodeScanner = new Html5QrcodeScanner(
+        "qr-reader", { fps: 10, qrbox: 250 });
+    html5QrcodeScanner.render(onScanSuccess);
+</script>

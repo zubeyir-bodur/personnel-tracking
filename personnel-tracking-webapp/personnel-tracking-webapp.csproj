@@ -69,7 +69,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Area\index.js" />
     <Content Include="favicon.ico" />
     <Content Include="img\brand.png" />
     <Content Include="img\qr-code.png" />
@@ -121,6 +120,7 @@
     <Content Include="lib\datatables\datatables.js" />
     <Content Include="lib\datatables\datatables.min.css" />
     <Content Include="lib\datatables\datatables.min.js" />
+    <Content Include="lib\qrcode\html5-qrcode.min.js" />
     <Content Include="lib\qrcode\qrcode.js" />
     <Content Include="lib\qrcode\qrcode.min.js" />
     <Content Include="QRCode\Index.html" />
