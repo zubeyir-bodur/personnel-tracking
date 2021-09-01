@@ -91,6 +91,7 @@
             alert(`Scan result ${decodedText}`, decodedResult);
             console.log(decodedText);
             var objectTracking = JSON.parse(decodedText);
+            console.log(objectTracking);
             let current = new Date();
             let cDate = current.getFullYear() + '-' + (current.getMonth() + 1) + '-' + current.getDate();
             let cTime = current.getHours() + ":" + current.getMinutes();
@@ -103,11 +104,14 @@
 
             console.log(objectTracking);
 
-            if (objectTracking.areaName == null || objectTracking.companyName == null) {
+            if (objectTracking.areaName == null || objectTracking.companyName == null || objectTracking.areaId == null) {
 
                 $("#error-modal").modal('show');
+               // console.log("null error");
 
             }
+
+            checkQRCode(objectTracking.areaName, objectTracking.companyName, objectTracking.areaId);
                    
         }
     }
@@ -115,4 +119,30 @@
     var html5QrcodeScanner = new Html5QrcodeScanner(
         "qr-reader", { fps: 10, qrbox: 250 });
     html5QrcodeScanner.render(onScanSuccess);
+
+    function checkQRCode(areaName, companyName, areaId) {
+        $.ajax({
+            url: "http://localhost:5000/api/area",
+            "type": "GET",
+            "datatype": 'json',
+            headers: {
+                "Authorization": "Bearer token"
+            },
+            "success": function (response) {
+                for (var i = 0; i < response.data.length; i++) {
+
+                    if (response.data[i].areaId == areaId) {
+                        if (response.data[i].area == areaName) {
+                            if (response.data[i].company == companyName) {
+                                return;
+                            }
+                        }
+                    }
+                }
+                $("#error-modal").modal('show');
+                return;
+            }
+        });
+
+    }
 </script>
