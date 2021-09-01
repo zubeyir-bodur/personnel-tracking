@@ -60,7 +60,6 @@ namespace personnel_tracking_webapi.Controllers
         public IActionResult Post([FromBody] AreaDTO areaDto)
         {
             ResponseModel response = new ResponseModel();
-
             try
             {
                 var company = dbContext.Companies.AsNoTracking().Where<Company>(u => u.CompanyName == areaDto.company).FirstOrDefault();
@@ -274,10 +273,5 @@ namespace personnel_tracking_webapi.Controllers
 
             return Ok(response);
         }
-    }
-
-    public class Coordinate {
-        public decimal latitude { get; set; }
-        public decimal longitude { get; set; }
     }
 }
