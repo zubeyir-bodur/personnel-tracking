@@ -54,35 +54,58 @@ namespace personnel_tracking_webapi.Controllers
                     response.ErrorMessage = "An error occurred while processing your request, please contact the website owner.";
                     return Ok(response);
                 }
-                var includedTrackings = dbContext.Trackings.Select(u => new TrackReport
+                // include the necessary information
+                var filter = dbContext.Trackings
+                    .Select(u => new {
+                        u.AreaId,
+                        u.Area.CompanyId,
+                        Name = u.Personnel.PersonnelName,
+                        Surname = u.Personnel.PersonnelSurname,
+                        Role = u.Personnel.PersonnelType.PersonnelTypeName,
+                        Company = u.Area.Company.CompanyName,
+                        Area = u.Area.AreaName,
+                        EntranceDate = u.EntranceDate,
+                        ExitDate = u.ExitDate,
+                        ExitType = PutWhiteSpace(TrackReport.GetExitType(u.AutoExit, u.ExitDate != null).ToString())
+                    })// filter
+                    .AsNoTracking().Where(
+                    t => t.AreaId == area.AreaId
+                    && t.CompanyId == company.CompanyId
+                    && t.EntranceDate.CompareTo(areaParam.Start) >= 0
+                    && t.EntranceDate.CompareTo(areaParam.End) <= 0);
+                // remove id's
+                var list = filter.Select(u => new TrackReport
                 {
-                    Name = u.Personnel.PersonnelName,
-                    Surname = u.Personnel.PersonnelSurname,
-                    Role = u.Personnel.PersonnelType.PersonnelTypeName,
-                    Company = u.Area.Company.CompanyName,
-                    Area = u.Area.AreaName,
+                    Name = u.Name,
+                    Surname = u.Surname,
+                    Role = u.Role,
+                    Company = u.Company,
+                    Area = u.Area,
                     EntranceDate = u.EntranceDate.ToString("g", new CultureInfo("fr-FR")),
                     ExitDate = u.ExitDate.Value.ToString("g", new CultureInfo("fr-FR")),
-                    ExitType = TrackReport.GetExitType(u.AutoExit, u.ExitDate != null)
-                }).AsNoTracking();
-                var list = includedTrackings.Where(
-                    tr => tr.Area.Equals(area.AreaName)
-                    && tr.Company.Equals(company.CompanyName) // also filter according to that company
-                    && tr.EntranceDate.CompareTo(areaParam.Start) >= 0
-                    && tr.EntranceDate.CompareTo(areaParam.End) <= 0).ToList();
+                    ExitType = u.ExitType
+                }).ToList();
 
-                // 2.1 use json serializer
-                // TODO change the path
-                var path = "files\\area-personnels";
+                // TO DO
+                // insert an empty tracking for each leave,
+                // into the position where leave start is in the right order according to
+                // entrance date. and all other information will say on leave
+
+                // 2. output files
+                // create directory
+                var path = "files\\";
+                var fileInfo = new FileInfo(path);
+                fileInfo.Directory.Create();
                 var JsonString = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                 });
-                System.IO.File.WriteAllText(path + ".json", JsonString);
+                System.IO.File.WriteAllText(path + "area-personnels.json", JsonString);
                 // 2.2 generate excel table
-                ExportExcel(list, areaParam.Start, path);
+                ExportExcel(list, areaParam.Start, path + "area-personnels");
                 // return the path so that frontend can send download requests using this path
-                response.Data = path;
+                string[] paths = { fileInfo.FullName + "personnel-areas.json", fileInfo.FullName + "personnel-areas.xlsx" };
+                response.Data = paths;
             }
             catch (Exception ex)
             {
@@ -120,10 +143,13 @@ namespace personnel_tracking_webapi.Controllers
                     return Ok(response);
                 }
 
-                var filter = dbContext.Trackings.AsNoTracking().Where(
+                // include the necessary information
+                var filter = dbContext.Trackings
+                    .AsNoTracking().Where(
                     t => t.PersonnelId == personnelParam.PersonnelId
                     && t.EntranceDate.CompareTo(personnelParam.Start) >= 0
                     && t.EntranceDate.CompareTo(personnelParam.End) <= 0);
+                // remove id's
                 var list = filter.Select(u => new TrackReport
                 {
                     Name = u.Personnel.PersonnelName,
@@ -133,21 +159,29 @@ namespace personnel_tracking_webapi.Controllers
                     Area = u.Area.AreaName,
                     EntranceDate = u.EntranceDate.ToString("g", new CultureInfo("fr-FR")),
                     ExitDate = u.ExitDate.Value.ToString("g", new CultureInfo("fr-FR")),
-                    ExitType = TrackReport.GetExitType(u.AutoExit, u.ExitDate != null)
+                    ExitType = PutWhiteSpace(TrackReport.GetExitType(u.AutoExit, u.ExitDate != null).ToString())
                 }).ToList();
 
-                // 2.1 use json serializer
-                // TODO change the path
-                var path = "files\\personnel-areas";
+                // TO DO
+                // insert an empty tracking for each leave,
+                // into the position where leave start is in the right order according to
+                // entrance date. and all other information will say on leave
+
+                // 2. output files
+                // create directory
+                var path = "files\\";
+                var fileInfo = new FileInfo(path);
+                fileInfo.Directory.Create();
                 var JsonString = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                 });
-                System.IO.File.WriteAllText(path + ".json", JsonString);
+                System.IO.File.WriteAllText(path + "personnel-areas.json", JsonString);
                 // 2.2 generate excel table
-                ExportExcel(list, personnelParam.Start, path);
-                // return the path so that frontend can send download requests using this path
-                response.Data = path;
+                ExportExcel(list, personnelParam.Start, path + "personnel-areas");
+                // return the paths so that frontend can send download requests using this path
+                string[] paths = { fileInfo.FullName + "personnel-areas.json", fileInfo.FullName + "personnel-areas.xlsx" };
+                response.Data = paths;
             }
             catch (Exception ex)
             {
@@ -197,7 +231,7 @@ namespace personnel_tracking_webapi.Controllers
         /// </summary>
         /// <author>Zubeyir Bodur</author>
         /// <param name=""></param>
-        private void ExportExcel<T>(List<T> list, DateTime date, string path)
+        private static void ExportExcel<T>(List<T> list, DateTime date, string path)
         {
             // Creating an instance
             // of ExcelPackage
@@ -259,15 +293,19 @@ namespace personnel_tracking_webapi.Controllers
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        private string PutWhiteSpace(string s)
+        private static string PutWhiteSpace(string s)
         {
 
             int index = 1;
             char[] arr = s.ToCharArray();
             while (index < arr.Length)
             {
-                if (arr[index] > 40 && arr[index] < 91)
+                if (arr[index] > 64 && arr[index] < 90)
+                {
                     s = s.Insert(index, " ");
+                    arr = s.ToCharArray();
+                    index++;
+                }
                 index++;
             }
             return s;
@@ -284,7 +322,7 @@ namespace personnel_tracking_webapi.Controllers
         public string EntranceDate { get; set; }
         public string ExitDate { get; set; }
 
-        public Exit ExitType;
+        public string ExitType { get; set; }
 
         public enum Exit
         {
