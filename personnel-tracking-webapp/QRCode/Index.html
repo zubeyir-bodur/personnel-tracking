@@ -84,7 +84,6 @@
 
     function onScanSuccess(decodedText, decodedResult) {
         if (decodedText !== lastResult) {
-            var objectQRCode = {};
             ++countResults;
             lastResult = decodedText;
             // Handle on success condition with the decoded message.
@@ -131,12 +130,8 @@
             "success": function (response) {
                 for (var i = 0; i < response.data.length; i++) {
 
-                    if (response.data[i].areaId == areaId) {
-                        if (response.data[i].area == areaName) {
-                            if (response.data[i].company == companyName) {
-                                return;
-                            }
-                        }
+                    if (response.data[i].areaId == areaId && response.data[i].area == areaName && response.data[i].company == companyName) {
+                        return;
                     }
                 }
                 $("#error-modal").modal('show');
