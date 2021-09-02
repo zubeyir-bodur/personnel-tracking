@@ -34,6 +34,7 @@ namespace personnel_tracking_webapi.Controllers
         [HttpPost("login")]
         public IActionResult Login(UserInfo userInfo)
         {
+            Console.WriteLine(userInfo.Identitynumber);
             var response = new ResponseModel();
             try
             {
@@ -41,9 +42,11 @@ namespace personnel_tracking_webapi.Controllers
                 var personnel = dbContext.Personnel.AsNoTracking()
                     .FirstOrDefault(p => p.IdentityNumber == userInfo.Identitynumber);
                 bool exists = personnel != null;
+                Console.WriteLine(exists);
                 // 1.1 If not, send a error response
                 if (!exists)
                 {
+                    Console.WriteLine("nope");
                     response.HasError = true;
                     response.ErrorMessage = "Please check your credentials";
                 }
@@ -51,6 +54,7 @@ namespace personnel_tracking_webapi.Controllers
                 else
                 {
                     // Don't send password to frontend
+                    Console.WriteLine("yep");
                     response.Data = new {
                         personnelId = personnel.PersonnelId,
                         companyName = dbContext.Companies
