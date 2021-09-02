@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+
 namespace personnel_tracking_webapi.Controllers
 {
     [Route("api/[controller]")]
@@ -194,12 +195,13 @@ namespace personnel_tracking_webapi.Controllers
         }
 
         [HttpGet("checkIDNum")]
-        public IActionResult checkIDNum(long idNum)
+        public IActionResult checkIDNum([FromBody]  string idNum)
         {
             ResponseModel response = new ResponseModel();
+            //System.Threading.Thread.Sleep(3000);
             Console.WriteLine(idNum+ "sd;klvmsd");
-
-            Personnel personnel = dbContext.Personnel.Where(u => u.IdentityNumber == idNum).FirstOrDefault();
+            long l = long.Parse(idNum);
+            Personnel personnel = dbContext.Personnel.Where(u => u.IdentityNumber == l).FirstOrDefault();
             if (personnel == null)
             {
                 response.Data = "Does not exist";
@@ -208,6 +210,7 @@ namespace personnel_tracking_webapi.Controllers
             {
                 response.Data = "Exists";
             }
+            
            
             return Ok(response);
         }
