@@ -123,6 +123,8 @@
     <Content Include="lib\datatables\datatables.min.js" />
     <Content Include="lib\qrcode\qrcode.js" />
     <Content Include="lib\qrcode\qrcode.min.js" />
+    <Content Include="Login\index.html" />
+    <Content Include="Login\index.js" />
     <Content Include="Tracking\Index.html" />
     <Content Include="Tracking\Index.js" />
     <Content Include="PersonnelType\Index.html" />

@@ -1,0 +1,100 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link href="../lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../lib/datatables/datatables.css" rel="stylesheet" />
+    <link href="../lib/datatables/DataTables-1.10.25/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="../lib/datatables/buttons.dataTables.min.css" rel="stylesheet" />
+    <script src="../lib/jquery/dist/jquery.min.js"></script>
+    <script src="../lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="../lib/datatables/datatables.min.js"></script>
+    <script src="../lib/datatables/dataTables.buttons.min.js"></script>
+    <script src="../lib/datatables/DataTables-1.10.25/js/dataTables.bootstrap5.min.js"></script>
+    <script src="../lib/qrcode/qrcode.min.js"></script>
+    <script src="index.js"></script>
+    <!------ Include the above in your HEAD tag ---------->
+</head>
+<body>
+    <div id="login">
+        <h3 class="text-center text-white pt-5">Login form</h3>
+        <div class="container">
+            <div id="login-row" class="row justify-content-center align-items-center">
+                <div id="login-column" class="col-md-6">
+                    <div id="login-box" class="col-md-12">
+                        <form id="login-form" class="form" action="" method="post">
+                            <h3 class="text-center text-info">Login</h3>
+                            <div class="form-group">
+                                <label for="id-input-edit">Identity number</label>
+                                <input type="text" class="form-control" id="id-input" required>
+                                <div class="error-id" style="display: none">Please enter a number</div>
+                                <br>
+                            </div>
+                            <div class="form-group">
+                                <label for="remember-me" class="text-info"></label><br>
+                                <input type="submit" name="submit" class="btn btn-info btn-md" value="submit">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<style>
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
+<script>
+    var form = document.getElementById("login-form");
+    form.addEventListener('submit', (e) => {
+
+        e.preventDefault();
+        var identityNumber = $('#id-input').val();
+        var idNum = {
+            identityNumber: Number(identityNumber),
+        }
+        checkValidIdentityNumber(identityNumber);
+
+    });
+
+     function checkValidIdentityNumber(values) {
+        alert(JSON.stringify(Number(values)));
+        var returnVal;
+        var settings = {
+            'url': 'http://localhost:5000/api/personnel/checkIDNum',
+            'method': 'GET',
+            'headers': {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer token'
+            },
+            'contentType': 'application/json',
+            'data': JSON.stringify(Number(values)),
+        };
+         $.ajax(settings).done((response) => {
+            console.log(response.data);
+            if (String(response.data) == "Does not exist") {
+
+                console.log("false");
+                returnVal = false;
+            }
+            else {
+                console.log("true");
+                returnVal = true;
+            }
+
+        });
+        return returnVal;
+    }
+</script>
+
