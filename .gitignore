@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 # Nuget Packages
 NuGet/*.nupkg
+/personnel-tracking-webapi/files
