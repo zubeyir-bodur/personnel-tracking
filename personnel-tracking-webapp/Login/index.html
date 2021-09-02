@@ -89,7 +89,10 @@
                  $("#error-id").css('display', 'block');
             },
              
-        };
+         };
+         $.ajax(settings).done((response) => {
+             console.log("all done");
+         });
         return returnVal;
     }
 </script>
