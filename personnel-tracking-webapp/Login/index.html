@@ -82,12 +82,14 @@
              },
              'dataType': 'json',
              'data': JSON.stringify(values),
-            'success': function (response) {
-                window.location.replace("http://localhost:63896/QRCode/Index.html");
-            },
-             'error': function (jqXHR, exception) {
-                 $("#error-id").css('display', 'block');
-            },
+             'success': function (response) {
+                 if (response.hasError) {
+                     $("#error-id").css('display', 'block');
+                 }
+                 else {
+                     window.location.replace("http://localhost:63896/QRCode/Index.html");
+                 }
+            }
              
          };
          $.ajax(settings).done((response) => {
