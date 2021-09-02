@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿<!--
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -14,7 +15,7 @@
     <script src="../lib/datatables/DataTables-1.10.25/js/dataTables.bootstrap5.min.js"></script>
     <script src="../lib/qrcode/qrcode.min.js"></script>
     <script src="index.js"></script>
-    <!------ Include the above in your HEAD tag ---------->
+    <!------ Include the above in your HEAD tag ----------
 </head>
 <body>
     <div id="login">
@@ -42,7 +43,32 @@
         </div>
     </div>
 </body>
-</html>
+</html>-->
+
+<div id="login">
+    <h3 class="text-center text-white pt-5">Login form</h3>
+    <div class="container">
+        <div id="login-row" class="row justify-content-center align-items-center">
+            <div id="login-column" class="col-md-6">
+                <div id="login-box" class="col-md-12">
+                    <form id="login-form" class="form" action="" method="post">
+                        <h3 class="text-center text-info">Login</h3>
+                        <div class="form-group">
+                            <label for="username" class="text-info">ID number:</label><br>
+                            <br>
+                            <input type="number" name="personnel_IDnumber" id="personnel_IDnumber" class="form-control" required>
+                            <div id="error-id" style="display: none">Please check your credentials</div>
+                            <br>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" name="submit" class="btn btn-info btn-md" value="submit">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <style>
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button {
@@ -69,32 +95,32 @@
 
     });
 
-     function checkValidIdentityNumber(values) {
-         //alert(values.Identitynumber);
+    function checkValidIdentityNumber(values) {
+        //alert(values.Identitynumber);
         var returnVal;
-         var settings = {
-             'url': 'http://localhost:5000/api/home/login',
-             'method': 'POST',
-             'headers': {
-                 'Content-Type': 'application/json',
-                 'Authorization': 'Bearer token'
+        var settings = {
+            'url': 'http://localhost:5000/api/home/login',
+            'method': 'POST',
+            'headers': {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer token'
 
-             },
-             'dataType': 'json',
-             'data': JSON.stringify(values),
-             'success': function (response) {
-                 if (response.hasError) {
-                     $("#error-id").css('display', 'block');
-                 }
-                 else {
-                     window.location.replace("http://localhost:63896/QRCode/Index.html");
-                 }
+            },
+            'dataType': 'json',
+            'data': JSON.stringify(values),
+            'success': function (response) {
+                if (response.hasError) {
+                    $("#error-id").css('display', 'block');
+                }
+                else {
+                    window.location.replace("http://localhost:63896/QRCode/Index.html");
+                }
             }
-             
-         };
-         $.ajax(settings).done((response) => {
-             console.log("all done");
-         });
+
+        };
+        $.ajax(settings).done((response) => {
+            console.log("all done");
+        });
         return returnVal;
     }
 </script>
