@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+
 namespace personnel_tracking_webapi.Controllers
 {
     [Route("api/[controller]")]
@@ -176,9 +177,11 @@ namespace personnel_tracking_webapi.Controllers
         //Check if user with given username exists
 
         [HttpGet("checkUsername")]
-        public IActionResult checkUsername( string username)
+        public IActionResult checkUsername([FromBody] string username)
         {
             ResponseModel response = new ResponseModel();
+            Console.WriteLine(username +"smth");
+
             Personnel personnel = dbContext.Personnel.Where(u => u.UserName == username).FirstOrDefault();
             if (personnel == null)
             {
@@ -188,6 +191,27 @@ namespace personnel_tracking_webapi.Controllers
             {
                 response.Data = "Exists";
             }
+            return Ok(response);
+        }
+
+        [HttpGet("checkIDNum")]
+        public IActionResult checkIDNum([FromBody]  string idNum)
+        {
+            ResponseModel response = new ResponseModel();
+            //System.Threading.Thread.Sleep(3000);
+            Console.WriteLine(idNum+ "sd;klvmsd");
+            long l = long.Parse(idNum);
+            Personnel personnel = dbContext.Personnel.Where(u => u.IdentityNumber == l).FirstOrDefault();
+            if (personnel == null)
+            {
+                response.Data = "Does not exist";
+            }
+            else
+            {
+                response.Data = "Exists";
+            }
+            
+           
             return Ok(response);
         }
 

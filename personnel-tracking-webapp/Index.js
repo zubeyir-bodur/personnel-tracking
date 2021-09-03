@@ -1,7 +1,7 @@
 ﻿$(() => {
     $(document).ready(() => {
-        $.get('Area/Index.html', (e) => {
-            $('#container-main').append(e);
+        $.get('Login/Index.html', (e) => {
+            $('#container-main').empty().append(e);
         });
         $("#CompanyPage").click(() => {
             $.get('Company/Index.html', (obj) => {
@@ -31,6 +31,16 @@
         });
         $("#TrackingPage").click(() => {
             $.get('Tracking/Index.html', (obj) => {
+                $('#container-main').empty().append(obj);
+            });
+        });
+        $("#LoginPage").click(() => {
+            $.get('Login/Index.html', (obj) => {
+                $('#container-main').empty().append(obj);
+            });
+        });
+        $("#ReportsPage").click(() => {
+            $.get('Reports/Index.html', (obj) => {
                 $('#container-main').empty().append(obj);
             });
         });

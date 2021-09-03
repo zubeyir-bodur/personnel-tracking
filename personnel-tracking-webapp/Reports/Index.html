@@ -1,0 +1,61 @@
+﻿<div id="container-reports">
+    <div class="col-12">
+        <br>
+        <div class="alert alert-warning" role="alert">
+            To download the Excel and JSON files to use, please choose a filter type.
+            Choosing "Area" will let you see which workers entered to this area. Choosing
+            "Personnel" will let you see where did this worker have been, it will also
+            show you if they were on a leave. After choosing this, you can specify the
+            dates and choose the area or personnel belonging yo your company.
+        </div>
+        <br>
+        <div class="btn-group button-group" role="group" aria-label="report-option">
+            <button id="report-personnel-btn" type="button" class="btn btn-success report-buttons border">Personnel</button>
+            <button id="report-area-btn" type="button" class="btn btn-success report-buttons border">Area</button>
+        </div>
+        <form id="report-form" class="needs-validation" novalidate>
+            <div id="list-companies" class="form-group">
+                <label for="company-input">Companies</label>
+                <select class="form-control validate-me" id="company-input" required></select>
+            </div>
+            <div id="list-personnel" class="form-group">
+                <label for="personnel-input">Personnels</label>
+                <select class="form-control validate-me" id="personnel-input" required></select>
+            </div>
+            <div id="list-areas" class="form-group">
+                <label for="area-input">Areas</label>
+                <select class="form-control validate-me" id="area-input" required></select>
+            </div>
+            <div id="calendar" class="form-group">
+                <label style="margin-right: 10px; margin-top: 20px;">Entrance Date</label>
+                <input type="datetime-local" id="start-date"><br>
+                <label style="margin-top: 10px; margin-right: 45px;">Exit Date</label>
+                <input type="datetime-local" id="end-date" style="margin-top: 10px;"><br>
+            </div>
+            <div id="downloadMessage"></div>
+        </form>
+
+        <!-- Error Modal-->
+        <div class="modal fade" id="error-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-danger" id="staticBackdropLabel">Error!</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="error-message">An error has ocurred!</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ok</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button input="button" class="btn btn-primary" id="download">
+            Download
+        </button>
+    </div>
+</div>
+<link href="Reports/Index.css" rel="stylesheet"/>
+<script src="Reports/Index.js"></script>

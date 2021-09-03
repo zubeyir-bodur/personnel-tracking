@@ -34,8 +34,9 @@ namespace personnel_tracking_webapi.Controllers
                 var areaDTOList = dbContext.Areas.Select(u => new AreaDTO
                 {
                     areaId = u.AreaId,
-                    company = u.Company.CompanyName,
-                    area = u.AreaName,
+                    companyId = u.CompanyId,
+                    companyName = u.Company.CompanyName,
+                    areaName = u.AreaName,
                     latitude = Convert.ToDouble(u.Latitude),
                     longitude = Convert.ToDouble(u.Longitude),
                     qr_code = "data:image/png;base64," + Convert.ToBase64String(u.QrCode)
@@ -60,16 +61,14 @@ namespace personnel_tracking_webapi.Controllers
         public IActionResult Post([FromBody] AreaDTO areaDto)
         {
             ResponseModel response = new ResponseModel();
-
             try
             {
-                var company = dbContext.Companies.AsNoTracking().Where<Company>(u => u.CompanyName == areaDto.company).FirstOrDefault();
                 Area newArea = new Area {
-                        AreaName = areaDto.area,
-                        CompanyId = company.CompanyId,
-                        Latitude = Convert.ToDecimal(areaDto.latitude),
-                        Longitude = Convert.ToDecimal(areaDto.longitude),
-                        QrCode = Convert.FromBase64String(areaDto.qr_code.Substring(22))
+                    AreaName = areaDto.areaName,
+                    CompanyId = areaDto.companyId,
+                    Latitude = Convert.ToDecimal(areaDto.latitude),
+                    Longitude = Convert.ToDecimal(areaDto.longitude),
+                    QrCode = Convert.FromBase64String("")
                 };
                 // 1- Coordinates must be unique
                 bool existsCoordinates = dbContext.Areas.AsNoTracking().
@@ -105,8 +104,9 @@ namespace personnel_tracking_webapi.Controllers
             response.Data = dbContext.Areas.Select(u => new AreaDTO
             {
                 areaId = u.AreaId,
-                company = u.Company.CompanyName,
-                area = u.AreaName,
+                companyId = u.CompanyId,
+                companyName = u.Company.CompanyName,
+                areaName = u.AreaName,
                 latitude = Convert.ToDouble(u.Latitude),
                 longitude = Convert.ToDouble(u.Longitude),
                 qr_code = "data:image/png;base64," + Convert.ToBase64String(u.QrCode)
@@ -121,12 +121,11 @@ namespace personnel_tracking_webapi.Controllers
 
             try
             {
-                var company = dbContext.Companies.AsNoTracking().Where<Company>(u => u.CompanyName == areaDto.company).FirstOrDefault();
                 Area newArea = new Area
                 {
                     AreaId = areaDto.areaId,
-                    AreaName = areaDto.area,
-                    CompanyId = company.CompanyId,
+                    AreaName = areaDto.areaName,
+                    CompanyId = areaDto.companyId,
                     Latitude = Convert.ToDecimal(areaDto.latitude),
                     Longitude = Convert.ToDecimal(areaDto.longitude),
                     QrCode = Convert.FromBase64String(areaDto.qr_code.Substring(22))
@@ -134,26 +133,33 @@ namespace personnel_tracking_webapi.Controllers
                 // 1- Coordinates must be unique, but may be equal to old one
                 decimal oldLat, oldLong;
                 var oldArea = dbContext.Areas.AsNoTracking().FirstOrDefault(a => a.AreaId == areaDto.areaId);
-                oldLat = oldArea.Latitude;
-                oldLong = oldArea.Longitude;
-                bool isOldCoordinate = newArea.Latitude == oldLat && newArea.Longitude == oldLong;
-                bool existsCoordinates = dbContext.Areas.AsNoTracking().
-                    FirstOrDefault(a =>
-                    (a.Latitude == newArea.Latitude
-                    && a.Longitude == newArea.Longitude)
-                    ) != null;
+                if (oldArea != null) {
+                    oldLat = oldArea.Latitude;
+                    oldLong = oldArea.Longitude;
+                    bool isOldCoordinate = newArea.Latitude == oldLat && newArea.Longitude == oldLong;
+                    bool existsCoordinates = dbContext.Areas.AsNoTracking().
+                        FirstOrDefault(a =>
+                        (a.Latitude == newArea.Latitude
+                        && a.Longitude == newArea.Longitude)
+                        ) != null;
 
-                // 2- A company can't have two areas with same names, but may be equal to old one
-                var companyAreas = dbContext.Areas.AsNoTracking().Where(a => a.CompanyId == newArea.CompanyId).ToList();
-                var isOldName = oldArea.AreaName.Equals(newArea.AreaName);
-                bool existsName = companyAreas.
-                    FirstOrDefault(a =>
-                    a.AreaName.Equals(newArea.AreaName)
-                    ) != null;
-                if (existsName && !isOldName)
-                    throw new Exception("A company can't have two areas with same names!");
-                else if (existsCoordinates && !isOldCoordinate)
-                    throw new Exception("An area with same coordinates already exist!");
+                    // 2- A company can't have two areas with same names, but may be equal to old one
+                    var companyAreas = dbContext.Areas.AsNoTracking().Where(a => a.CompanyId == newArea.CompanyId).ToList();
+                    var isOldName = oldArea.AreaName.Equals(newArea.AreaName);
+                    bool existsName = companyAreas.
+                        FirstOrDefault(a =>
+                        a.AreaName.Equals(newArea.AreaName)
+                        ) != null;
+                    if (existsName && !isOldName)
+                        throw new Exception("A company can't have two areas with same names!");
+                    else if (existsCoordinates && !isOldCoordinate)
+                        throw new Exception("An area with same coordinates already exist!");
+                    else
+                    {
+                        dbContext.Update<Area>(newArea).State = EntityState.Modified;
+                        Console.WriteLine("Affected row number is " + dbContext.SaveChanges());
+                    }
+                }
                 else
                 {
                     dbContext.Update<Area>(newArea).State = EntityState.Modified;
@@ -172,8 +178,9 @@ namespace personnel_tracking_webapi.Controllers
             response.Data = dbContext.Areas.Select(u => new AreaDTO
             {
                 areaId = u.AreaId,
-                company = u.Company.CompanyName,
-                area = u.AreaName,
+                companyId = u.CompanyId,
+                companyName = u.Company.CompanyName,
+                areaName = u.AreaName,
                 latitude = Convert.ToDouble(u.Latitude),
                 longitude = Convert.ToDouble(u.Longitude),
                 qr_code = "data:image/png;base64," + Convert.ToBase64String(u.QrCode)
@@ -188,11 +195,10 @@ namespace personnel_tracking_webapi.Controllers
 
             try
             {
-                var company = dbContext.Companies.AsNoTracking().Where<Company>(u => u.CompanyName.Equals(areaDto.company)).FirstOrDefault();
                 var delArea = new Area {
                     AreaId = areaDto.areaId,
-                    AreaName = areaDto.area,
-                    CompanyId = company.CompanyId,
+                    AreaName = areaDto.areaName,
+                    CompanyId = areaDto.companyId,
                     Latitude = Convert.ToDecimal(areaDto.latitude),
                     Longitude = Convert.ToDecimal(areaDto.longitude)
                     //QrCode = Convert.FromBase64String(areaDto.qr_code)
@@ -212,8 +218,9 @@ namespace personnel_tracking_webapi.Controllers
             response.Data = dbContext.Areas.Select(u => new AreaDTO
             {
                 areaId = u.AreaId,
-                company = u.Company.CompanyName,
-                area = u.AreaName,
+                companyId = u.CompanyId,
+                companyName = u.Company.CompanyName,
+                areaName = u.AreaName,
                 latitude = Convert.ToDouble(u.Latitude),
                 longitude = Convert.ToDouble(u.Longitude),
                 qr_code = "data:image/png;base64," + Convert.ToBase64String(u.QrCode)
@@ -258,26 +265,5 @@ namespace personnel_tracking_webapi.Controllers
             }
             return Ok(response);
         }
-
-        public IActionResult SaveChanges()
-        {
-            ResponseModel response = new ResponseModel();
-            try
-            {
-                dbContext.SaveChanges();
-            }
-            catch (Exception e)
-            {
-                response.HasError = true;
-                response.ErrorMessage = e.Message;
-            }
-
-            return Ok(response);
-        }
-    }
-
-    public class Coordinate {
-        public decimal latitude { get; set; }
-        public decimal longitude { get; set; }
     }
 }
