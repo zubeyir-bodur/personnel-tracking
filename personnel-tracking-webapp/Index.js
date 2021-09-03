@@ -1,6 +1,6 @@
 ﻿$(() => {
     $(document).ready(() => {
-        $.get('Area/Index.html', (e) => {
+        $.get('Login/Index.html', (e) => {
             $('#container-main').empty().append(e);
         });
         $("#CompanyPage").click(() => {
