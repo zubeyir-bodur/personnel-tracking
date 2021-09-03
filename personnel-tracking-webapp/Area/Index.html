@@ -334,7 +334,30 @@
             validate_me[i].classList.remove('is-invalid');
         }
         $('#loading-modal').modal('show');
-        openCodeModal(values);
+        var areaEdited;
+        // send post request first
+        await $.ajax({
+            "url": "http://localhost:5000/api/area",
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
+            "data": JSON.stringify(values),
+            "dataType": "json",
+            "success": (response) => {
+                areaEdited = searchArea(values.latitude, values.longitude, response.data);
+            }
+        });
+        var newValues = {
+            areaId: areaEdited.areaId,
+            company: company,
+            area: area,
+            latitude: parseFloat(latitude),
+            longitude: parseFloat(longitude)
+        };
+        // then send a put request to update the qr code image
+        openCodeModalEdit(newValues);
         $('#create-data-modal').modal('hide');
     }
 
@@ -345,31 +368,10 @@
 
     function generateQRCode(values) {
         return code = new QRCode(document.getElementById("qr-code"), JSON.stringify (values));
-    }    
-
-    function openCodeModal(values) {
-        var code = generateQRCode(values);
-        let dataUrl;        
-        setTimeout(() => {
-            $('#loading-modal').modal('hide');
-            dataUrl = code._oDrawing._elImage.src;
-            var newVal = {
-                company: values.company,
-                area: values.area,
-                latitude: values.latitude,
-                longitude: values.longitude,
-                qr_code: dataUrl
-            };
-            var hasNoError = sendData(newVal);
-            if (hasNoError) {
-                $("#qr-code-modal").modal('show');
-                $("#qr-code-img").attr('src', dataUrl);
-            }
-        }, 2000);
-
     }
 
     function openCodeModalEdit(values) {
+        console.log(values);
         var code = generateQRCode(values);
         let dataUrl;
         setTimeout(() => {
@@ -556,5 +558,15 @@
         var datatable = $('#table-area').DataTable();
         datatable.clear().rows.add(response.data).draw();
         return true;
+    }
+
+    // Search the area from the response data using their coordinates
+    function searchArea(lat, long, array) {
+        for (var i = 0; i < array.length; i++) {
+            if (array[i].latitude === lat && array[i].longitude === long) {
+                return array[i];
+            }
+        }
+        return null;
     }
 </script>
