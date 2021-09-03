@@ -90,6 +90,8 @@ namespace personnel_tracking_webapi.Controllers
             var response = new ResponseModel();
             try
             {
+                scan.scanTime = scan.scanTime.AddHours(3);
+
                 var personnel = dbContext.Personnel.
                     AsNoTracking().FirstOrDefault(p => p.IdentityNumber == scan.IdentityNumber);
                 Tracking newTracking = new Tracking
@@ -101,6 +103,9 @@ namespace personnel_tracking_webapi.Controllers
                     ExitDate = null,
                     AutoExit = false
                 };
+
+               // Console.WriteLine(newTracking.EntranceDate);
+
 
                 //Auto Exit procedure
                 // 1. find the last recent tracking

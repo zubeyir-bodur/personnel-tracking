@@ -62,6 +62,7 @@
 
         e.preventDefault();
         var identityNumber = $('#personnel_IDnumber').val();
+        localStorage.setItem("identityNumber", Number(identityNumber));
         var idNum = {
             Identitynumber: Number(identityNumber),
         }
@@ -84,9 +85,11 @@
              'data': JSON.stringify(values),
              'success': function (response) {
                  if (response.hasError) {
+                     console.log("has error");
                      $("#error-id").css('display', 'block');
                  }
                  else {
+                     console.log("no error");
                      window.location.replace("http://localhost:63896/QRCode/Index.html");
                  }
             }
