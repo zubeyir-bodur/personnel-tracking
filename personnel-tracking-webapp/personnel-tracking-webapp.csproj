@@ -123,10 +123,13 @@
     <Content Include="lib\qrcode\html5-qrcode.min.js" />
     <Content Include="lib\qrcode\qrcode.js" />
     <Content Include="lib\qrcode\qrcode.min.js" />
-    <Content Include="Login\index.html" />
-    <Content Include="Login\index.js" />
+    <Content Include="Login\Index.html" />
+    <Content Include="Login\Index.js" />
     <Content Include="QRCode\Index.html" />
     <Content Include="QRCode\Index.js" />
+    <Content Include="Reports\Index.html" />
+    <Content Include="Reports\Index.js" />
+    <Content Include="Reports\Index.css" />
     <Content Include="Tracking\Index.html" />
     <Content Include="Tracking\Index.js" />
     <Content Include="PersonnelType\Index.html" />
