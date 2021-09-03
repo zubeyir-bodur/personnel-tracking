@@ -1,6 +1,23 @@
 ﻿/*#container-reports {
     background-color:aqua
 }*/
-.button-group {
-    padding-left: 5%;
+
+#list-companies {
+    display: none;
+}
+
+#list-personnel {
+    display: none;
+}
+
+#list-areas {
+    display: none;
+}
+
+#calendar {
+    display: none;
+}
+
+#download {
+    display: none;
 }

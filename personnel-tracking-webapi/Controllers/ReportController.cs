@@ -14,11 +14,13 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using personnel_tracking_webapi.Models;
+using personnel_tracking_webapi.Filters;
 
 namespace personnel_tracking_webapi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [TokenCheck]
     public class ReportController : ControllerBase
     {
         private readonly PersonnelTrackingDBContext dbContext;
@@ -27,13 +29,40 @@ namespace personnel_tracking_webapi.Controllers
             if (dbContext == null) dbContext = new PersonnelTrackingDBContext();
         }
 
+        /// <summary>
+        /// Gets the personnels of a given company
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut("personnelsOfCompany")]
+        public IActionResult PersonnelsOfCompany([FromBody]CompanyDTO companyDTO) {
+            var response = new ResponseModel();
+            try
+            {
+                response.Data = dbContext.Personnel
+                    .AsNoTracking()
+                    .Where(p => p.CompanyId == companyDTO.CompanyId)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                response.Data = null;
+                response.HasError = true;
+                response.ErrorMessage = ex.Message;
+                if (ex.InnerException != null)
+                {
+                    response.ErrorMessage += ": " + ex.InnerException.Message;
+                }
+            }
+            return Ok(response);
+        }
+
 
         /// <summary>
         /// Get files for the trackings of a given area
         /// </summary>
         /// <param name="areaParam"></param>
         /// <returns></returns>
-        [HttpGet("area")]
+        [HttpPut("area")]
         public IActionResult FilesArea(AreaParam areaParam)
         {
             var response = new ResponseModel();
@@ -125,7 +154,7 @@ namespace personnel_tracking_webapi.Controllers
         /// </summary>
         /// <param name="personnelParam"></param>
         /// <returns></returns>
-        [HttpGet("personnel")]
+        [HttpPut("personnel")]
         public IActionResult FilesPersonnel(PersonnelParam personnelParam)
         {
             var response = new ResponseModel();
@@ -221,7 +250,6 @@ namespace personnel_tracking_webapi.Controllers
             return new Dictionary<string, string>
             {
                 { "xlsx","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
-                { ".xls", "application/vnd.ms-excel"},
                 { ".json", "application/json"}
             };
         }

@@ -199,6 +199,7 @@
         // Clear the fields if there is still data
         $("#create-button").click(() => {
             $('#area-input').val("");
+            $('#company-input').val("");
             $('#latitude-input').val("");
             $('#longitude-input').val("");
             $("#create-form").removeClass("was-walidated");
@@ -216,8 +217,8 @@
             var datatable = $('#table-area').DataTable();
             var data = datatable.row($(this).parents('tr')).data();
             selected_area_id = data.areaId;
-            $('#company-input-edit').val(data.company);
-            $('#area-input-edit').val(data.area);
+            $('#company-input-edit').val(data.companyId);
+            $('#area-input-edit').val(data.areaName);
             $('#latitude-input-edit').val(data.latitude);
             $('#longitude-input-edit').val(data.longitude);
             $("#edit-form").removeClass("was-walidated");
@@ -248,8 +249,9 @@
         $('#submit-button-delete').click(() => {
             var values = {
                 areaId: delArea.areaId,
-                company: delArea.company,
-                area: delArea.area,
+                companyId : delArea.companyId,
+                companyName: delArea.companyName,
+                areaName: delArea.areaName,
                 latitude: delArea.latitude,
                 longitude: delArea.longitude,
                 qr_code: delArea.qr_code
@@ -263,14 +265,16 @@
 
     async function updateEvent(event) {
         event.preventDefault();
-        var company = $('#company-input-edit').val();
-        var area = $("#area-input-edit").val();
+        var companyName = $('#company-input-edit').text();
+        var companyId = $('#company-input-edit').val();
+        var areaName = $("#area-input-edit").val();
         var latitude = $("#latitude-input-edit").val();
         var longitude = $("#longitude-input-edit").val();
         var values = {
             areaId: selected_area_id,
-            company: company,
-            area: area,
+            companyId : Number(companyId),
+            companyName: companyName,
+            areaName: areaName,
             latitude: parseFloat(latitude),
             longitude: parseFloat(longitude)
         };
@@ -296,19 +300,21 @@
             validate_me[i].classList.remove('is-invalid');
         }
         $('#loading-modal').modal('show');
-        openCodeModalEdit(values);
+        openCodeModal(values);
         $('#edit-data-modal').modal('hide');
     }
 
     async function createEvent(event) {
         event.preventDefault();
-        var company = $('#company-input').val();
-        var area = $("#area-input").val();
+        var companyId = $('#company-input').val();
+        var companyName = $('#company-input').text();
+        var areaName = $("#area-input").val();
         var latitude = $("#latitude-input").val();
         var longitude = $("#longitude-input").val();
         var values = {
-            company: company,
-            area: area,
+            companyId: Number(companyId),
+            companyName: companyName,
+            areaName: areaName,
             latitude: parseFloat(latitude),
             longitude: parseFloat(longitude)
         };
@@ -351,13 +357,14 @@
         });
         var newValues = {
             areaId: areaEdited.areaId,
-            companyName: company,
-            areaName: area,
-            latitude: parseFloat(latitude),
-            longitude: parseFloat(longitude)
+            companyId: values.companyId,
+            companyName: values.companyName,
+            areaName: values.areaName,
+            latitude: values.latitude,
+            longitude: values.longitude
         };
         // then send a put request to update the qr code image
-        openCodeModalEdit(newValues);
+        openCodeModal(newValues);
         $('#create-data-modal').modal('hide');
     }
 
@@ -370,29 +377,29 @@
         return code = new QRCode(document.getElementById("qr-code"), JSON.stringify (values));
     }
 
-    function openCodeModalEdit(values) {
-        var code = generateQRCode(values);
+    function openCodeModal(values) {
+        var qrValues = {
+            areaId: values.areaId,
+            companyName: values.companyName,
+            areaName: values.areaName,
+            latitude: values.latitude,
+            longitude: values.longitude
+        };
+        var code = generateQRCode(qrValues);
         let dataUrl;
         setTimeout(() => {
             $('#loading-modal').modal('hide');
             dataUrl = code._oDrawing._elImage.src;
             var newVal = {
                 areaId: values.areaId,
+                companyId: values.companyId,
                 companyName: values.companyName,
                 areaName: values.areaName,
                 latitude: values.latitude,
                 longitude: values.longitude,
                 qr_code: dataUrl
             };
-            var oldVal = {
-                areaId: newVal.areaId,
-                company: newVal.companyName,
-                area: newVal.areaName,
-                latitude: newVal.latitude,
-                longitude: newVal.longitude,
-                qr_code: dataUrl
-            }
-            var hasNoError = updateValue(oldVal);
+            var hasNoError = updateValue(newVal);
             if (hasNoError) {
                 $("#qr-code-modal").modal('show');
                 $("#qr-code-img").attr('src', dataUrl);
@@ -424,11 +431,11 @@
                         },
                         {
                             title: "Company",
-                            data: "company"
+                            data: "companyName"
                         },
                         {
                             title: "Area",
-                            data: "area"
+                            data: "areaName"
                         },
                         {
                             title: "Latitude",
@@ -518,9 +525,12 @@
             dataType: "json",
             success: (response) => {
                 for (var i = 0; i < response.data.length; i++) {
-                    $("#company-input").append(`<option>${response.data[i].companyName}</option>`);
-                    $("#company-input-edit").append(`<option>${response.data[i].companyName}</option>`);
+                    console.log(response.data[i]);
+                    $("#company-input").append(`<option value=${response.data[i].companyId}>${response.data[i].companyName}</option>`);
+                    $("#company-input-edit").append(`<option value=${response.data[i].companyId}>${response.data[i].companyName}</option>`);
                 }
+                $("#company-input").append($('<option value="" selected disabled hidden>')
+                    .text("Choose a company"));
             }
         });
     }
