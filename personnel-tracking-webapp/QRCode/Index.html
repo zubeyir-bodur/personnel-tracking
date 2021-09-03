@@ -98,7 +98,7 @@
     $('#ok-button-exit').click(() => {
 
         $('#exit-modal').modal('hide');
-        window.location.replace("http://localhost:63896/Login/Index.html");
+        window.location.replace("http://localhost:63896/Index.html#Login");
 
     });
 
@@ -113,7 +113,9 @@
             lastResult = decodedText;
             // Handle on success condition with the decoded message.
             //alert(`Scan result ${decodedText}`, decodedResult);
+            
             var objectTracking = JSON.parse(decodedText);
+            console.log(objectTracking);
             let current = new Date();
             objectTracking.scanTime = current;
 

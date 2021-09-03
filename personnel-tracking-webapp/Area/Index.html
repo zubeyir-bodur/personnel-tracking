@@ -351,8 +351,8 @@
         });
         var newValues = {
             areaId: areaEdited.areaId,
-            company: company,
-            area: area,
+            companyName: company,
+            areaName: area,
             latitude: parseFloat(latitude),
             longitude: parseFloat(longitude)
         };
@@ -371,7 +371,6 @@
     }
 
     function openCodeModalEdit(values) {
-        console.log(values);
         var code = generateQRCode(values);
         let dataUrl;
         setTimeout(() => {
@@ -379,13 +378,21 @@
             dataUrl = code._oDrawing._elImage.src;
             var newVal = {
                 areaId: values.areaId,
-                company: values.company,
-                area: values.area,
+                companyName: values.companyName,
+                areaName: values.areaName,
                 latitude: values.latitude,
                 longitude: values.longitude,
                 qr_code: dataUrl
             };
-            var hasNoError = updateValue(newVal);
+            var oldVal = {
+                areaId: newVal.areaId,
+                company: newVal.companyName,
+                area: newVal.areaName,
+                latitude: newVal.latitude,
+                longitude: newVal.longitude,
+                qr_code: dataUrl
+            }
+            var hasNoError = updateValue(oldVal);
             if (hasNoError) {
                 $("#qr-code-modal").modal('show');
                 $("#qr-code-img").attr('src', dataUrl);
