@@ -151,7 +151,9 @@
             "success": function (response) {
                 for (var i = 0; i < response.data.length; i++) {
 
-                    if (response.data[i].areaId == trackingObject.areaId && response.data[i].area == trackingObject.areaName && response.data[i].company == trackingObject.companyName) {
+                    if (response.data[i].areaId == trackingObject.areaId
+                        && response.data[i].areaName == trackingObject.areaName
+                        && response.data[i].companyName == trackingObject.companyName) {
                         addTracking(trackingObject);
                         return;
                     }
