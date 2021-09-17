@@ -95,7 +95,7 @@ namespace personnel_tracking_webapi.Controllers
                         Area = u.Area.AreaName,
                         EntranceDate = u.EntranceDate,
                         ExitDate = u.ExitDate,
-                        ExitType = PutWhiteSpace(TrackReport.GetExitType(u.AutoExit, u.ExitDate != null).ToString())
+                        ExitType = PutWhiteSpace(TrackReport.GetExitType(u.AutoExit, u.ExitDate != null, false).ToString())
                     })// filter
                     .AsNoTracking().Where(
                     t => t.AreaId == area.AreaId
@@ -114,11 +114,6 @@ namespace personnel_tracking_webapi.Controllers
                     ExitDate = u.ExitDate.Value.ToString("g", new CultureInfo("fr-FR")),
                     ExitType = u.ExitType
                 }).ToList();
-
-                // TO DO
-                // insert an empty tracking for each leave,
-                // into the position where leave start is in the right order according to
-                // entrance date. and all other information will say on leave
 
                 // 2. output files
                 // create directory
@@ -164,7 +159,16 @@ namespace personnel_tracking_webapi.Controllers
                 var personnel = dbContext.Personnel
                     .AsNoTracking()
                     .FirstOrDefault(p => p.PersonnelId == personnelParam.PersonnelId);
-                
+                var role = dbContext.PersonnelTypes
+                    .AsNoTracking()
+                    .FirstOrDefault(pt => pt.PersonnelTypeId == personnel.PersonnelTypeId);
+
+                var company = dbContext
+                    .Companies
+                    .AsNoTracking()
+                    .FirstOrDefault(c => c.CompanyId == personnel.CompanyId);
+
+
                 if (personnel == null)
                 {
                     response.HasError = true;
@@ -188,14 +192,56 @@ namespace personnel_tracking_webapi.Controllers
                     Area = u.Area.AreaName,
                     EntranceDate = u.EntranceDate.ToString("g", new CultureInfo("fr-FR")),
                     ExitDate = u.ExitDate.Value.ToString("g", new CultureInfo("fr-FR")),
-                    ExitType = PutWhiteSpace(TrackReport.GetExitType(u.AutoExit, u.ExitDate != null).ToString())
+                    ExitType = PutWhiteSpace(TrackReport.GetExitType(u.AutoExit, u.ExitDate != null, false).ToString())
                 }).ToList();
 
                 // TO DO
                 // insert an empty tracking for each leave,
                 // into the position where leave start is in the right order according to
                 // entrance date. and all other information will say on leave
-
+                var leavesOfP = dbContext.Leaves.Where(l => l.PersonnelId == personnelParam.PersonnelId).ToList();
+                if (leavesOfP.Count != 0) {
+                    foreach (var leave in leavesOfP)
+                    {
+                        list.Add(new TrackReport
+                        {
+                            Name = personnel.PersonnelName,
+                            Surname = personnel.PersonnelSurname,
+                            Role = role.PersonnelTypeName,
+                            Company = company.CompanyName,
+                            Area = "ON LEAVE",
+                            EntranceDate = leave.LeaveStart.ToString("g", new CultureInfo("fr-FR")),
+                            ExitDate = leave.LeaveEnd.ToString("g", new CultureInfo("fr-FR")),
+                            ExitType = PutWhiteSpace(TrackReport.GetExitType(false, true, true).ToString())
+                        });
+                    }
+                    var dateyList = list.Select(u => new
+                    {
+                        Name = u.Name,
+                        Surname = u.Surname,
+                        Role = u.Role,
+                        Company = u.Company,
+                        Area = u.Area,
+                        EntranceDate = DateTime.Parse(u.EntranceDate, new CultureInfo("fr-FR")),
+                        ExitDate = u.ExitDate,
+                        ExitType = u.ExitType
+                    }).OrderBy(i => i.EntranceDate).ToList();
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        list[i] = new TrackReport
+                        {
+                            Name = dateyList[i].Name,
+                            Surname = dateyList[i].Surname,
+                            Role = dateyList[i].Role,
+                            Company = dateyList[i].Company,
+                            Area = dateyList[i].Area,
+                            EntranceDate = dateyList[i].EntranceDate.ToString("g", new CultureInfo("fr-FR")),
+                            ExitDate = dateyList[i].ExitDate,
+                            ExitType = dateyList[i].ExitType
+                        };
+                    }
+                }
+                
                 // 2. output files
                 // create directory
                 var path = "files\\";
@@ -356,18 +402,21 @@ namespace personnel_tracking_webapi.Controllers
         {
             Automatic,
             Manual,
-            NotExitedYet
+            NotExitedYet,
+            OnLeave
         }
 
 
-        public static Exit GetExitType(bool AutoExit, bool ExitDateExists)
+        public static Exit GetExitType(bool AutoExit, bool ExitDateExists, bool onLeave)
         {
             if (AutoExit)
                 return Exit.Automatic;
             else if (!AutoExit && !ExitDateExists)
                 return Exit.NotExitedYet;
-            else
+            else if (!onLeave)
                 return Exit.Manual;
+            else 
+                return Exit.OnLeave;
         }
     }
 }
