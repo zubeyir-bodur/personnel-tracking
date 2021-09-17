@@ -76,6 +76,8 @@
 <script>
 
     $(document).ready(function () {
+        var user = JSON.parse(localStorage.getItem("user"));
+        $("#exampleModalLongTitle").text("Welcome " + user.personnelName + " " + user.personnelSurname);
         $("#login-succesful-modal").modal('show');
     });
 
@@ -122,11 +124,10 @@
 
             // use local storage in login html and this one to access identity number
             objectTracking.identityNumber = Number(localStorage.getItem("identityNumber"));
-
             // change string format to integer format in case
             objectTracking.areaId = Number(objectTracking.areaId);
 
-            if (objectTracking.areaName == null || objectTracking.companyName == null || objectTracking.areaId == null) {
+            if (objectTracking.areaName == null || objectTracking.companyId == null || objectTracking.areaId == null) {
                 $("#error-modal").modal('show');
                 return;
 
@@ -153,7 +154,7 @@
 
                     if (response.data[i].areaId == trackingObject.areaId
                         && response.data[i].areaName == trackingObject.areaName
-                        && response.data[i].companyName == trackingObject.companyName) {
+                        && response.data[i].compamyId == trackingObject.compamyId) {
                         addTracking(trackingObject);
                         return;
                     }

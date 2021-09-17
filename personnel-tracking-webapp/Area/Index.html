@@ -65,18 +65,6 @@
             </div>
         </div>
 
-
-        <div class="modal fade" id="loading-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-sm">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <p class="text-lg-center">Loading</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
         <div class="modal fade" id="edit-data-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -299,7 +287,6 @@
             validate_me[i].classList.remove('is-valid');
             validate_me[i].classList.remove('is-invalid');
         }
-        $('#loading-modal').modal('show');
         openCodeModal(values);
         $('#edit-data-modal').modal('hide');
     }
@@ -307,17 +294,23 @@
     async function createEvent(event) {
         event.preventDefault();
         var companyId = $('#company-input').val();
-        var companyName = $('#company-input').text();
+        console.log(companyId);
+        //var companyName = $('#company-input').text();
         var areaName = $("#area-input").val();
         var latitude = $("#latitude-input").val();
         var longitude = $("#longitude-input").val();
         var values = {
             companyId: Number(companyId),
-            companyName: companyName,
+            companyName: "",
             areaName: areaName,
             latitude: parseFloat(latitude),
             longitude: parseFloat(longitude)
         };
+        if (companyId == null) {
+            $("#company-input").removeClass('is-valid');
+            $("#company-input").addClass('is-invalid');
+            return;
+        }
         var rangesResponse = await checkCoordinates(parseFloat(latitude), parseFloat(longitude));
         if (!rangesResponse.success) {
             if (!rangesResponse.successArray[0]) {
@@ -339,8 +332,10 @@
             validate_me[i].classList.remove('is-valid');
             validate_me[i].classList.remove('is-invalid');
         }
-        $('#loading-modal').modal('show');
         var areaEdited;
+        var hasError;
+        var errorMessage;
+        var data;
         // send post request first
         await $.ajax({
             "url": "http://localhost:5000/api/area",
@@ -352,9 +347,21 @@
             "data": JSON.stringify(values),
             "dataType": "json",
             "success": (response) => {
+                hasError = response.hasError;
+                errorMessage = response.errorMessage;
+                data = response.data;
+                if (hasError)
+                    return;
                 areaEdited = searchArea(values.latitude, values.longitude, response.data);
             }
         });
+        if (hasError) {
+            $('#error-message').text(errorMessage);
+            $('#error-modal').modal('show');
+            var datatable = $('#table-area').DataTable();
+            datatable.clear().rows.add(data).draw();
+            return;
+        }
         var newValues = {
             areaId: areaEdited.areaId,
             companyId: values.companyId,
@@ -380,7 +387,7 @@
     function openCodeModal(values) {
         var qrValues = {
             areaId: values.areaId,
-            companyName: values.companyName,
+            companyId: values.companyId,
             areaName: values.areaName,
             latitude: values.latitude,
             longitude: values.longitude
@@ -388,7 +395,6 @@
         var code = generateQRCode(qrValues);
         let dataUrl;
         setTimeout(() => {
-            $('#loading-modal').modal('hide');
             dataUrl = code._oDrawing._elImage.src;
             var newVal = {
                 areaId: values.areaId,
@@ -480,9 +486,9 @@
         return hasNoError;
     }
 
-    function updateValue(values) {
+    async function updateValue(values) {
         var hasNoError;
-        $.ajax({
+        await $.ajax({
             "url": "http://localhost:5000/api/area",
             "method": "PUT",
             "headers": {

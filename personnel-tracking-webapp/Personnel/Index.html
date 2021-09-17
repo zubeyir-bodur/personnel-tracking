@@ -324,11 +324,18 @@
                             { title: "Password" },
                             { title: "actions" }
                         ],
-                        "columnDefs": [{
+                        "columnDefs": [
+                        {
                             "targets": -1,
                             "data": null,
                             "defaultContent": "<a class=\"btn btn-danger\" id=\"delete-button\" data-toggle=\"modal\" data-target=\"#myDeleteModal\">Delete</a> <a class=\"btn btn-primary\"id=\"editModelB\" style=\"margin - left: 2 % \" data-toggle=\"modal\" data-target=\#myModa\">Edit</a>"
-                        }]
+                        },
+                        {
+                            "targets": -2,
+                            "data": null,
+                            "defaultContent": "<p type=\"password\">" + "******"+ "</p>"
+                        }
+                        ]
 
                     });
                     return dataset;

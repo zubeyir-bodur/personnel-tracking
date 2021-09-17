@@ -25,8 +25,8 @@ namespace personnel_tracking_dto
         }
          */
         public int AreaId { get; set; }
-        public string Company { get; set; }
-        public string Area { get; set; }
+        public int CompanyId { get; set; }
+        public string AreaName { get; set; }
         public decimal Latitude { get; set; }
         public decimal Longitute { get; set; }
         /**
