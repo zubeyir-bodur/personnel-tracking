@@ -1,3 +1,5 @@
+Update: The webapp is now live, though with api missing: http://83.66.137.46/personnel-tracking-webapp/
+
 # Personnel tracking application with QR Code:
 1. A construction company wants to track the entry-exit times of senior personnel in different regions at its construction sites.
 2. One of the clients (a company) has 3000 people work at the construction site. 500 of those are personnel who undertake the duties of architects, engineers, department chiefs and construction chiefs. There is one CEO as well.
